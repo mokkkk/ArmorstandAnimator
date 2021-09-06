@@ -2,8 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using UnityEngine.UI;
-using SFB;
 
 namespace ArmorstandAnimator
 {
@@ -41,110 +39,48 @@ namespace ArmorstandAnimator
         public float[] scale;
     }
 
-    public class JsonManager : MonoBehaviour
+    public class CreateNodeObject : MonoBehaviour
     {
-        // SceneManager
-        [SerializeField]
-        private SceneManager sceneManager;
-
-        // Jsonファイル読み込み用UI
-        [SerializeField]
-        private GameObject jsonFilePanel;
-        // ファイルパス表示
-        [SerializeField]
-        private InputField pathInputField;
-        // パーツ名表示
-        [SerializeField]
-        private InputField nodeNameInputField;
-
-        // ファイルパス
-        private string[] paths;
-
+        // NodeManager
+        public NodeManager nodeManager;
         // モデル作成用
-        [SerializeField]
-        private GameObject nodeObject;
-        [SerializeField]
-        private GameObject pivotCube;
-
-        private Transform elementHolder;
+        public GameObject nodeObject, pivotCube;
 
         private const float ScaleOffset = 16.0f;
         private const float HeadScaleOffset = 0.622568f;
         private const float PivotCenter = 8.0f;
 
-        // jsonファイル読み込みUI表示切替
-        public void SetJsonFilePanelVisible()
-        {
-            jsonFilePanel.SetActive(!jsonFilePanel.activeSelf);
-        }
-
-        // jsonファイル選択
-        public void SelectJsonFilePath()
-        {
-            // ファイルダイアログを開く
-            var extensions = new[]
-            {
-    new ExtensionFilter( "Model Files", "json"),
-};
-            paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true);
-
-            pathInputField.text = paths[0];
-        }
-
-        // jsonモデル作成
-        public void CreateNode()
-        {
-            sceneManager.CreateNode(nodeNameInputField.text, paths);
-            SetJsonFilePanelVisible();
-        }
-
-        // jsonファイルからモデルを作る
-        public Node GenerateJsonModel(string nodeName, string path, int nodeListCount)
+        // モデルJsonファイル読み込み
+        public Node GenerateJsonModel(string path, string nodeName, int id)
         {
             // component, transform取得
             var newNode = Instantiate(nodeObject, Vector3.zero, Quaternion.identity);
             var node = newNode.GetComponent<Node>();
-            elementHolder = newNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
-
-            // ノード名設定
-            node.nodeName = nodeName;
-            newNode.name = node.nodeName;
+            node.nodeManager = nodeManager;
+            var elementHolder = newNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
 
             // ID設定
-            node.nodeID = nodeListCount;
+            node.nodeID = id;
 
-            // Json読み込み
-            ReadJson(path);
-
-            return node;
-        }
-
-        // モデルJsonファイル読み込み
-        private void ReadJson(string path)
-        {
             // ファイル読み込み
             string line;
             string inputString = "";
-
-            // Read the file and display it line by line.  
+            // ファイルの改行削除，1行に纏める
             System.IO.StreamReader file =
                 new System.IO.StreamReader(path);
             while ((line = file.ReadLine()) != null)
             {
                 inputString += line.Replace("\r", "").Replace("\n", "");
             }
-
             file.Close();
 
-            // ファイル読み込み
-            // string inputString = Resources.Load<TextAsset>("test").ToString();
             // デシリアライズ
             JsonModel inputJson = JsonUtility.FromJson<JsonModel>(inputString);
 
             // キューブ生成
             foreach (JsonElement element in inputJson.elements)
             {
-                CreateCube(element);
+                GenerateCube(element, elementHolder);
             }
 
             // Scale Offset
@@ -171,11 +107,11 @@ namespace ArmorstandAnimator
                 elementHolder.localScale = headScale;
             }
 
-            Debug.Log("Cube Created");
+            return node;
         }
 
         // キューブ生成
-        private void CreateCube(JsonElement element)
+        public void GenerateCube(JsonElement element, Transform elementHolder)
         {
             var cube = Instantiate(pivotCube, Vector3.zero, Quaternion.identity);
             cube.transform.parent = elementHolder;
@@ -183,8 +119,6 @@ namespace ArmorstandAnimator
             //  RightHand to LeftHand
             var from = new Vector3(element.from[0], element.from[1], element.to[2] + 2.0f * (PivotCenter - element.to[2]));
             var to = new Vector3(element.to[0], element.to[1], element.from[2] + 2.0f * (PivotCenter - element.from[2]));
-
-            Debug.Log("from : " + from + "        to : " + to);
 
             // Scale
             var scale = Vector3.zero;
@@ -227,8 +161,56 @@ namespace ArmorstandAnimator
                         break;
                 }
                 cube.transform.parent = elementHolder;
+                // transform childに引っかからないよう，一度親子関係を解除
+                pivot.transform.parent = transform.root;
                 Destroy(pivot);
             }
+        }
+
+        // プロジェクトファイルからモデル作成
+        public Node GenerateJsonModelProject(ASAModelNode nodeData)
+        {
+            // component, transform取得
+            var newNode = Instantiate(nodeObject, Vector3.zero, Quaternion.identity);
+            var node = newNode.GetComponent<Node>();
+            node.nodeManager = nodeManager;
+            var elementHolder = newNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
+
+            // ID設定
+            node.nodeID = nodeData.id;
+
+            // キューブ生成
+            foreach (ASAModelNodeElement element in nodeData.elements)
+            {
+                GenerateCubeProject(element, elementHolder);
+            }
+
+            // head.rotation
+            elementHolder.localEulerAngles = new Vector3(nodeData.transform.rotation[0], nodeData.transform.rotation[1], nodeData.transform.rotation[2]);
+
+            // head.translation
+            elementHolder.localPosition = new Vector3(nodeData.transform.position[0], nodeData.transform.position[1], nodeData.transform.position[2]);
+
+            // head.scale
+            elementHolder.localScale = new Vector3(nodeData.transform.scale[0], nodeData.transform.scale[1], nodeData.transform.scale[2]);
+
+            return node;
+        }
+
+        // プロジェクトファイルからキューブ生成
+        public void GenerateCubeProject(ASAModelNodeElement element, Transform elementHolder)
+        {
+            var cube = Instantiate(pivotCube, Vector3.zero, Quaternion.identity);
+            cube.transform.parent = elementHolder;
+
+            // Scale
+            cube.transform.localScale = new Vector3(element.scale[0], element.scale[1], element.scale[2]);
+
+            // transform
+            cube.transform.localPosition = new Vector3(element.position[0], element.position[1], element.position[2]);
+
+            // rotation
+            cube.transform.localEulerAngles = new Vector3(element.rotation[0], element.rotation[1], element.rotation[2]);
         }
     }
 }

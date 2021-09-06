@@ -9,14 +9,19 @@ namespace ArmorstandAnimator
     {
         public bool isOpen;
 
+        // NodeManager
+        private NodeManager nodeManager;
+
         // 操作対象ノード
         [SerializeField]
         private Node targetNode;
 
         // Component取得用
+        private Text nodeName;
         private Toggle toggle;
         private GameObject content;
-
+        private InputField customModelDataInputField;
+        private InputField parentNodeInputField;
         private InputField positionX, positionY, positionZ;
         private InputField rotationX, rotationY, rotationZ;
 
@@ -24,14 +29,20 @@ namespace ArmorstandAnimator
         private const float NodeUISizeClose = 25.0f;
         private const float NodeUISizeOpen = 225.0f;
 
-        // 実装後削除する
-        void Start()
+        // 初期化(ファイル追加時)
+        public void Initialize(Node targetNode)
         {
+            // 操作対象ノード設定
+            this.targetNode = targetNode;
+
             // Component取得
+            nodeManager = GameObject.Find("SceneManager").GetComponent<NodeManager>();
+            nodeName = this.transform.Find("Tab").Find("Toggle").Find("Label").GetComponent<Text>();
             toggle = this.transform.Find("Tab").Find("Toggle").GetComponent<Toggle>();
             isOpen = toggle.isOn;
             content = this.transform.Find("Content").gameObject;
-
+            customModelDataInputField = content.transform.Find("CustomModelData").Find("ID").GetComponent<InputField>();
+            parentNodeInputField = content.transform.Find("Parent").Find("Name").GetComponent<InputField>();
             positionX = content.transform.Find("Position").Find("X").GetComponent<InputField>();
             positionY = content.transform.Find("Position").Find("Y").GetComponent<InputField>();
             positionZ = content.transform.Find("Position").Find("Z").GetComponent<InputField>();
@@ -39,33 +50,19 @@ namespace ArmorstandAnimator
             rotationY = content.transform.Find("Rotation").Find("Y").GetComponent<InputField>();
             rotationZ = content.transform.Find("Rotation").Find("Z").GetComponent<InputField>();
 
-            // 初期値代入
-            positionX.text = positionY.text = positionZ.text = "0.0";
-            rotationX.text = rotationY.text = rotationZ.text = "0.0";
-        }
-
-        // 初期化
-        public void Initialize(Node targetNode)
-        {
-            // 操作対象ノード設定
-            this.targetNode = targetNode;
-
-            // Component取得
-            toggle = this.transform.Find("Tab").Find("Toggle").GetComponent<Toggle>();
-            isOpen = toggle.isOn;
-            content = this.transform.Find("Content").gameObject;
-            positionX = content.transform.Find("Position").Find("X").GetComponent<InputField>();
-            positionY = content.transform.Find("Position").Find("Y").GetComponent<InputField>();
-            positionZ = content.transform.Find("Position").Find("Z").GetComponent<InputField>();
-            rotationX = content.transform.Find("Rotation").Find("X").GetComponent<InputField>();
-            rotationY = content.transform.Find("Rotation").Find("X").GetComponent<InputField>();
-            rotationZ = content.transform.Find("Rotation").Find("X").GetComponent<InputField>();
-
-            // 初期値代入
-            positionX.text = positionY.text = positionZ.text = "0.0";
-            rotationX.text = rotationY.text = rotationZ.text = "0.0";
-
             // 値取得
+            nodeName.text = targetNode.nodeName;
+            customModelDataInputField.text = targetNode.customModelData.ToString();
+            if (!ReferenceEquals(targetNode.parentNode, null))
+                parentNodeInputField.text = targetNode.parentNode.nodeName;
+            else
+                parentNodeInputField.text = "Root";
+            positionX.text = targetNode.pos.x.ToString();
+            positionY.text = targetNode.pos.y.ToString();
+            positionZ.text = targetNode.pos.z.ToString();
+            rotationX.text = targetNode.rotate.x.ToString();
+            rotationY.text = targetNode.rotate.y.ToString();
+            rotationZ.text = targetNode.rotate.z.ToString();
 
             // サイズ調整
             this.GetComponent<RectTransform>().sizeDelta = new Vector2(this.GetComponent<RectTransform>().sizeDelta.x, NodeUISizeOpen);
@@ -90,6 +87,32 @@ namespace ArmorstandAnimator
                 this.GetComponent<RectTransform>().sizeDelta = new Vector2(this.GetComponent<RectTransform>().sizeDelta.x, NodeUISizeClose);
                 this.GetComponent<LayoutElement>().preferredHeight = NodeUISizeClose;
             }
+        }
+
+        // Position変更時
+        public void OnPositionChanged()
+        {
+            var pos = new Vector3(float.Parse(positionX.text), float.Parse(positionY.text), float.Parse(positionZ.text));
+            targetNode.SetPosition(pos);
+        }
+
+        // Rotation変更時
+        public void OnRotationChanged()
+        {
+            var rotate = new Vector3(float.Parse(rotationX.text), float.Parse(rotationY.text), float.Parse(rotationZ.text));
+            targetNode.SetRotation(rotate);
+        }
+
+        // 親ノード選択
+        public void OnSelectParentClicked()
+        {
+            nodeManager.SetParentNode(targetNode, this);
+        }
+
+        // 親ノード決定時
+        public void OnParentNodeChanged(string parendNodeName)
+        {
+            parentNodeInputField.text = parendNodeName;
         }
     }
 }
