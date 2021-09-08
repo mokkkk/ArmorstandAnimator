@@ -29,6 +29,9 @@ namespace ArmorstandAnimator
         // プロジェクトファイル保存/読込用
         private ProjectFileManager projectFileManager;
 
+        // mcfunction書出用
+        private GenerateModelMcfunc modelMcfunc;
+
         // Start is called before the first frame update
         void Start()
         {
@@ -39,22 +42,29 @@ namespace ArmorstandAnimator
             nodeManager = this.gameObject.GetComponent<NodeManager>();
             nodeManager.Initialize();
             projectFileManager = this.gameObject.GetComponent<ProjectFileManager>();
+            modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
 
             // ノード追加(テスト用)
-            string[] testPath = { "C:\\Users\\KawashimaLab\\Desktop\\test.json" };
-            nodeManager.CreateNode("Hoge", 0, testPath);
-            nodeManager.CreateNode("Fuga", 1, testPath);
-            nodeManager.CreateNode("Piyo", 2, testPath);
+            // string[] testPath = { "C:\\Users\\KawashimaLab\\Desktop\\test.json" };
+            // nodeManager.CreateNode("Hoge", 0, testPath);
+            // nodeManager.CreateNode("Fuga", 1, testPath);
+            // nodeManager.CreateNode("Piyo", 2, testPath);
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Z))
-                SaveProjectFileModel();
+            // if (Input.GetKeyDown(KeyCode.Z))
+            //     SaveProjectFileModel();
 
-            if (Input.GetKeyDown(KeyCode.X))
-                LoadProjectFileModel();
+            // if (Input.GetKeyDown(KeyCode.X))
+            //     LoadProjectFileModel();
+
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                modelMcfunc.GenerateSummonFunction(generalSetting, nodeList);
+                modelMcfunc.GenerateModelFunction(generalSetting, nodeList);
+            }
         }
 
         // asamodelproject保存

@@ -165,6 +165,7 @@ GameObject:
   - component: {fileID: 26231354}
   - component: {fileID: 26231355}
   - component: {fileID: 26231356}
+  - component: {fileID: 26231357}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -236,6 +237,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 299589ccaab8f3a43b3322f64e7f22a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &26231357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26231352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30cc7806af890224cb3221614101b3b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &28034150
@@ -2778,7 +2791,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 592456305}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 26231354}
+        m_TargetAssemblyTypeName: ArmorstandAnimator.SceneManager, Assembly-CSharp
+        m_MethodName: SaveProjectFileModel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &592456305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3326,9 +3351,12 @@ MonoBehaviour:
   nodeName: 
   customModelData: 0
   parentNode: {fileID: 0}
+  parentNodeID: 0
   childrenNode: []
   pos: {x: 0, y: 0, z: 0}
   rotate: {x: 0, y: 0, z: 0}
+  element: {fileID: 0}
+  elementCubes: []
 --- !u!1 &808057654
 GameObject:
   m_ObjectHideFlags: 0
@@ -5228,7 +5256,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1255039062}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 26231354}
+        m_TargetAssemblyTypeName: ArmorstandAnimator.SceneManager, Assembly-CSharp
+        m_MethodName: LoadProjectFileModel
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1255039062
 MonoBehaviour:
   m_ObjectHideFlags: 0
