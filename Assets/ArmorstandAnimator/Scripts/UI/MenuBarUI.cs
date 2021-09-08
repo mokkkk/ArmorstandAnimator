@@ -18,24 +18,6 @@ namespace ArmorstandAnimator
         [SerializeField]
         private GameObject fileMenu;
 
-        // Start is called before the first frame update
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            // var selectedObj = EventSystem.current.currentSelectedGameObject;
-
-            // // Fileメニュー表示
-            // if (selectedObj == fileButton.gameObject)
-            //     fileMenu.SetActive(true);
-            // else
-            //     fileMenu.SetActive(false);
-        }
-
         public void OnFileBarClicked()
         {
             if (fileMenu.activeSelf)
@@ -44,10 +26,33 @@ namespace ArmorstandAnimator
                 fileMenu.SetActive(true);
         }
 
+        public void OnSaveProjectClicked()
+        {
+            sceneManager.SaveProjectFileModel();
+            fileMenu.SetActive(false);
+        }
+
+        public void OnLoadProjectClicked()
+        {
+            sceneManager.LoadProjectFileModel();
+            fileMenu.SetActive(false);
+        }
+
         public void OnImportJsonClicked()
         {
             nodeManager.SetJsonFilePanelVisible();
+            fileMenu.SetActive(false);
+        }
 
+        public void OnExportFuncSummonClicked()
+        {
+            sceneManager.ExportFuncSummon();
+            fileMenu.SetActive(false);
+        }
+
+        public void OnExportFuncModelClicked()
+        {
+            sceneManager.ExportFuncModel();
             fileMenu.SetActive(false);
         }
     }

@@ -59,12 +59,6 @@ namespace ArmorstandAnimator
 
             // if (Input.GetKeyDown(KeyCode.X))
             //     LoadProjectFileModel();
-
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                modelMcfunc.GenerateSummonFunction(generalSetting, nodeList);
-                modelMcfunc.GenerateModelFunction(generalSetting, nodeList);
-            }
         }
 
         // asamodelproject保存
@@ -98,6 +92,18 @@ namespace ArmorstandAnimator
             generalSetting.SetText(project.itemID, project.modelName);
             // ノード作成
             nodeManager.CreateNodeProject(project.nodeList);
+        }
+
+        // Export summon function
+        public void ExportFuncSummon()
+        {
+            modelMcfunc.GenerateSummonFunction(generalSetting, nodeList);
+        }
+
+        // Export model function
+        public void ExportFuncModel()
+        {
+            modelMcfunc.GenerateModelFunction(generalSetting, nodeList);
         }
 
         // Node追加
