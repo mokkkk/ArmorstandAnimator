@@ -11,6 +11,8 @@ namespace ArmorstandAnimator
 
         // AnimationManager
         private AnimationManager animationManager;
+        // KeyframeUI
+        private KeyframeUI keyframeUI;
 
         // 操作対象ノード
         [SerializeField]
@@ -34,6 +36,7 @@ namespace ArmorstandAnimator
 
             // Component取得
             animationManager = GameObject.Find("SceneManager").GetComponent<AnimationManager>();
+            keyframeUI = animationManager.keyframeUI;
             nodeName = this.transform.Find("Tab").Find("Toggle").Find("Label").GetComponent<Text>();
             toggle = this.transform.Find("Tab").Find("Toggle").GetComponent<Toggle>();
             isOpen = toggle.isOn;
@@ -51,6 +54,30 @@ namespace ArmorstandAnimator
             // サイズ調整
             this.GetComponent<RectTransform>().sizeDelta = new Vector2(this.GetComponent<RectTransform>().sizeDelta.x, AnimationUISizeOpen);
             this.GetComponent<LayoutElement>().preferredHeight = AnimationUISizeOpen;
+        }
+
+        // Rotate設定時
+        public void OnRotateChanged()
+        {
+            keyframeUI.UpdateKeyframe();
+        }
+
+        // SetRotate
+        public void SetRotate(Vector3 rotate)
+        {
+            this.rotationX.text = rotate.x.ToString();
+            this.rotationY.text = rotate.y.ToString();
+            this.rotationZ.text = rotate.z.ToString();
+        }
+
+        // GetRotate
+        public Vector3 GetRotate()
+        {
+            var rotate = Vector3.zero;
+            rotate.x = float.Parse(rotationX.text);
+            rotate.y = float.Parse(rotationY.text);
+            rotate.z = float.Parse(rotationZ.text);
+            return rotate;
         }
     }
 }

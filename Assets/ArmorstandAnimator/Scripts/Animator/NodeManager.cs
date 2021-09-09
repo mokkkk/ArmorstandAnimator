@@ -154,6 +154,15 @@ namespace ArmorstandAnimator
             }
         }
 
+        // ノードUI消去
+        public void ClearNodeUI()
+        {
+            foreach (Node n in sceneManager.NodeList)
+            {
+                Destroy(n.targetNodeUI.gameObject);
+            }
+        }
+
         // ノード消去
         public void RemoveNode(Node node)
         {

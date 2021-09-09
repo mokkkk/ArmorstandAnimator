@@ -369,9 +369,9 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ArmorstandAnimator.NodeUI, Assembly-CSharp
-        m_MethodName: OnRotationChanged
+      - m_Target: {fileID: 231301594589974171}
+        m_TargetAssemblyTypeName: ArmorstandAnimator.AnimationUI, Assembly-CSharp
+        m_MethodName: OnRotateChanged
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -761,9 +761,9 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ArmorstandAnimator.NodeUI, Assembly-CSharp
-        m_MethodName: OnRotationChanged
+      - m_Target: {fileID: 231301594589974171}
+        m_TargetAssemblyTypeName: ArmorstandAnimator.AnimationUI, Assembly-CSharp
+        m_MethodName: OnRotateChanged
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -916,9 +916,9 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: ArmorstandAnimator.NodeUI, Assembly-CSharp
-        m_MethodName: OnRotationChanged
+      - m_Target: {fileID: 231301594589974171}
+        m_TargetAssemblyTypeName: ArmorstandAnimator.AnimationUI, Assembly-CSharp
+        m_MethodName: OnRotateChanged
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

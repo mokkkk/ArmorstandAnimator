@@ -175,10 +175,7 @@ namespace ArmorstandAnimator
         private void ClearModelUI()
         {
             // ノードUI消去
-            foreach (Node n in nodeList)
-            {
-                Destroy(n.targetNodeUI.gameObject);
-            }
+            nodeManager.ClearNodeUI();
             // UI非表示
             modelModeUI.SetActive(false);
         }
@@ -196,10 +193,7 @@ namespace ArmorstandAnimator
         private void ClearAnimUI()
         {
             // アニメーションUI消去
-            foreach (Node n in nodeList)
-            {
-                Destroy(n.targetAnimationUI.gameObject);
-            }
+            animationManager.ClearAnimationUI();
             // UI非表示
             animModeUI.SetActive(false);
         }
