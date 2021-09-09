@@ -16,6 +16,7 @@ namespace ArmorstandAnimator
         public NodeManager nodeManager;
         // 対応するUI
         public NodeUI targetNodeUI;
+        public AnimationUI targetAnimationUI;
 
         // ID
         public int nodeID;
@@ -69,9 +70,7 @@ namespace ArmorstandAnimator
             this.pos = this.rotate = Vector3.zero;
 
             // UI追加
-            var newUI = Instantiate(nodeUIObj, Vector3.zero, Quaternion.identity, uiParent);
-            newUI.GetComponent<NodeUI>().Initialize(this);
-            this.targetNodeUI = newUI.GetComponent<NodeUI>();
+            CreateUIModel(nodeUIObj, uiParent);
         }
 
         // 初期化(プロジェクトファイル)
@@ -101,16 +100,28 @@ namespace ArmorstandAnimator
             this.parentNodeID = nodeData.parentNodeID;
 
             // UI追加
+            CreateUIModel(nodeUIObj, uiParent);
+        }
+
+        // 対応UI作成
+        public void CreateUIModel(GameObject nodeUIObj, Transform uiParent)
+        {
             var newUI = Instantiate(nodeUIObj, Vector3.zero, Quaternion.identity, uiParent);
             newUI.GetComponent<NodeUI>().Initialize(this);
             this.targetNodeUI = newUI.GetComponent<NodeUI>();
+        }
+        public void CreateUIAnim(GameObject animationUIObj, Transform uiParent)
+        {
+            var newUI = Instantiate(animationUIObj, Vector3.zero, Quaternion.identity, uiParent);
+            newUI.GetComponent<AnimationUI>().Initialize(this);
+            this.targetAnimationUI = newUI.GetComponent<AnimationUI>();
         }
 
         // pos変更
         public void SetPosition(Vector3 pos)
         {
             this.pos = pos;
-            nodeManager.SetNodePosition(this);
+            // nodeManager.SetNodePosition(this);
         }
 
         // rotate変更
@@ -119,7 +130,7 @@ namespace ArmorstandAnimator
             this.rotate = rotate;
             pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rotate.z);
             pose01.localEulerAngles = new Vector3(rotate.x, rotate.y, 0.0f);
-            nodeManager.SetNodePosition(this);
+            // nodeManager.SetNodePosition(this);
         }
 
         // ParentNode変更
@@ -138,24 +149,24 @@ namespace ArmorstandAnimator
                 targetNodeUI.OnParentNodeChanged(parentNode.nodeName);
             }
         }
-        // Pos変更時
-        // Rotate変更時
 
-        // mcfuncの書き出し
-        public int ExportMcfunction()
+        // Node消去
+        public void RemoveNode()
         {
-            var fineName = Application.dataPath + "\\Test\\File\\test.mcfunction";
-            List<string> func = new List<string>();
+            nodeManager.RemoveNode(this);
+        }
 
-            func.Add("# Test");
-            func.Add($"data modify entity @s rotate.Head[0] set value {rotate.x:F0}f");
-            func.Add($"data modify entity @s rotate.Head[1] set value {rotate.y:F0}f");
-            func.Add($"data modify entity @s rotate.Head[2] set value {rotate.z:F0}f");
+        // 防具立て表示設定
+        public void SetArmorstandVisible(bool visible)
+        {
+            this.transform.Find("ArmorStand").gameObject.SetActive(visible);
+        }
 
-            File.WriteAllLines(fineName, func);
-
-            Debug.Log("Export Finished");
-            return 0;
+        // 回転軸表示設定
+        public void SetAxisVisible(bool visible)
+        {
+            pose2.Find("Axis").gameObject.SetActive(visible);
+            pose01.Find("Axis").gameObject.SetActive(visible);
         }
     }
 }

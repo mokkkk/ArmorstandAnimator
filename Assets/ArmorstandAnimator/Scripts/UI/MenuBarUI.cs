@@ -16,44 +16,52 @@ namespace ArmorstandAnimator
         [SerializeField]
         private Button fileButton;
         [SerializeField]
-        private GameObject fileMenu;
+        private GameObject fileMenuModel, fileMenuAnim;
 
         public void OnFileBarClicked()
         {
-            if (fileMenu.activeSelf)
-                fileMenu.SetActive(false);
+            if (fileMenuModel.activeSelf || fileMenuAnim.activeSelf)
+                SetFileMenuActive(false);
             else
-                fileMenu.SetActive(true);
+                SetFileMenuActive(true);
+        }
+
+        void SetFileMenuActive(bool value)
+        {
+            if (sceneManager.appMode == AppMode.Model)
+                fileMenuModel.SetActive(value);
+            else
+                fileMenuAnim.SetActive(value);
         }
 
         public void OnSaveProjectClicked()
         {
             sceneManager.SaveProjectFileModel();
-            fileMenu.SetActive(false);
+            fileMenuModel.SetActive(false);
         }
 
         public void OnLoadProjectClicked()
         {
             sceneManager.LoadProjectFileModel();
-            fileMenu.SetActive(false);
+            fileMenuModel.SetActive(false);
         }
 
         public void OnImportJsonClicked()
         {
             nodeManager.SetJsonFilePanelVisible();
-            fileMenu.SetActive(false);
+            fileMenuModel.SetActive(false);
         }
 
         public void OnExportFuncSummonClicked()
         {
             sceneManager.ExportFuncSummon();
-            fileMenu.SetActive(false);
+            fileMenuModel.SetActive(false);
         }
 
         public void OnExportFuncModelClicked()
         {
             sceneManager.ExportFuncModel();
-            fileMenu.SetActive(false);
+            fileMenuModel.SetActive(false);
         }
     }
 }

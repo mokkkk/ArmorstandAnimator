@@ -5,11 +5,21 @@ using UnityEngine.UI;
 
 namespace ArmorstandAnimator
 {
+    public enum AppMode
+    {
+        Model, Animation
+    }
+
     public class SceneManager : MonoBehaviour
     {
+        // 現在のモード
+        public AppMode appMode;
+
+        // 各モードのUI
+        [SerializeField]
+        private GameObject modelModeUI, animModeUI;
 
         // 全ノードリスト
-        [SerializeField]
         private List<Node> nodeList;
         public List<Node> NodeList
         {
@@ -26,6 +36,9 @@ namespace ArmorstandAnimator
         // jsonモデル作成用
         private NodeManager nodeManager;
 
+        // アニメーション作成用
+        private AnimationManager animationManager;
+
         // プロジェクトファイル保存/読込用
         private ProjectFileManager projectFileManager;
 
@@ -41,6 +54,7 @@ namespace ArmorstandAnimator
             // Component取得
             nodeManager = this.gameObject.GetComponent<NodeManager>();
             nodeManager.Initialize();
+            animationManager = this.gameObject.GetComponent<AnimationManager>();
             projectFileManager = this.gameObject.GetComponent<ProjectFileManager>();
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
 
@@ -54,11 +68,25 @@ namespace ArmorstandAnimator
         // Update is called once per frame
         void Update()
         {
-            // if (Input.GetKeyDown(KeyCode.Z))
-            //     SaveProjectFileModel();
 
-            // if (Input.GetKeyDown(KeyCode.X))
-            //     LoadProjectFileModel();
+        }
+
+        // モード変更
+        public void ChangeAppMode(Slider slider)
+        {
+            var value = slider.value;
+            if (value == 0)
+            {
+                this.appMode = AppMode.Model;
+                ClearAnimUI();
+                CreateModelUI();
+            }
+            else if (value == 1)
+            {
+                this.appMode = AppMode.Animation;
+                ClearModelUI();
+                CreateAnimUI();
+            }
         }
 
         // asamodelproject保存
@@ -123,6 +151,66 @@ namespace ArmorstandAnimator
                 n.nodeID = i;
                 i++;
             }
+        }
+
+        // 防具立て表示/非表示
+        public void ShowArmorstand()
+        {
+            foreach (Node n in NodeList)
+            {
+                n.SetArmorstandVisible(generalSetting.ShowArmorstand);
+            }
+        }
+
+        // 防具立て表示/非表示
+        public void ShowAxis()
+        {
+            foreach (Node n in NodeList)
+            {
+                n.SetAxisVisible(generalSetting.ShowAxis);
+            }
+        }
+
+        // ModelモードUI消去
+        private void ClearModelUI()
+        {
+            // ノードUI消去
+            foreach (Node n in nodeList)
+            {
+                Destroy(n.targetNodeUI.gameObject);
+            }
+            // UI非表示
+            modelModeUI.SetActive(false);
+        }
+
+        // ModelモードUI作成
+        private void CreateModelUI()
+        {
+            // UI表示
+            modelModeUI.SetActive(true);
+            // ノードUI表示
+            nodeManager.CreateNodeUI();
+        }
+
+        // AnimationモードUI消去
+        private void ClearAnimUI()
+        {
+            // アニメーションUI消去
+            foreach (Node n in nodeList)
+            {
+                Destroy(n.targetAnimationUI.gameObject);
+            }
+            // UI非表示
+            animModeUI.SetActive(false);
+        }
+
+        // AnimationモードUI作成
+        private void CreateAnimUI()
+        {
+            // UI表示
+            animModeUI.SetActive(true);
+            // アニメーションUI表示
+            animationManager.CreateAnimationUI();
         }
     }
 }

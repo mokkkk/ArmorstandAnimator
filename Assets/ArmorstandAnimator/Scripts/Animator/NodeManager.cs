@@ -145,6 +145,36 @@ namespace ArmorstandAnimator
             }
         }
 
+        // ノードUIのみ表示
+        public void CreateNodeUI()
+        {
+            foreach (Node n in sceneManager.NodeList)
+            {
+                n.CreateUIModel(nodeUIObj, nodeUIScrollview);
+            }
+        }
+
+        // ノード消去
+        public void RemoveNode(Node node)
+        {
+            // ノードリストから対応ノード消去
+            sceneManager.RemoveNode(node);
+            // 対象ノードを親にしているノードの親をRootに設定
+            foreach (Node n in sceneManager.NodeList)
+            {
+                if (ReferenceEquals(n.parentNode, node))
+                {
+                    n.SetParentNode(null);
+                }
+            }
+            // 親子関係整理
+            CreateNodeTree();
+
+            // ノードオブジェクト削除
+            Destroy(node.targetNodeUI.gameObject);
+            Destroy(node.gameObject);
+        }
+
         // 親ノードの選択
         public void SetParentNode(Node targetNode, NodeUI targetNodeUI)
         {

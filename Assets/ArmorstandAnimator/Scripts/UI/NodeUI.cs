@@ -27,9 +27,9 @@ namespace ArmorstandAnimator
 
         // NodeUIサイズ決定用
         private const float NodeUISizeClose = 25.0f;
-        private const float NodeUISizeOpen = 225.0f;
+        private const float NodeUISizeOpen = 275.0f;
 
-        // 初期化(ファイル追加時)
+        // 初期化
         public void Initialize(Node targetNode)
         {
             // 操作対象ノード設定
@@ -94,6 +94,7 @@ namespace ArmorstandAnimator
         {
             var pos = new Vector3(float.Parse(positionX.text), float.Parse(positionY.text), float.Parse(positionZ.text));
             targetNode.SetPosition(pos);
+            nodeManager.SetNodePosition(targetNode);
         }
 
         // Rotation変更時
@@ -101,6 +102,7 @@ namespace ArmorstandAnimator
         {
             var rotate = new Vector3(float.Parse(rotationX.text), float.Parse(rotationY.text), float.Parse(rotationZ.text));
             targetNode.SetRotation(rotate);
+            nodeManager.SetNodePosition(targetNode);
         }
 
         // 親ノード選択
@@ -113,6 +115,12 @@ namespace ArmorstandAnimator
         public void OnParentNodeChanged(string parendNodeName)
         {
             parentNodeInputField.text = parendNodeName;
+        }
+
+        // ノード消去
+        public void OnRemoveNodeClicked()
+        {
+            targetNode.RemoveNode();
         }
     }
 }
