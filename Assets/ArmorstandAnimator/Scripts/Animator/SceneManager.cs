@@ -32,6 +32,8 @@ namespace ArmorstandAnimator
         // 一般設定
         [SerializeField]
         private GeneralSettingUI generalSetting;
+        [SerializeField]
+        private AnimationSettingUI animationSetting;
 
         // jsonモデル作成用
         private NodeManager nodeManager;
@@ -41,6 +43,7 @@ namespace ArmorstandAnimator
 
         // プロジェクトファイル保存/読込用
         private ProjectFileManager projectFileManager;
+        private AnimationFileManager animationFileManager;
 
         // mcfunction書出用
         private GenerateModelMcfunc modelMcfunc;
@@ -56,6 +59,7 @@ namespace ArmorstandAnimator
             nodeManager.Initialize();
             animationManager = this.gameObject.GetComponent<AnimationManager>();
             projectFileManager = this.gameObject.GetComponent<ProjectFileManager>();
+            animationFileManager = this.gameObject.GetComponent<AnimationFileManager>();
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
 
             // ノード追加(テスト用)
@@ -68,7 +72,8 @@ namespace ArmorstandAnimator
         // Update is called once per frame
         void Update()
         {
-
+            if (Input.GetKeyDown(KeyCode.X))
+                animationFileManager.SaveProjectFileAnim(animationSetting, animationManager.KeyframeList);
         }
 
         // モード変更

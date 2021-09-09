@@ -29,9 +29,22 @@ namespace ArmorstandAnimator
     {
         [SerializeField]
         private SceneManager sceneManager;
+
+        // キーフレーム管理用
         public KeyframeUI keyframeUI;
         [SerializeField]
         private List<Keyframe> keyframeList;
+        public List<Keyframe> KeyframeList
+        {
+            get
+            {
+                return this.keyframeList;
+            }
+        }
+
+        // 一般設定
+        // [SerializeField]
+        // private AnimationSettingUI animationSetting;
 
         // アニメーションUI表示用
         [SerializeField]
@@ -71,6 +84,7 @@ namespace ArmorstandAnimator
         {
             // ターゲットキーフレーム設定
             selectedKeyframeIndex = 0;
+
             // UI作成
             var rotations = new List<Vector3>();
             foreach (Node n in sceneManager.NodeList)
@@ -78,25 +92,39 @@ namespace ArmorstandAnimator
                 n.CreateUIAnim(animationUIObj, animationUIScrollView);
                 rotations.Add(n.rotate);
             }
+
             // キーフレームのrotationsとノード数を比較し，一致しない場合キーフレームリストを初期化
             if (keyframeList.Any())
+            {
                 if (rotations.Count != keyframeList[0].rotations.Count)
                 {
                     this.keyframeList = new List<Keyframe>();
                     Debug.Log("Reset Keyframe List");
                 }
+            }
+
             // キーフレームが存在しない場合，キーフレーム[0]を作成
             if (!keyframeList.Any())
             {
                 CreateKeyframe(-1, rotations);
             }
+
+            // キーフレームリスト数だけキーフレームビュー用ボタン作成
+            for (int i = 0; i < keyframeList.Count; i++)
+            {
+                // キーフレームボタン作成
+                AddKeyframeButton(keyframeList[i]);
+            }
+            // キーフレームビュー更新
+            UpdateKeyframeView();
+
             // リスト更新
             keyframeUI.GetAnimationUIList();
             // 内容設定
             SelectKeyframe(selectedKeyframeIndex);
         }
 
-        // アニメーションUI消去
+        // UI消去
         public void ClearAnimationUI()
         {
             // アニメーションUI消去
@@ -104,8 +132,14 @@ namespace ArmorstandAnimator
             {
                 Destroy(n.targetAnimationUI.gameObject);
             }
+            // キーフレームボタン消去
+            foreach (KeyframeButton button in keyframeButtonList)
+            {
+                Destroy(button.gameObject);
+            }
             // リスト更新
             keyframeUI.ClearAnimationUIList();
+            keyframeButtonList = new List<KeyframeButton>();
         }
 
         // アニメーションファイル読込
@@ -117,12 +151,18 @@ namespace ArmorstandAnimator
             var newKeyframe = new Keyframe(keyframeList.Count, keyframeList[keyframeList.Count - 1].tick + 5, Vector3.zero, keyframeList[selectedKeyframeIndex].rotations);
             this.keyframeList.Add(newKeyframe);
             // キーフレームボタン作成
-            var newKeyframeButton = Instantiate(keyframeButtonObj, Vector3.zero, Quaternion.identity, keyframeView.transform);
-            var button = newKeyframeButton.GetComponent<KeyframeButton>();
-            button.Initialize(newKeyframe.index, newKeyframe.tick, this);
-            keyframeButtonList.Add(button);
+            AddKeyframeButton(newKeyframe);
             // キーフレームビュー更新
             UpdateKeyframeView();
+        }
+
+        // キーフレームボタン作成
+        private void AddKeyframeButton(Keyframe keyframe)
+        {
+            var newKeyframeButton = Instantiate(keyframeButtonObj, Vector3.zero, Quaternion.identity, keyframeView.transform);
+            var button = newKeyframeButton.GetComponent<KeyframeButton>();
+            button.Initialize(keyframe.index, keyframe.tick, this);
+            keyframeButtonList.Add(button);
         }
 
         // キーフレーム作成
@@ -131,13 +171,6 @@ namespace ArmorstandAnimator
             // キーフレーム作成
             var newKeyframe = new Keyframe(0, tick + 1, Vector3.zero, rotations);
             this.keyframeList.Add(newKeyframe);
-            // キーフレームボタン作成
-            var newKeyframeButton = Instantiate(keyframeButtonObj, Vector3.zero, Quaternion.identity, keyframeView.transform);
-            var button = newKeyframeButton.GetComponent<KeyframeButton>();
-            button.Initialize(newKeyframe.index, newKeyframe.tick, this);
-            keyframeButtonList.Add(button);
-            // キーフレームビュー更新
-            UpdateKeyframeView();
         }
 
         // キーフレーム選択
@@ -204,6 +237,12 @@ namespace ArmorstandAnimator
             {
                 if (rootNode.nodeType == NodeType.Root)
                     SetNodePosition(rootNode);
+            }
+
+            // 全ノードの位置をずらす
+            foreach (Node n in sceneManager.NodeList)
+            {
+                n.transform.position += keyframe.rootPos;
             }
         }
 
