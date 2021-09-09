@@ -73,7 +73,10 @@ namespace ArmorstandAnimator
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.X))
-                animationFileManager.SaveProjectFileAnim(animationSetting, animationManager.KeyframeList);
+                SaveProjectFileAnim();
+
+            if (Input.GetKeyDown(KeyCode.C))
+                LoadProjectFileAnim();
         }
 
         // モード変更
@@ -98,6 +101,12 @@ namespace ArmorstandAnimator
         public void SaveProjectFileModel()
         {
             projectFileManager.SaveProjectFileModel(generalSetting, nodeList);
+        }
+
+        // asaanimproject保存
+        public void SaveProjectFileAnim()
+        {
+            animationFileManager.SaveProjectFileAnim(animationSetting, animationManager.KeyframeList);
         }
 
         // asamodelproject読込
@@ -125,6 +134,26 @@ namespace ArmorstandAnimator
             generalSetting.SetText(project.itemID, project.modelName);
             // ノード作成
             nodeManager.CreateNodeProject(project.nodeList);
+        }
+
+        // asaanimationproject読込
+        public void LoadProjectFileAnim()
+        {
+            ASAAnimationProject project;
+            // プロジェクトファイル読込
+            var res = animationFileManager.LoadProjectFileAnim(out project);
+
+            // ファイルを読み込めなかった場合，中断
+            if (res < 0)
+                return;
+
+            // Keyframe消去
+            animationManager.ClearAnimationUIOnLoad();
+
+            // アニメーション設定更新
+            animationSetting.SetText(project.animationName);
+            // キーフレーム作成
+            animationManager.CreateAnimationUIProject(project);
         }
 
         // Export summon function

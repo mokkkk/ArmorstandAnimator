@@ -73,5 +73,41 @@ namespace ArmorstandAnimator
 
             Debug.Log("AnimationFile Saved");
         }
+
+        public int LoadProjectFileAnim(out ASAAnimationProject project)
+        {
+            // // 初期化
+            // paths = new string[];
+            project = new ASAAnimationProject();
+
+            // ファイルダイアログを開く
+            var extensions = new[]
+            {
+    new ExtensionFilter( "Animation Files", "asaanim"),
+};
+            paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true);
+
+            // ファイルを選択しなかった場合，中断
+            if (paths.Length < 1)
+                return -1;
+
+            // ファイル読み込み
+            string line;
+            string inputString = "";
+            // ファイルの改行削除，1行に纏める
+            System.IO.StreamReader file =
+                new System.IO.StreamReader(paths[0]);
+            while ((line = file.ReadLine()) != null)
+            {
+                inputString += line.Replace("\r", "").Replace("\n", "");
+            }
+            file.Close();
+
+            project = JsonUtility.FromJson<ASAAnimationProject>(inputString);
+
+            Debug.Log("AnimationFile Loaded");
+
+            return 0;
+        }
     }
 }

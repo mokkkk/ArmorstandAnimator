@@ -32,15 +32,6 @@ namespace ArmorstandAnimator
             this.animationUIList = new List<AnimationUI>();
         }
 
-        // animationUIList取得
-        public void GetAnimationUIList()
-        {
-            foreach (Transform child in animationUIHolder)
-            {
-                animationUIList.Add(child.GetComponent<AnimationUI>());
-            }
-        }
-
         // UI更新
         public void SetUIContent(Keyframe keyframe)
         {

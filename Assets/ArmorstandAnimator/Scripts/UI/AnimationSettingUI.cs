@@ -16,5 +16,9 @@ namespace ArmorstandAnimator
                 return this.animationName.text;
             }
         }
+        public void SetText(string animationName)
+        {
+            this.animationName.text = animationName;
+        }
     }
 }

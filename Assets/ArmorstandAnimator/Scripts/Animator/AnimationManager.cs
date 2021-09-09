@@ -86,10 +86,12 @@ namespace ArmorstandAnimator
             selectedKeyframeIndex = 0;
 
             // UI作成
+            keyframeUI.ClearAnimationUIList();
             var rotations = new List<Vector3>();
             foreach (Node n in sceneManager.NodeList)
             {
                 n.CreateUIAnim(animationUIObj, animationUIScrollView);
+                keyframeUI.animationUIList.Add(n.targetAnimationUI);
                 rotations.Add(n.rotate);
             }
 
@@ -118,8 +120,6 @@ namespace ArmorstandAnimator
             // キーフレームビュー更新
             UpdateKeyframeView();
 
-            // リスト更新
-            keyframeUI.GetAnimationUIList();
             // 内容設定
             SelectKeyframe(selectedKeyframeIndex);
         }
@@ -142,7 +142,33 @@ namespace ArmorstandAnimator
             keyframeButtonList = new List<KeyframeButton>();
         }
 
+        // UI消去
+        public void ClearAnimationUIOnLoad()
+        {
+            // UI消去
+            ClearAnimationUI();
+            // キーフレーム消去
+            this.keyframeList = new List<Keyframe>();
+        }
+
         // アニメーションファイル読込
+        public void CreateAnimationUIProject(ASAAnimationProject project)
+        {
+            int i = 0;
+            foreach (ASAAnimationKeyframe k in project.keyframes)
+            {
+                var rootPos = new Vector3(k.rootPos[0], k.rootPos[1], k.rootPos[2]);
+                var rotations = new List<Vector3>();
+                foreach (ASAAnimationRotate r in k.rotates)
+                    rotations.Add(new Vector3(r.rotate[0], r.rotate[1], r.rotate[2]));
+
+                var newKeyframe = new Keyframe(i, k.tick, rootPos, rotations);
+                keyframeList.Add(newKeyframe);
+
+                i++;
+            }
+            CreateAnimationUI();
+        }
 
         // キーフレーム追加
         public void AddKeyframe()
