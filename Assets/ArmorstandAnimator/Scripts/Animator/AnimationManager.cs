@@ -32,7 +32,6 @@ namespace ArmorstandAnimator
 
         // キーフレーム管理用
         public KeyframeUI keyframeUI;
-        [SerializeField]
         private List<Keyframe> keyframeList;
         public List<Keyframe> KeyframeList
         {
@@ -41,10 +40,6 @@ namespace ArmorstandAnimator
                 return this.keyframeList;
             }
         }
-
-        // 一般設定
-        // [SerializeField]
-        // private AnimationSettingUI animationSetting;
 
         // アニメーションUI表示用
         [SerializeField]
@@ -58,6 +53,13 @@ namespace ArmorstandAnimator
         [SerializeField]
         private RectTransform keyframeView;
         private List<KeyframeButton> keyframeButtonList;
+
+        // アニメーション用マスク
+        [SerializeField]
+        private GameObject whileAnimationMask;
+        // アニメーション再生中ステータス
+        private bool isPreviewPlaying = false;
+        private bool stopPreview = false;
 
         // 選択中のキーフレームindex
         private int selectedKeyframeIndex;
@@ -76,15 +78,6 @@ namespace ArmorstandAnimator
         {
             keyframeList = new List<Keyframe>();
             keyframeButtonList = new List<KeyframeButton>();
-        }
-
-        void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Z))
-                AddKeyframe();
-
-            if (Input.GetKeyDown(KeyCode.X))
-                StartCoroutine("AnimationPreview");
         }
 
         // アニメーションUI表示
@@ -212,6 +205,25 @@ namespace ArmorstandAnimator
             this.keyframeList.Add(newKeyframe);
         }
 
+        // キーフレーム削除
+        public void DeleteKeyframe()
+        {
+            // キーフレーム削除
+            keyframeList.RemoveAt(selectedKeyframeIndex);
+            // キーフレームボタン削除
+            var kfb = keyframeButtonList[selectedKeyframeIndex];
+            Destroy(kfb.gameObject);
+            keyframeButtonList.RemoveAt(selectedKeyframeIndex);
+            var currentKeyframe = --selectedKeyframeIndex;
+            // tick順でキーフレームソート
+            SortKeyframeByTick();
+            // キーフレームビュー更新
+            UpdateKeyframeView();
+            // 内容設定
+            selectedKeyframeIndex = currentKeyframe;
+            SelectKeyframe(selectedKeyframeIndex);
+        }
+
         // キーフレーム選択
         public void SelectKeyframe(int index)
         {
@@ -332,13 +344,31 @@ namespace ArmorstandAnimator
         }
 
 
+        // プレビュー再生
+        public void PlayAnimationPreview()
+        {
+            if (!isPreviewPlaying)
+                StartCoroutine("AnimationPreview");
+        }
+
+        // プレビュー停止
+        public void StopAnimationPreview()
+        {
+            if (isPreviewPlaying)
+                stopPreview = true;
+        }
+
+
         // アニメーションプレビュー
         private IEnumerator AnimationPreview()
         {
             Debug.Log("Start Animation");
 
+            whileAnimationMask.SetActive(true);
+            isPreviewPlaying = true;
+
             int index = 0;
-            while (index < keyframeList.Count - 1)
+            while (index < keyframeList.Count - 1 && !stopPreview)
             {
                 // tick
                 float t = 0.0f;
@@ -346,7 +376,7 @@ namespace ArmorstandAnimator
                 float animationTime = (keyframeList[index + 1].tick - keyframeList[index].tick) * TickToSec;
 
                 // indexからindex+1までアニメーション再生
-                while (t < animationTime)
+                while (t < animationTime && !stopPreview)
                 {
                     var lerpTime = t / animationTime;
                     var rootX = Mathf.Lerp(keyframeList[index].rootPos.x, keyframeList[index + 1].rootPos.x, lerpTime);
@@ -375,6 +405,10 @@ namespace ArmorstandAnimator
 
             // アニメーション終了
             SelectKeyframe(0);
+
+            whileAnimationMask.SetActive(false);
+            isPreviewPlaying = false;
+            stopPreview = false;
 
             Debug.Log("End Animation");
         }

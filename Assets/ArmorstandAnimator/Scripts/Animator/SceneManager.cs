@@ -35,6 +35,10 @@ namespace ArmorstandAnimator
         [SerializeField]
         private AnimationSettingUI animationSetting;
 
+        // 地面
+        [SerializeField]
+        private GameObject groundPlane;
+
         // jsonモデル作成用
         private NodeManager nodeManager;
 
@@ -74,8 +78,6 @@ namespace ArmorstandAnimator
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.C))
-                ExportFuncAnimation();
         }
 
         // モード変更
@@ -208,6 +210,12 @@ namespace ArmorstandAnimator
             {
                 n.SetAxisVisible(generalSetting.ShowAxis);
             }
+        }
+
+        // 地面表示/非表示
+        public void ShowGround()
+        {
+            groundPlane.SetActive(generalSetting.ShowGround);
         }
 
         // ModelモードUI消去

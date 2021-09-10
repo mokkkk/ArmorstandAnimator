@@ -25,6 +25,8 @@ namespace ArmorstandAnimator
         private InputField tick;
         [SerializeField]
         private InputField rootPosX, rootPosY, rootPosZ;
+        [SerializeField]
+        private Button deleteButton;
 
         // animationUIList消去
         public void ClearAnimationUIList()
@@ -87,6 +89,7 @@ namespace ArmorstandAnimator
             rootPosX.interactable = value;
             rootPosY.interactable = value;
             rootPosZ.interactable = value;
+            deleteButton.interactable = value;
         }
     }
 }

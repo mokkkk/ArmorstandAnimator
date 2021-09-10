@@ -75,5 +75,11 @@ namespace ArmorstandAnimator
             sceneManager.LoadProjectFileAnim();
             fileMenuAnim.SetActive(false);
         }
+
+        public void OnExportDatapackClicked()
+        {
+            sceneManager.ExportFuncAnimation();
+            fileMenuAnim.SetActive(false);
+        }
     }
 }

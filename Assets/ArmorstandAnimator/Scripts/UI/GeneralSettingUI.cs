@@ -43,6 +43,15 @@ namespace ArmorstandAnimator
                 return this.showAxis.isOn;
             }
         }
+        [SerializeField]
+        private Toggle showGround;
+        public bool ShowGround
+        {
+            get
+            {
+                return this.showGround.isOn;
+            }
+        }
 
         public void SetText(string itemId, string modelName)
         {
@@ -59,6 +68,11 @@ namespace ArmorstandAnimator
         public void OnShowAxisChanged()
         {
             sceneManager.ShowAxis();
+        }
+
+        public void OnShowGroundChanged()
+        {
+            sceneManager.ShowGround();
         }
     }
 }

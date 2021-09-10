@@ -27,20 +27,16 @@ namespace ArmorstandAnimator
 
         public void GenerateDatapack(GeneralSettingUI generalSetting, AnimationSettingUI animationSetting, List<Node> nodeList, List<Keyframe> keyframeList)
         {
-            /*
             // ファイルパス決定
             var extensionList = new[]
             {
     new ExtensionFilter( "folder", "")
 };
-            var paths = StandaloneFileBrowser.OpenFilePanel("Save File", "", extensionList, false);
+            var paths = StandaloneFileBrowser.OpenFolderPanel("Save File", "", false);
             // ファイルを選択しなかった場合，中断
             if (paths.Length < 1)
                 return;
             var path = paths[0];
-            */
-
-            var path = Path.Combine(Application.dataPath, "Test");
 
             // モデル名，アニメーション名取得
             modelName = generalSetting.ModelName;
