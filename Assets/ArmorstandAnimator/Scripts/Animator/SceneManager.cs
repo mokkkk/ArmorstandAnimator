@@ -47,6 +47,7 @@ namespace ArmorstandAnimator
 
         // mcfunction書出用
         private GenerateModelMcfunc modelMcfunc;
+        private GenerateAnimationMcfunction animationMcfunc;
 
         // Start is called before the first frame update
         void Start()
@@ -61,6 +62,7 @@ namespace ArmorstandAnimator
             projectFileManager = this.gameObject.GetComponent<ProjectFileManager>();
             animationFileManager = this.gameObject.GetComponent<AnimationFileManager>();
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
+            animationMcfunc = this.gameObject.GetComponent<GenerateAnimationMcfunction>();
 
             // ノード追加(テスト用)
             // string[] testPath = { "C:\\Users\\KawashimaLab\\Desktop\\test.json" };
@@ -72,7 +74,8 @@ namespace ArmorstandAnimator
         // Update is called once per frame
         void Update()
         {
-
+            if (Input.GetKeyDown(KeyCode.C))
+                ExportFuncAnimation();
         }
 
         // モード変更
@@ -162,6 +165,12 @@ namespace ArmorstandAnimator
         public void ExportFuncModel()
         {
             modelMcfunc.GenerateModelFunction(generalSetting, nodeList);
+        }
+
+        // Export animation datapack
+        public void ExportFuncAnimation()
+        {
+            animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
         }
 
         // Node追加

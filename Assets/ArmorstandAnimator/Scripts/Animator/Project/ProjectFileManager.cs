@@ -129,7 +129,7 @@ namespace ArmorstandAnimator
             {
     new ExtensionFilter( "Model Files", "asamodel"),
 };
-            paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true);
+            paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
 
             // ファイルを選択しなかった場合，中断
             if (paths.Length < 1)
