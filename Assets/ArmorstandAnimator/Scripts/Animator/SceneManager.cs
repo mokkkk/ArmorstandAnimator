@@ -72,11 +72,7 @@ namespace ArmorstandAnimator
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.X))
-                SaveProjectFileAnim();
 
-            if (Input.GetKeyDown(KeyCode.C))
-                LoadProjectFileAnim();
         }
 
         // モード変更

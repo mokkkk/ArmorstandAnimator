@@ -62,9 +62,14 @@ namespace ArmorstandAnimator
         // 選択中のキーフレームindex
         private int selectedKeyframeIndex;
 
+        // アニメーション終了タイム
+        private int animationEndTime;
+
         // キーフレームビュー用
         private const float KeyframeButtonWidth = 25.0f;
         private const float KeyframeButtonMarginOffset = 5f;
+        // tick -> 秒
+        private const float TickToSec = 0.05f;
 
         // Start is called before the first frame update
         void Start()
@@ -77,6 +82,9 @@ namespace ArmorstandAnimator
         {
             if (Input.GetKeyDown(KeyCode.Z))
                 AddKeyframe();
+
+            if (Input.GetKeyDown(KeyCode.X))
+                StartCoroutine("AnimationPreview");
         }
 
         // アニメーションUI表示
@@ -122,6 +130,28 @@ namespace ArmorstandAnimator
 
             // 内容設定
             SelectKeyframe(selectedKeyframeIndex);
+
+            // アニメーション終了時間更新
+            this.animationEndTime = keyframeList[keyframeList.Count - 1].tick;
+        }
+
+        // アニメーションファイル読込
+        public void CreateAnimationUIProject(ASAAnimationProject project)
+        {
+            int i = 0;
+            foreach (ASAAnimationKeyframe k in project.keyframes)
+            {
+                var rootPos = new Vector3(k.rootPos[0], k.rootPos[1], k.rootPos[2]);
+                var rotations = new List<Vector3>();
+                foreach (ASAAnimationRotate r in k.rotates)
+                    rotations.Add(new Vector3(r.rotate[0], r.rotate[1], r.rotate[2]));
+
+                var newKeyframe = new Keyframe(i, k.tick, rootPos, rotations);
+                keyframeList.Add(newKeyframe);
+
+                i++;
+            }
+            CreateAnimationUI();
         }
 
         // UI消去
@@ -151,25 +181,6 @@ namespace ArmorstandAnimator
             this.keyframeList = new List<Keyframe>();
         }
 
-        // アニメーションファイル読込
-        public void CreateAnimationUIProject(ASAAnimationProject project)
-        {
-            int i = 0;
-            foreach (ASAAnimationKeyframe k in project.keyframes)
-            {
-                var rootPos = new Vector3(k.rootPos[0], k.rootPos[1], k.rootPos[2]);
-                var rotations = new List<Vector3>();
-                foreach (ASAAnimationRotate r in k.rotates)
-                    rotations.Add(new Vector3(r.rotate[0], r.rotate[1], r.rotate[2]));
-
-                var newKeyframe = new Keyframe(i, k.tick, rootPos, rotations);
-                keyframeList.Add(newKeyframe);
-
-                i++;
-            }
-            CreateAnimationUI();
-        }
-
         // キーフレーム追加
         public void AddKeyframe()
         {
@@ -180,6 +191,8 @@ namespace ArmorstandAnimator
             AddKeyframeButton(newKeyframe);
             // キーフレームビュー更新
             UpdateKeyframeView();
+            // アニメーション終了時間更新
+            this.animationEndTime = keyframeList[keyframeList.Count - 1].tick;
         }
 
         // キーフレームボタン作成
@@ -316,6 +329,54 @@ namespace ArmorstandAnimator
 
             // キーフレームビューのサイズ設定
             keyframeView.sizeDelta = new Vector2(rightButtonPos + KeyframeButtonWidth, keyframeView.sizeDelta.y);
+        }
+
+
+        // アニメーションプレビュー
+        private IEnumerator AnimationPreview()
+        {
+            Debug.Log("Start Animation");
+
+            int index = 0;
+            while (index < keyframeList.Count - 1)
+            {
+                // tick
+                float t = 0.0f;
+                // アニメーション時間
+                float animationTime = (keyframeList[index + 1].tick - keyframeList[index].tick) * TickToSec;
+
+                // indexからindex+1までアニメーション再生
+                while (t < animationTime)
+                {
+                    var lerpTime = t / animationTime;
+                    var rootX = Mathf.Lerp(keyframeList[index].rootPos.x, keyframeList[index + 1].rootPos.x, lerpTime);
+                    var rootY = Mathf.Lerp(keyframeList[index].rootPos.y, keyframeList[index + 1].rootPos.y, lerpTime);
+                    var rootZ = Mathf.Lerp(keyframeList[index].rootPos.z, keyframeList[index + 1].rootPos.z, lerpTime);
+                    var rootPos = new Vector3(rootX, rootY, rootZ);
+                    var rotations = new List<Vector3>();
+                    for (int i = 0; i < keyframeList[index].rotations.Count; i++)
+                    {
+                        var rotateX = Mathf.Lerp(keyframeList[index].rotations[i].x, keyframeList[index + 1].rotations[i].x, lerpTime);
+                        var rotateY = Mathf.Lerp(keyframeList[index].rotations[i].y, keyframeList[index + 1].rotations[i].y, lerpTime);
+                        var rotateZ = Mathf.Lerp(keyframeList[index].rotations[i].z, keyframeList[index + 1].rotations[i].z, lerpTime);
+                        rotations.Add(new Vector3(rotateX, rotateY, rotateZ));
+                    }
+
+                    var dummyKey = new Keyframe(0, 0, rootPos, rotations);
+
+                    SetNodeRotation(dummyKey);
+
+                    t += Time.deltaTime;
+                    yield return null;
+                }
+
+                index++;
+            }
+
+            // アニメーション終了
+            SelectKeyframe(0);
+
+            Debug.Log("End Animation");
         }
     }
 }
