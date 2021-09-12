@@ -9,7 +9,7 @@ https://twitter.com/nukknu99/status/1431509536695742465
 
 ## 使い方
 
-ツールをダウンロード，解凍した後，ArmorstandAnimator.exe を実行してください．
+Releasesからツールをダウンロード，解凍した後，ArmorstandAnimator.exe を実行してください．
 
 ツールの使い方については，ダウンロードしたフォルダ内にあるReadmeを参照してください．
 
