@@ -138,7 +138,7 @@ namespace ArmorstandAnimator
                 // アニメーション時間(tick)
                 var time = keyframeList[i + 1].tick - keyframeList[i].tick;
                 // 移動距離
-                var moveX = (keyframeList[i + 1].rootPos.x - keyframeList[i].rootPos.x) / time;
+                var moveX = -(keyframeList[i + 1].rootPos.x - keyframeList[i].rootPos.x) / time;
                 var moveY = (keyframeList[i + 1].rootPos.y - keyframeList[i].rootPos.y) / time;
                 var moveZ = (keyframeList[i + 1].rootPos.z - keyframeList[i].rootPos.z) / time;
                 // 書き込み
