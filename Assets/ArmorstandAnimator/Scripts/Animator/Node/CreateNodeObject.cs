@@ -75,7 +75,8 @@ namespace ArmorstandAnimator
             file.Close();
 
             // デシリアライズ
-            JsonModel inputJson = JsonUtility.FromJson<JsonModel>(inputString);
+            JsonModel inputJson = new JsonModel();
+            inputJson = JsonUtility.FromJson<JsonModel>(inputString);
 
             // キューブ生成
             foreach (JsonElement element in inputJson.elements)
@@ -87,24 +88,28 @@ namespace ArmorstandAnimator
             elementHolder.localScale /= ScaleOffset;
             elementHolder.localScale *= HeadScaleOffset;
 
-            // head.rotation
-            if (inputJson.display.head.rotation != null)
+            // head
+            if (!ReferenceEquals(inputJson.display.head, null))
             {
-                elementHolder.localRotation = Quaternion.Euler(new Vector3(-inputJson.display.head.rotation[0], -inputJson.display.head.rotation[1], inputJson.display.head.rotation[2]));
-            }
+                // head.rotation
+                if (inputJson.display.head.rotation != null)
+                {
+                    elementHolder.localRotation = Quaternion.Euler(new Vector3(-inputJson.display.head.rotation[0], -inputJson.display.head.rotation[1], inputJson.display.head.rotation[2]));
+                }
 
-            // head.translation
-            if (inputJson.display.head.translation != null)
-            {
-                var headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffset, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffset, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffset);
-                elementHolder.localPosition += headTranslation;
-            }
+                // head.translation
+                if (inputJson.display.head.translation != null)
+                {
+                    var headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffset, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffset, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffset);
+                    elementHolder.localPosition += headTranslation;
+                }
 
-            // head.scale
-            if (inputJson.display.head.scale != null)
-            {
-                var headScale = new Vector3(elementHolder.localScale.x * inputJson.display.head.scale[0], elementHolder.localScale.y * inputJson.display.head.scale[1], elementHolder.localScale.z * inputJson.display.head.scale[2]);
-                elementHolder.localScale = headScale;
+                // head.scale
+                if (inputJson.display.head.scale != null)
+                {
+                    var headScale = new Vector3(elementHolder.localScale.x * inputJson.display.head.scale[0], elementHolder.localScale.y * inputJson.display.head.scale[1], elementHolder.localScale.z * inputJson.display.head.scale[2]);
+                    elementHolder.localScale = headScale;
+                }
             }
 
             return node;
