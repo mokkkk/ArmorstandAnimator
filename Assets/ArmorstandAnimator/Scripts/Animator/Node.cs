@@ -12,6 +12,7 @@ namespace ArmorstandAnimator
 
     public class Node : MonoBehaviour
     {
+        
         // NodeManager
         public NodeManager nodeManager;
         // 対応するUI

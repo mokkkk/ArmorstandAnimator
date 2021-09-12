@@ -26,12 +26,23 @@ namespace ArmorstandAnimator
                 SetFileMenuActive(true);
         }
 
+        public void HideFileMenu()
+        {
+            SetFileMenuActive(false);
+        }
+
         void SetFileMenuActive(bool value)
         {
             if (sceneManager.appMode == AppMode.Model)
                 fileMenuModel.SetActive(value);
             else
                 fileMenuAnim.SetActive(value);
+        }
+
+        public void OnNewProjectClicked()
+        {
+            sceneManager.NewProjectWarning();
+            fileMenuModel.SetActive(false);
         }
 
         public void OnSaveProjectClicked()
@@ -62,6 +73,12 @@ namespace ArmorstandAnimator
         {
             sceneManager.ExportFuncModel();
             fileMenuModel.SetActive(false);
+        }
+
+        public void OnNewAnimationClicked()
+        {
+            sceneManager.NewAnimationWarning();
+            fileMenuAnim.SetActive(false);
         }
 
         public void OnSaveAnimationClicked()

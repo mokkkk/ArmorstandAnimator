@@ -35,6 +35,10 @@ namespace ArmorstandAnimator
         [SerializeField]
         private AnimationSettingUI animationSetting;
 
+        // メニューバー
+        [SerializeField]
+        private MenuBarUI menuBarUI;
+
         // 地面
         [SerializeField]
         private GameObject groundPlane;
@@ -46,6 +50,8 @@ namespace ArmorstandAnimator
         private AnimationManager animationManager;
 
         // プロジェクトファイル保存/読込用
+        [SerializeField]
+        private GameObject warningPanelModel, warningPanelAnim;
         private ProjectFileManager projectFileManager;
         private AnimationFileManager animationFileManager;
 
@@ -67,12 +73,6 @@ namespace ArmorstandAnimator
             animationFileManager = this.gameObject.GetComponent<AnimationFileManager>();
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
             animationMcfunc = this.gameObject.GetComponent<GenerateAnimationMcfunction>();
-
-            // ノード追加(テスト用)
-            // string[] testPath = { "C:\\Users\\KawashimaLab\\Desktop\\test.json" };
-            // nodeManager.CreateNode("Hoge", 0, testPath);
-            // nodeManager.CreateNode("Fuga", 1, testPath);
-            // nodeManager.CreateNode("Piyo", 2, testPath);
         }
 
         // Update is called once per frame
@@ -83,6 +83,7 @@ namespace ArmorstandAnimator
         // モード変更
         public void ChangeAppMode(Slider slider)
         {
+            menuBarUI.HideFileMenu();
             var value = slider.value;
             if (value == 0)
             {
@@ -96,6 +97,54 @@ namespace ArmorstandAnimator
                 ClearModelUI();
                 CreateAnimUI();
             }
+        }
+
+        public void NewProjectWarning()
+        {
+            warningPanelModel.SetActive(true);
+        }
+
+        public void CreateNewProject(bool value)
+        {
+            if (value)
+            {
+                // ノード消去
+                foreach (Node n in nodeList)
+                {
+                    Destroy(n.targetNodeUI.gameObject);
+                    Destroy(n.gameObject);
+                }
+
+                // リスト初期化
+                this.nodeList = new List<Node>();
+
+                // プロジェクト設定更新
+                generalSetting.SetText("", "");
+            }
+
+            // 警告非表示
+            warningPanelModel.SetActive(false);
+        }
+
+        public void NewAnimationWarning()
+        {
+            warningPanelAnim.SetActive(true);
+        }
+
+        public void CreateNewAnimation(bool value)
+        {
+            if (value)
+            {
+                // Keyframe消去
+                animationManager.ClearAnimationUIOnLoad();
+                // アニメーション設定更新
+                animationSetting.SetText("");
+                // UI新規作成
+                animationManager.CreateAnimationUI();
+            }
+
+            // 警告非表示
+            warningPanelAnim.SetActive(false);
         }
 
         // asamodelproject保存

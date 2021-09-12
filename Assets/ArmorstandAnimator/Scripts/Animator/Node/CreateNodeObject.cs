@@ -125,6 +125,12 @@ namespace ArmorstandAnimator
             scale.x = to.x - from.x;
             scale.y = to.y - from.y;
             scale.z = to.z - from.z;
+            if (scale.x == 0)
+                scale.x = 0.001f;
+            if (scale.y == 0)
+                scale.y = 0.001f;
+            if (scale.z == 0)
+                scale.z = 0.001f;
             cube.transform.localScale = scale;
 
             // transform
