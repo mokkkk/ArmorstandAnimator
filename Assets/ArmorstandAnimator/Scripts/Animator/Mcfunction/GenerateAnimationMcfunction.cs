@@ -89,12 +89,40 @@ namespace ArmorstandAnimator
             // .mcfunction書き込み用
             var writer = new StreamWriter(path, false);
 
-            // 各ノードのPose.Headをkeyframeのrotationsに設定
+            // 各ノードのPose.Headのrotationsを設定
             int i = 0;
             foreach (Node n in nodeList)
             {
+                // Root:rotationsのまま
+                // Node,Leaf:親ノードのRotate参照
+                Vector3 rotate = Vector3.zero;
+                if (n.nodeType == NodeType.Root)
+                {
+                    rotate.x = keyframe.rotations[i].x;
+                    rotate.y = keyframe.rotations[i].y;
+                    rotate.z = keyframe.rotations[i].z;
+                }
+                else
+                {
+                    var end = false;
+                    Vector3 parentRotate = Vector3.zero;
+                    Node parent = n;
+                    // 親ノードのRotateを合計
+                    while (!end)
+                    {
+                        parent = parent.parentNode;
+                        parentRotate += keyframe.rotations[parent.nodeID];
+                        if (parent.nodeType == NodeType.Root)
+                            end = true;
+                    }
+                    // 親ノードRotate + 自分のRotate
+                    rotate.x = keyframe.rotations[i].x + parentRotate.x;
+                    rotate.y = keyframe.rotations[i].y + parentRotate.y;
+                    rotate.z = keyframe.rotations[i].z + parentRotate.z;
+                }
+
                 string selector = $"@e[type=armor_stand,tag={modelName}Parts,tag={n.nodeName}]";
-                string func = $"execute as {selector} run data merge entity @s {{Pose:{{Head:[{keyframe.rotations[i].x}f,{keyframe.rotations[i].y}f,{keyframe.rotations[i].z}f]}}}}";
+                string func = $"execute as {selector} run data merge entity @s {{Pose:{{Head:[{rotate.x}f,{rotate.y}f,{rotate.z}f]}}}}";
                 writer.WriteLine(func);
                 i++;
             }
@@ -213,10 +241,64 @@ namespace ArmorstandAnimator
                 int j = 0;
                 foreach (Node n in nodeList)
                 {
+                    // 現キーフレームのrotate
+                    Vector3 rotateCurrent = Vector3.zero;
+                    if (n.nodeType == NodeType.Root)
+                    {
+                        rotateCurrent.x = keyframeList[i].rotations[j].x;
+                        rotateCurrent.y = keyframeList[i].rotations[j].y;
+                        rotateCurrent.z = keyframeList[i].rotations[j].z;
+                    }
+                    else
+                    {
+                        var end = false;
+                        Vector3 parentRotate = Vector3.zero;
+                        Node parent = n;
+                        // 親ノードのRotateを合計
+                        while (!end)
+                        {
+                            parent = parent.parentNode;
+                            parentRotate += keyframeList[i].rotations[parent.nodeID];
+                            if (parent.nodeType == NodeType.Root)
+                                end = true;
+                        }
+                        // 親ノードRotate + 自分のRotate
+                        rotateCurrent.x = keyframeList[i].rotations[j].x + parentRotate.x;
+                        rotateCurrent.y = keyframeList[i].rotations[j].y + parentRotate.y;
+                        rotateCurrent.z = keyframeList[i].rotations[j].z + parentRotate.z;
+                    }
+
+                    // 次キーフレームのrotate
+                    Vector3 rotateNext = Vector3.zero;
+                    if (n.nodeType == NodeType.Root)
+                    {
+                        rotateNext.x = keyframeList[i + 1].rotations[j].x;
+                        rotateNext.y = keyframeList[i + 1].rotations[j].y;
+                        rotateNext.z = keyframeList[i + 1].rotations[j].z;
+                    }
+                    else
+                    {
+                        var end = false;
+                        Vector3 parentRotate = Vector3.zero;
+                        Node parent = n;
+                        // 親ノードのRotateを合計
+                        while (!end)
+                        {
+                            parent = parent.parentNode;
+                            parentRotate += keyframeList[i + 1].rotations[parent.nodeID];
+                            if (parent.nodeType == NodeType.Root)
+                                end = true;
+                        }
+                        // 親ノードRotate + 自分のRotate
+                        rotateNext.x = keyframeList[i + 1].rotations[j].x + parentRotate.x;
+                        rotateNext.y = keyframeList[i + 1].rotations[j].y + parentRotate.y;
+                        rotateNext.z = keyframeList[i + 1].rotations[j].z + parentRotate.z;
+                    }
+
                     // rotations取得
-                    var rotateX = Mathf.FloorToInt((keyframeList[i + 1].rotations[j].x - keyframeList[i].rotations[j].x) * 1000 / time);
-                    var rotateY = Mathf.FloorToInt((keyframeList[i + 1].rotations[j].y - keyframeList[i].rotations[j].y) * 1000 / time);
-                    var rotateZ = Mathf.FloorToInt((keyframeList[i + 1].rotations[j].z - keyframeList[i].rotations[j].z) * 1000 / time);
+                    var rotateX = Mathf.FloorToInt((rotateNext.x - rotateCurrent.x) * 1000 / time);
+                    var rotateY = Mathf.FloorToInt((rotateNext.y - rotateCurrent.y) * 1000 / time);
+                    var rotateZ = Mathf.FloorToInt((rotateNext.z - rotateCurrent.z) * 1000 / time);
                     string func = $"scoreboard players set #asa_animate_x AsaMatrix {rotateX}";
                     writer.WriteLine(func);
                     func = $"scoreboard players set #asa_animate_y AsaMatrix {rotateY}";

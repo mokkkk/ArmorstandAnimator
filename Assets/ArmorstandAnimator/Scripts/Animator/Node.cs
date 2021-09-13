@@ -129,8 +129,16 @@ namespace ArmorstandAnimator
         public void SetRotation(Vector3 rotate)
         {
             this.rotate = rotate;
-            pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rotate.z);
-            pose01.localEulerAngles = new Vector3(rotate.x, rotate.y, 0.0f);
+            if (nodeType != NodeType.Root)
+            {
+                pose2.localEulerAngles = new Vector3(0.0f, 0.0f, parentNode.pose2.localEulerAngles.z + rotate.z);
+                pose01.localEulerAngles = new Vector3(parentNode.pose01.localEulerAngles.x + rotate.x, parentNode.pose01.localEulerAngles.y + rotate.y, 0.0f);
+            }
+            else
+            {
+                pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rotate.z);
+                pose01.localEulerAngles = new Vector3(rotate.x, rotate.y, 0.0f);
+            }
             // nodeManager.SetNodePosition(this);
         }
 

@@ -141,7 +141,9 @@ namespace ArmorstandAnimator
             foreach (Node n in sceneManager.NodeList)
             {
                 if (n.nodeType == NodeType.Root)
+                {
                     SetNodePosition(n);
+                }
             }
         }
 
@@ -213,7 +215,7 @@ namespace ArmorstandAnimator
             // targetNodeUI.OnParentNodeChanged(selectParentUI.selectedNode);
             // ノード親子関係整理
             CreateNodeTree();
-            // ノード位置更新
+            // ノード位置，角度更新
             SetNodePosition(selectParentUI.targetNode);
             SetParentNodeSettingPanelVisible();
         }
@@ -226,9 +228,24 @@ namespace ArmorstandAnimator
             parentNodeSettingPanel.SetActive(!parentNodeSettingPanel.activeSelf);
         }
 
+        // ノード角度決定
+        public void SetNodeRotation(Node targetNode)
+        {
+            // 角度計算
+            targetNode.SetRotation(targetNode.rotate);
+
+            // 自分の子ノードでSetNodeRotation実行
+            if (targetNode.childrenNode.Any())
+                foreach (Node n in targetNode.childrenNode)
+                    SetNodeRotation(n);
+        }
+
         // ノード位置決定
         public void SetNodePosition(Node targetNode)
         {
+            // 角度計算
+            targetNode.SetRotation(targetNode.rotate);
+
             // 親ノードの位置取得
             var parentPos = Vector3.zero;
             if (!ReferenceEquals(targetNode.parentNode, null))
