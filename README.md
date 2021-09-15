@@ -1,11 +1,11 @@
-# ArmorstandAnimator
+# Armorstands_Animator
 Armorstandを組み合わせてアニメーションさせるためのツール
 
 ## 機能
 
 防具立て+頭防具を使用したアニメーションを作ることができるツールです．↓のような作品を作ることができます．
 
-https://twitter.com/nukknu99/status/1431509536695742465
+https://twitter.com/nukknu99/status/1438131295725383684
 
 ## 使い方
 
