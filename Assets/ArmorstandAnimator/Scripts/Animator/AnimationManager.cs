@@ -308,7 +308,12 @@ namespace ArmorstandAnimator
             // 親ノードの回転取得
             var parentRotation = Vector3.zero;
             if (!ReferenceEquals(targetNode.parentNode, null))
-                parentRotation = targetNode.parentNode.rotate;
+            {
+                parentRotation.x = targetNode.parentNode.pose01.localEulerAngles.x;
+                parentRotation.y = targetNode.parentNode.pose01.localEulerAngles.y;
+                parentRotation.z = targetNode.parentNode.pose2.localEulerAngles.z;
+                // parentRotation = targetNode.parentNode.rotate;
+            }
 
             // 位置計算
             var rotatedPos = MatrixRotation.RotationWorld(MatrixRotation.RotationLocal(targetNode.pos, parentRotation), parentRotation);

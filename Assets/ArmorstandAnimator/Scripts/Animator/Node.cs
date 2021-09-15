@@ -41,7 +41,7 @@ namespace ArmorstandAnimator
         public Vector3 pos, rotate;
 
         // モデル回転用
-        private Transform pose2, pose01;
+        public Transform pose2, pose01;
         // モデルTransform
         public Transform element;
 
@@ -139,6 +139,7 @@ namespace ArmorstandAnimator
                 pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rotate.z);
                 pose01.localEulerAngles = new Vector3(rotate.x, rotate.y, 0.0f);
             }
+            Debug.Log(this.nodeName + ":Set" + rotate);
             // nodeManager.SetNodePosition(this);
         }
 
