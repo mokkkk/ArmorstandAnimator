@@ -56,6 +56,26 @@ namespace ArmorstandAnimator
             this.GetComponent<LayoutElement>().preferredHeight = AnimationUISizeOpen;
         }
 
+        // 表示切替時
+        public void OnToggleChanged()
+        {
+            // パネル表示切替
+            content.SetActive(toggle.isOn);
+            isOpen = toggle.isOn;
+
+            // サイズ調整
+            if (toggle.isOn)
+            {
+                this.GetComponent<RectTransform>().sizeDelta = new Vector2(this.GetComponent<RectTransform>().sizeDelta.x, AnimationUISizeOpen);
+                this.GetComponent<LayoutElement>().preferredHeight = AnimationUISizeOpen;
+            }
+            else
+            {
+                this.GetComponent<RectTransform>().sizeDelta = new Vector2(this.GetComponent<RectTransform>().sizeDelta.x, AnimationUISizeClose);
+                this.GetComponent<LayoutElement>().preferredHeight = AnimationUISizeClose;
+            }
+        }
+
         // Rotate設定時
         public void OnRotateChanged()
         {
