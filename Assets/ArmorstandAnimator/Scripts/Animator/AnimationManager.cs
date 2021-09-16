@@ -178,7 +178,7 @@ namespace ArmorstandAnimator
         public void AddKeyframe()
         {
             // キーフレーム作成
-            var newKeyframe = new Keyframe(keyframeList.Count, keyframeList[keyframeList.Count - 1].tick + 5, Vector3.zero, keyframeList[selectedKeyframeIndex].rotations);
+            var newKeyframe = new Keyframe(keyframeList.Count, keyframeList[keyframeList.Count - 1].tick + 5, keyframeList[selectedKeyframeIndex].rootPos, keyframeList[selectedKeyframeIndex].rotations);
             this.keyframeList.Add(newKeyframe);
             // キーフレームボタン作成
             AddKeyframeButton(newKeyframe);
@@ -186,6 +186,8 @@ namespace ArmorstandAnimator
             UpdateKeyframeView();
             // アニメーション終了時間更新
             this.animationEndTime = keyframeList[keyframeList.Count - 1].tick;
+            // 追加したキーフレームを選択
+            SelectKeyframe(keyframeList.Count - 1);
         }
 
         // キーフレームボタン作成
