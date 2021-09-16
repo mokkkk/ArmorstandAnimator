@@ -7730,7 +7730,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1527832977}
         m_TargetAssemblyTypeName: ArmorstandAnimator.KeyframeUI, Assembly-CSharp
-        m_MethodName: UpdateKeyframe
+        m_MethodName: UpdateKeyframeTick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
