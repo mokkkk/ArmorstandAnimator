@@ -6,6 +6,9 @@
 [Bb]uilds/
 [Ll]ogs/
 
+# Icons
+ArmorstandAnimator/Sprites/icons
+
 # Never ignore Asset meta data
 ![Aa]ssets/**/*.meta
 

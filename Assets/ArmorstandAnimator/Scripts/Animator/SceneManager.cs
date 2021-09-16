@@ -224,6 +224,12 @@ namespace ArmorstandAnimator
             animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
         }
 
+        // Export animation datapack (animation only)
+        public void ExportFuncOnlyAnimation()
+        {
+            animationMcfunc.GenerateDatapackOnlyAnimation(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
+        }
+
         // Node追加
         public void AddNode(Node node)
         {

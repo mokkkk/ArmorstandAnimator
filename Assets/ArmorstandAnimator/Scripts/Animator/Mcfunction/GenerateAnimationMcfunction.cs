@@ -80,6 +80,44 @@ namespace ArmorstandAnimator
             Debug.Log("Animation Datapack Exported");
         }
 
+        public void GenerateDatapackOnlyAnimation(GeneralSettingUI generalSetting, AnimationSettingUI animationSetting, List<Node> nodeList, List<Keyframe> keyframeList)
+        {
+            // ファイルパス決定
+            var extensionList = new[]
+            {
+    new ExtensionFilter( "folder", "")
+};
+            var paths = StandaloneFileBrowser.OpenFolderPanel("Save File", "", false);
+            // ファイルを選択しなかった場合，中断
+            if (paths.Length < 1)
+                return;
+            var path = paths[0];
+
+            // モデル名，アニメーション名取得
+            modelName = generalSetting.ModelName;
+            animationName = animationSetting.AnimationName;
+
+            // アニメーション名フォルダ作成
+            path = Path.Combine(path, animationSetting.AnimationName.ToLower());
+            Directory.CreateDirectory(path);
+
+            // start.mcfunction
+            GenerateStartFunction(path, keyframeList[0], nodeList);
+            // main.mcfunction
+            GenerateMainFunction(path, keyframeList);
+            // end.mcfunction
+            GenerateEndFunction(path);
+
+            // Keyframesフォルダ作成
+            path = Path.Combine(path, KeyframesFolderName);
+            Directory.CreateDirectory(path);
+
+            // index.mcfunction
+            GenerateKeyframeFunction(path, keyframeList, nodeList);
+
+            Debug.Log("Animation Datapack Exported");
+        }
+
 
         // start.mcfunction
         private void GenerateStartFunction(string path, Keyframe keyframe, List<Node> nodeList)
