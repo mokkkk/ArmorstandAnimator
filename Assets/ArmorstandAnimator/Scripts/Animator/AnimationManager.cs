@@ -242,6 +242,21 @@ namespace ArmorstandAnimator
         {
             // ノードTransform更新
             SetNodeRotation(keyframe);
+            // キーフレームの値更新
+            this.keyframeList[selectedKeyframeIndex] = keyframe;
+            // tick順でキーフレームソート
+            SortKeyframeByTick();
+            // キーフレームビュー更新
+            UpdateKeyframeView();
+            // 更新後のキーフレームIndexを返す
+            return selectedKeyframeIndex;
+        }
+
+        // キーフレームリスト更新
+        public int UpdateKeyframeListTick(Keyframe keyframe)
+        {
+            // ノードTransform更新
+            SetNodeRotation(keyframe);
             foreach (Keyframe k in keyframeList)
             {
                 // Tickが被らないようにする

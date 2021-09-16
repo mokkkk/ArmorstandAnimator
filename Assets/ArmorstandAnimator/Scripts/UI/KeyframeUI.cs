@@ -78,6 +78,29 @@ namespace ArmorstandAnimator
             SetUIContent(newKeyframe);
         }
 
+        // 対応Keyframe更新
+        public void UpdateKeyframeTick()
+        {
+            // UIの値からキーフレームの値を設定
+            var id = targetKeyframe.index;
+            var tick = int.Parse(this.tick.text);
+            var rootPos = new Vector3(float.Parse(rootPosX.text), float.Parse(rootPosY.text), float.Parse(rootPosZ.text));
+            var rotations = new List<Vector3>();
+            foreach (AnimationUI ui in animationUIList)
+            {
+                rotations.Add(ui.GetRotate());
+            }
+            var newKeyframe = new Keyframe(id, tick, rootPos, rotations);
+
+            // AnimationManagerのキーフレームリストを更新
+            var newIndex = animationManager.UpdateKeyframeListTick(newKeyframe);
+            newKeyframe.index = newIndex;
+            this.targetKeyframe = newKeyframe;
+
+            // UIの内容更新
+            SetUIContent(newKeyframe);
+        }
+
         // public void OnButtonClicked()
         // {
         //     animationManager.SelectKeyframe(this.keyframe);
