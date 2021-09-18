@@ -235,9 +235,16 @@ namespace ArmorstandAnimator
             targetNode.SetRotation(targetNode.rotate);
 
             // 自分の子ノードでSetNodeRotation実行
-            if (targetNode.childrenNode.Any())
-                foreach (Node n in targetNode.childrenNode)
-                    SetNodeRotation(n);
+            // if (targetNode.childrenNode.Any())
+            //     foreach (Node n in targetNode.childrenNode)
+            //         SetNodeRotation(n);
+
+            // Rootノードからノード位置更新
+            foreach (Node n in sceneManager.NodeList)
+            {
+                if (n.nodeType == NodeType.Root)
+                    SetNodePosition(n);
+            }
         }
 
         // ノード位置決定
