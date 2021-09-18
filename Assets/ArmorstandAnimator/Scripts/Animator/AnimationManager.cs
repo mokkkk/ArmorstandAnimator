@@ -301,16 +301,16 @@ namespace ArmorstandAnimator
         // ノードRotate更新
         public void SetNodeRotation(Keyframe keyframe)
         {
-            for (int i = 0; i < sceneManager.NodeList.Count; i++)
-            {
-                sceneManager.NodeList[i].SetRotation(keyframe.rotations[i]);
-            }
+            // for (int i = 0; i < sceneManager.NodeList.Count; i++)
+            // {
+            //     sceneManager.NodeList[i].SetRotation(keyframe.rotations[i]);
+            // }
 
             // 各RootノードでSetNodePosition実行
             foreach (Node rootNode in sceneManager.NodeList)
             {
                 if (rootNode.nodeType == NodeType.Root)
-                    SetNodePosition(rootNode);
+                    SetNodePosition(rootNode, keyframe);
             }
 
             // 全ノードの位置をずらす
@@ -321,8 +321,11 @@ namespace ArmorstandAnimator
         }
 
         // ノード位置決定
-        public void SetNodePosition(Node targetNode)
+        public void SetNodePosition(Node targetNode, Keyframe keyframe)
         {
+            // 角度更新
+            sceneManager.NodeList[targetNode.nodeID].SetRotation(keyframe.rotations[targetNode.nodeID]);
+
             // 親ノードの位置取得
             var parentPos = Vector3.zero;
             if (!ReferenceEquals(targetNode.parentNode, null))
@@ -348,7 +351,7 @@ namespace ArmorstandAnimator
             // 自分の子ノードでSetNodePosition実行
             if (targetNode.childrenNode.Any())
                 foreach (Node n in targetNode.childrenNode)
-                    SetNodePosition(n);
+                    SetNodePosition(n, keyframe);
         }
 
         // キーフレームビューのボタン位置設定
