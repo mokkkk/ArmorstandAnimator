@@ -94,7 +94,7 @@ namespace ArmorstandAnimator
         {
             var pos = new Vector3(float.Parse(positionX.text), float.Parse(positionY.text), float.Parse(positionZ.text));
             targetNode.SetPosition(pos);
-            nodeManager.SetNodePosition(targetNode);
+            nodeManager.UpdateNodeTransform();
         }
 
         // Rotation変更時
@@ -102,7 +102,7 @@ namespace ArmorstandAnimator
         {
             var rotate = new Vector3(float.Parse(rotationX.text), float.Parse(rotationY.text), float.Parse(rotationZ.text));
             targetNode.SetRotation(rotate);
-            nodeManager.SetNodePosition(targetNode);
+            nodeManager.UpdateNodeTransform();
         }
 
         // 親ノード選択
