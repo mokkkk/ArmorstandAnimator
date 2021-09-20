@@ -301,16 +301,11 @@ namespace ArmorstandAnimator
         // ノードRotate更新
         public void SetNodeRotation(Keyframe keyframe)
         {
-            for (int i = 0; i < sceneManager.NodeList.Count; i++)
-            {
-                sceneManager.NodeList[i].SetRotation(keyframe.rotations[i]);
-            }
-
             // 各RootノードでSetNodePosition実行
             foreach (Node rootNode in sceneManager.NodeList)
             {
                 if (rootNode.nodeType == NodeType.Root)
-                    SetNodePosition(rootNode);
+                    SetNodePosition(rootNode, keyframe, Vector3.zero);
             }
 
             // 全ノードの位置をずらす
@@ -321,25 +316,18 @@ namespace ArmorstandAnimator
         }
 
         // ノード位置決定
-        public void SetNodePosition(Node targetNode)
+        public void SetNodePosition(Node targetNode, Keyframe keyframe, Vector3 parentRotate)
         {
+            // 角度更新
+            sceneManager.NodeList[targetNode.nodeID].SetRotation(keyframe.rotations[targetNode.nodeID], parentRotate);
+
             // 親ノードの位置取得
             var parentPos = Vector3.zero;
             if (!ReferenceEquals(targetNode.parentNode, null))
                 parentPos = targetNode.parentNode.transform.position;
 
-            // 親ノードの回転取得
-            var parentRotation = Vector3.zero;
-            if (!ReferenceEquals(targetNode.parentNode, null))
-            {
-                parentRotation.x = targetNode.parentNode.pose01.localEulerAngles.x;
-                parentRotation.y = targetNode.parentNode.pose01.localEulerAngles.y;
-                parentRotation.z = targetNode.parentNode.pose2.localEulerAngles.z;
-                // parentRotation = targetNode.parentNode.rotate;
-            }
-
             // 位置計算
-            var rotatedPos = MatrixRotation.RotationWorld(MatrixRotation.RotationLocal(targetNode.pos, parentRotation), parentRotation);
+            var rotatedPos = MatrixRotation.RotationWorld(MatrixRotation.RotationLocal(targetNode.pos, parentRotate), parentRotate);
             rotatedPos += parentPos;
 
             // 位置更新
@@ -348,7 +336,7 @@ namespace ArmorstandAnimator
             // 自分の子ノードでSetNodePosition実行
             if (targetNode.childrenNode.Any())
                 foreach (Node n in targetNode.childrenNode)
-                    SetNodePosition(n);
+                    SetNodePosition(n, keyframe, parentRotate + targetNode.rotate);
         }
 
         // キーフレームビューのボタン位置設定

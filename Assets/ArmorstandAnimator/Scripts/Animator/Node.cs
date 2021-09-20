@@ -129,18 +129,73 @@ namespace ArmorstandAnimator
         public void SetRotation(Vector3 rotate)
         {
             this.rotate = rotate;
+
+            var rx = rotate.x;
+            // if (rx < 0)
+            //     rx += 360;
+            // if (rx > 360)
+            //     rx -= 360;
+            var ry = rotate.y;
+            // if (ry < 0)
+            //     ry += 360;
+            // if (ry > 360)
+            //     ry -= 360;
+            var rz = rotate.z;
+            // if (rz < 0)
+            //     rz += 360;
+            // if (rz > 360)
+            //     rz -= 360;
+            pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
+            pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
+        }
+
+        // rotate変更
+        public void SetRotation(Vector3 rotate, Vector3 parentRotate)
+        {
+            this.rotate = rotate;
             if (nodeType != NodeType.Root)
             {
-                pose2.localEulerAngles = new Vector3(0.0f, 0.0f, parentNode.pose2.localEulerAngles.z + rotate.z);
-                pose01.localEulerAngles = new Vector3(parentNode.pose01.localEulerAngles.x + rotate.x, parentNode.pose01.localEulerAngles.y + rotate.y, 0.0f);
+                var rx = parentRotate.x + rotate.x;
+                // if (rx < 0)
+                //     rx += 360;
+                // if (rx > 360)
+                //     rx -= 360;
+                var ry = parentRotate.y + rotate.y;
+                // if (ry < 0)
+                //     ry += 360;
+                // if (ry > 360)
+                //     ry -= 360;
+                var rz = parentRotate.z + rotate.z;
+                // if (rz < 0)
+                //     rz += 360;
+                // if (rz > 360)
+                //     rz -= 360;
+                pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
+                pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
+                // Debug.Log(this.nodeName + ":R" + new Vector3(rx, ry, rz));
+                Debug.Log(this.nodeName + ":Set" + new Vector3(pose01.localEulerAngles.x, pose01.localEulerAngles.y, pose2.localEulerAngles.z));
             }
             else
             {
-                pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rotate.z);
-                pose01.localEulerAngles = new Vector3(rotate.x, rotate.y, 0.0f);
+                var rx = rotate.x;
+                // if (rx < 0)
+                //     rx += 360;
+                // if (rx > 360)
+                //     rx -= 360;
+                var ry = rotate.y;
+                // if (ry < 0)
+                //     ry += 360;
+                // if (ry > 360)
+                //     ry -= 360;
+                var rz = rotate.z;
+                // if (rz < 0)
+                //     rz += 360;
+                // if (rz > 360)
+                //     rz -= 360;
+                pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
+                pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
+                Debug.Log(this.nodeName + ":Set" + new Vector3(rx, ry, rz));
             }
-            Debug.Log(this.nodeName + ":Set" + rotate);
-            // nodeManager.SetNodePosition(this);
         }
 
         // ParentNode変更

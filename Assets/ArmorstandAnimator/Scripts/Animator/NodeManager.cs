@@ -138,13 +138,7 @@ namespace ArmorstandAnimator
             CreateNodeTree();
 
             // ノード位置更新
-            foreach (Node n in sceneManager.NodeList)
-            {
-                if (n.nodeType == NodeType.Root)
-                {
-                    SetNodePosition(n);
-                }
-            }
+            UpdateNodeTransform();
         }
 
         // ノードUIのみ表示
@@ -212,11 +206,10 @@ namespace ArmorstandAnimator
             // 対象ノードの親ノードを決定
             var selectParentUI = parentNodeSettingPanel.GetComponent<SelectParentUI>();
             selectParentUI.targetNode.SetParentNode(selectParentUI.selectedNode);
-            // targetNodeUI.OnParentNodeChanged(selectParentUI.selectedNode);
             // ノード親子関係整理
             CreateNodeTree();
             // ノード位置，角度更新
-            SetNodePosition(selectParentUI.targetNode);
+            UpdateNodeTransform();
             SetParentNodeSettingPanelVisible();
         }
 
@@ -234,36 +227,23 @@ namespace ArmorstandAnimator
             // 角度計算
             targetNode.SetRotation(targetNode.rotate);
 
-            // 自分の子ノードでSetNodeRotation実行
-            if (targetNode.childrenNode.Any())
-                foreach (Node n in targetNode.childrenNode)
-                    SetNodeRotation(n);
+            // ノード位置更新
+            UpdateNodeTransform();
         }
 
         // ノード位置決定
-        public void SetNodePosition(Node targetNode)
+        public void SetNodePosition(Node targetNode, Vector3 parentRotate)
         {
             // 角度計算
-            targetNode.SetRotation(targetNode.rotate);
+            targetNode.SetRotation(targetNode.rotate, parentRotate);
 
             // 親ノードの位置取得
             var parentPos = Vector3.zero;
             if (!ReferenceEquals(targetNode.parentNode, null))
                 parentPos = targetNode.parentNode.transform.position;
 
-            // 親ノードの回転取得
-            var parentRotation = Vector3.zero;
-            if (!ReferenceEquals(targetNode.parentNode, null))
-            {
-                // parentRotation = targetNode.parentNode.rotate;
-                parentRotation.x = targetNode.parentNode.pose01.localEulerAngles.x;
-                parentRotation.y = targetNode.parentNode.pose01.localEulerAngles.y;
-                parentRotation.z = targetNode.parentNode.pose2.localEulerAngles.z;
-                Debug.Log(targetNode.nodeName + ":" + parentRotation);
-            }
-
             // 位置計算
-            var rotatedPos = MatrixRotation.RotationWorld(MatrixRotation.RotationLocal(targetNode.pos, parentRotation), parentRotation);
+            var rotatedPos = MatrixRotation.RotationWorld(MatrixRotation.RotationLocal(targetNode.pos, parentRotate), parentRotate);
             rotatedPos += parentPos;
 
             // 位置更新
@@ -272,7 +252,20 @@ namespace ArmorstandAnimator
             // 自分の子ノードでSetNodePosition実行
             if (targetNode.childrenNode.Any())
                 foreach (Node n in targetNode.childrenNode)
-                    SetNodePosition(n);
+                {
+                    SetNodePosition(n, parentRotate + targetNode.rotate);
+                }
+        }
+
+        // ノード位置更新
+        public void UpdateNodeTransform()
+        {
+            // Rootノードからノード位置更新
+            foreach (Node n in sceneManager.NodeList)
+            {
+                if (n.nodeType == NodeType.Root)
+                    SetNodePosition(n, Vector3.zero);
+            }
         }
 
         // ノード親子関係整理
