@@ -148,8 +148,6 @@ namespace ArmorstandAnimator
                 var rz = parentRotate.z + rotate.z;
                 pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
                 pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
-                // Debug.Log(this.nodeName + ":R" + new Vector3(rx, ry, rz));
-                Debug.Log(this.nodeName + ":Set" + new Vector3(pose01.localEulerAngles.x, pose01.localEulerAngles.y, pose2.localEulerAngles.z));
             }
             else
             {
@@ -158,7 +156,6 @@ namespace ArmorstandAnimator
                 var rz = rotate.z;
                 pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
                 pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
-                Debug.Log(this.nodeName + ":Set" + new Vector3(rx, ry, rz));
             }
         }
 

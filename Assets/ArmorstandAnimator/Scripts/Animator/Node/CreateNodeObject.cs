@@ -95,7 +95,7 @@ namespace ArmorstandAnimator
                 // head.rotation
                 if (inputJson.display.head.rotation != null)
                 {
-                    elementHolder.localRotation = Quaternion.Euler(new Vector3(-inputJson.display.head.rotation[0], -inputJson.display.head.rotation[1], inputJson.display.head.rotation[2]));
+                    elementHolder.localEulerAngles = new Vector3(-inputJson.display.head.rotation[0], -inputJson.display.head.rotation[1], inputJson.display.head.rotation[2]);
                 }
 
                 // head.translation
@@ -233,7 +233,7 @@ namespace ArmorstandAnimator
             // モデル削除
             foreach (Transform t in elementHolder)
             {
-                t.parent = transform.root;
+                // t.parent = transform.root;
                 Destroy(t.gameObject);
             }
 
@@ -253,7 +253,11 @@ namespace ArmorstandAnimator
             JsonModel inputJson = new JsonModel();
             inputJson = JsonUtility.FromJson<JsonModel>(inputString);
 
-            // Transformを戻す
+            // Transform初期化
+            targetNode.transform.position = Vector3.zero;
+            targetNode.transform.rotation = Quaternion.identity;
+            targetNode.pose2.localRotation = Quaternion.identity;
+            targetNode.pose01.localRotation = Quaternion.identity;
             elementHolder.localRotation = Quaternion.identity;
             elementHolder.localPosition = new Vector3(0.0f, DefaultLocalPositionY, 0.0f);
             elementHolder.localScale = Vector3.one;
@@ -274,7 +278,7 @@ namespace ArmorstandAnimator
                 // head.rotation
                 if (inputJson.display.head.rotation != null)
                 {
-                    elementHolder.localRotation = Quaternion.Euler(new Vector3(-inputJson.display.head.rotation[0], -inputJson.display.head.rotation[1], inputJson.display.head.rotation[2]));
+                    elementHolder.localEulerAngles = new Vector3(-inputJson.display.head.rotation[0], -inputJson.display.head.rotation[1], inputJson.display.head.rotation[2]);
                 }
 
                 // head.translation
