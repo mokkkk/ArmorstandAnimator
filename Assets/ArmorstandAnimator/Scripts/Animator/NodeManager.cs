@@ -54,6 +54,17 @@ namespace ArmorstandAnimator
 
         private Transform elementHolder;
 
+        // ノードモデル変更用
+        private Node updateTargetNode;
+        [SerializeField]
+        private GameObject updateJsonFilePanel;
+        [SerializeField]
+        private InputField updatePathInputField;
+        [SerializeField]
+        private InputField updateNodeNameInputField;
+        [SerializeField]
+        private InputField updateCustomModelDataField;
+
         private const float ScaleOffset = 16.0f;
         private const float HeadScaleOffset = 0.622568f;
         private const float PivotCenter = 8.0f;
@@ -296,21 +307,59 @@ namespace ArmorstandAnimator
             }
         }
 
-        // ノード作成(デバッグ用)
-        public void CreateNode(string nodeName, int customModelData, string[] paths)
+
+        // ノードのモデル更新
+        public void StartUpdateNodeModel(Node targetNode)
         {
-            // ID決定
-            var id = sceneManager.NodeList.Count;
+            this.updateTargetNode = targetNode;
 
-            // モデル作成
-            var newNode = createNodeObject.GenerateJsonModel(paths[0], nodeName, id);
+            // Json読込UI表示
+            SetJsonFilePanelVisibleUpdate();
+        }
 
-            // ノード初期化
-            newNode.transform.parent = nodeHolder;
-            newNode.Initialize(nodeName, customModelData, nodeUIObj, nodeUIScrollview);
+        //  ノードのモデル更新UI表示切替
+        public void SetJsonFilePanelVisibleUpdate()
+        {
+            updateJsonFilePanel.SetActive(!updateJsonFilePanel.activeSelf);
+            if (updateJsonFilePanel.activeSelf)
+            {
+                updateNodeNameInputField.text = updateTargetNode.nodeName.ToString();
+                updateCustomModelDataField.text = updateTargetNode.customModelData.ToString();
+            }
+            else
+            {
+                this.updateTargetNode = null;
+            }
+        }
 
-            // SceneManagerのNodeListにノード追加
-            sceneManager.NodeList.Add(newNode);
+        // jsonファイル選択
+        public void SelectJsonFilePathUpdate()
+        {
+            // ファイルダイアログを開く
+            var extensions = new[]
+            {
+    new ExtensionFilter( "Model Files", "json"),
+};
+            paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true);
+
+            updatePathInputField.text = paths[0];
+        }
+
+        // ノードのモデル更新
+        public void UpdateNodeModel()
+        {
+            var nodeName = updateNodeNameInputField.text;
+            var customModelData = int.Parse(updateCustomModelDataField.text);
+
+            // モデル更新
+            createNodeObject.UpdateJsonModel(paths[0], updateTargetNode);
+            updateTargetNode.UpdateNodeName(nodeName);
+
+            // Json読込UI非表示
+            SetJsonFilePanelVisibleUpdate();
+
+            // モデル位置更新
+            UpdateNodeTransform();
         }
     }
 }

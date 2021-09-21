@@ -131,20 +131,8 @@ namespace ArmorstandAnimator
             this.rotate = rotate;
 
             var rx = rotate.x;
-            // if (rx < 0)
-            //     rx += 360;
-            // if (rx > 360)
-            //     rx -= 360;
             var ry = rotate.y;
-            // if (ry < 0)
-            //     ry += 360;
-            // if (ry > 360)
-            //     ry -= 360;
             var rz = rotate.z;
-            // if (rz < 0)
-            //     rz += 360;
-            // if (rz > 360)
-            //     rz -= 360;
             pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
             pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
         }
@@ -156,20 +144,8 @@ namespace ArmorstandAnimator
             if (nodeType != NodeType.Root)
             {
                 var rx = parentRotate.x + rotate.x;
-                // if (rx < 0)
-                //     rx += 360;
-                // if (rx > 360)
-                //     rx -= 360;
                 var ry = parentRotate.y + rotate.y;
-                // if (ry < 0)
-                //     ry += 360;
-                // if (ry > 360)
-                //     ry -= 360;
                 var rz = parentRotate.z + rotate.z;
-                // if (rz < 0)
-                //     rz += 360;
-                // if (rz > 360)
-                //     rz -= 360;
                 pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
                 pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
                 // Debug.Log(this.nodeName + ":R" + new Vector3(rx, ry, rz));
@@ -178,20 +154,8 @@ namespace ArmorstandAnimator
             else
             {
                 var rx = rotate.x;
-                // if (rx < 0)
-                //     rx += 360;
-                // if (rx > 360)
-                //     rx -= 360;
                 var ry = rotate.y;
-                // if (ry < 0)
-                //     ry += 360;
-                // if (ry > 360)
-                //     ry -= 360;
                 var rz = rotate.z;
-                // if (rz < 0)
-                //     rz += 360;
-                // if (rz > 360)
-                //     rz -= 360;
                 pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
                 pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
                 Debug.Log(this.nodeName + ":Set" + new Vector3(rx, ry, rz));
@@ -232,6 +196,13 @@ namespace ArmorstandAnimator
         {
             pose2.Find("Axis").gameObject.SetActive(visible);
             pose01.Find("Axis").gameObject.SetActive(visible);
+        }
+
+        // NodeName変更
+        public void UpdateNodeName(string name)
+        {
+            this.nodeName = name;
+            targetNodeUI.UpdateNodeName();
         }
     }
 }

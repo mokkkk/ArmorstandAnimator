@@ -122,5 +122,17 @@ namespace ArmorstandAnimator
         {
             targetNode.RemoveNode();
         }
+
+        // ノード更新
+        public void OnUpdateNodeClicked()
+        {
+            nodeManager.StartUpdateNodeModel(targetNode);
+        }
+
+        // ノード名更新
+        public void UpdateNodeName()
+        {
+            this.nodeName.text = targetNode.nodeName;
+        }
     }
 }
