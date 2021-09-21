@@ -200,6 +200,9 @@ namespace ArmorstandAnimator
         {
             this.nodeName = name;
             targetNodeUI.UpdateNodeName();
+            elementCubes = new List<Transform>();
+            foreach (Transform child in element)
+                elementCubes.Add(child);
         }
     }
 }

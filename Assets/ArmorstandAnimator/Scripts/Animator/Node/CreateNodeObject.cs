@@ -231,9 +231,14 @@ namespace ArmorstandAnimator
             // component, transform取得
             var elementHolder = targetNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
             // モデル削除
+            var tList = new List<Transform>();
             foreach (Transform t in elementHolder)
             {
-                // t.parent = transform.root;
+                tList.Add(t);
+            }
+            foreach (Transform t in tList)
+            {
+                t.parent = transform.root;
                 Destroy(t.gameObject);
             }
 

@@ -89,6 +89,7 @@ namespace ArmorstandAnimator
                 for (int j = 0; j < nodeArray[i].elements.Length; j++)
                 {
                     nodeArray[i].elements[j] = new ASAModelNodeElement();
+
                     nodeArray[i].elements[j].position = new float[] { nodeList[i].elementCubes[j].localPosition.x, nodeList[i].elementCubes[j].localPosition.y, nodeList[i].elementCubes[j].localPosition.z };
                     nodeArray[i].elements[j].rotation = new float[] { nodeList[i].elementCubes[j].localEulerAngles.x, nodeList[i].elementCubes[j].localEulerAngles.y, nodeList[i].elementCubes[j].localEulerAngles.z };
                     nodeArray[i].elements[j].scale = new float[] { nodeList[i].elementCubes[j].localScale.x, nodeList[i].elementCubes[j].localScale.y, nodeList[i].elementCubes[j].localScale.z };
