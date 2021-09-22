@@ -89,6 +89,12 @@ namespace ArmorstandAnimator
             }
         }
 
+        // CustomModelData変更時
+        public void OnCmdChanged()
+        {
+            targetNode.SetCmd(int.Parse(customModelDataInputField.text));
+        }
+
         // Position変更時
         public void OnPositionChanged()
         {

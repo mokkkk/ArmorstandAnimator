@@ -118,6 +118,12 @@ namespace ArmorstandAnimator
             this.targetAnimationUI = newUI.GetComponent<AnimationUI>();
         }
 
+        // CustomModelData変更
+        public void SetCmd(int cmd)
+        {
+            this.customModelData = cmd;
+        }
+
         // pos変更
         public void SetPosition(Vector3 pos)
         {
