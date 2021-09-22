@@ -118,6 +118,12 @@ namespace ArmorstandAnimator
             this.targetAnimationUI = newUI.GetComponent<AnimationUI>();
         }
 
+        // CustomModelData変更
+        public void SetCmd(int cmd)
+        {
+            this.customModelData = cmd;
+        }
+
         // pos変更
         public void SetPosition(Vector3 pos)
         {
@@ -131,20 +137,8 @@ namespace ArmorstandAnimator
             this.rotate = rotate;
 
             var rx = rotate.x;
-            // if (rx < 0)
-            //     rx += 360;
-            // if (rx > 360)
-            //     rx -= 360;
             var ry = rotate.y;
-            // if (ry < 0)
-            //     ry += 360;
-            // if (ry > 360)
-            //     ry -= 360;
             var rz = rotate.z;
-            // if (rz < 0)
-            //     rz += 360;
-            // if (rz > 360)
-            //     rz -= 360;
             pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
             pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
         }
@@ -156,45 +150,18 @@ namespace ArmorstandAnimator
             if (nodeType != NodeType.Root)
             {
                 var rx = parentRotate.x + rotate.x;
-                // if (rx < 0)
-                //     rx += 360;
-                // if (rx > 360)
-                //     rx -= 360;
                 var ry = parentRotate.y + rotate.y;
-                // if (ry < 0)
-                //     ry += 360;
-                // if (ry > 360)
-                //     ry -= 360;
                 var rz = parentRotate.z + rotate.z;
-                // if (rz < 0)
-                //     rz += 360;
-                // if (rz > 360)
-                //     rz -= 360;
                 pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
                 pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
-                // Debug.Log(this.nodeName + ":R" + new Vector3(rx, ry, rz));
-                Debug.Log(this.nodeName + ":Set" + new Vector3(pose01.localEulerAngles.x, pose01.localEulerAngles.y, pose2.localEulerAngles.z));
             }
             else
             {
                 var rx = rotate.x;
-                // if (rx < 0)
-                //     rx += 360;
-                // if (rx > 360)
-                //     rx -= 360;
                 var ry = rotate.y;
-                // if (ry < 0)
-                //     ry += 360;
-                // if (ry > 360)
-                //     ry -= 360;
                 var rz = rotate.z;
-                // if (rz < 0)
-                //     rz += 360;
-                // if (rz > 360)
-                //     rz -= 360;
                 pose2.localEulerAngles = new Vector3(0.0f, 0.0f, rz);
                 pose01.localEulerAngles = new Vector3(rx, ry, 0.0f);
-                Debug.Log(this.nodeName + ":Set" + new Vector3(rx, ry, rz));
             }
         }
 
@@ -232,6 +199,16 @@ namespace ArmorstandAnimator
         {
             pose2.Find("Axis").gameObject.SetActive(visible);
             pose01.Find("Axis").gameObject.SetActive(visible);
+        }
+
+        // NodeName変更
+        public void UpdateNodeName(string name)
+        {
+            this.nodeName = name;
+            targetNodeUI.UpdateNodeName();
+            elementCubes = new List<Transform>();
+            foreach (Transform child in element)
+                elementCubes.Add(child);
         }
     }
 }

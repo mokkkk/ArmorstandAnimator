@@ -89,6 +89,12 @@ namespace ArmorstandAnimator
             }
         }
 
+        // CustomModelData変更時
+        public void OnCmdChanged()
+        {
+            targetNode.SetCmd(int.Parse(customModelDataInputField.text));
+        }
+
         // Position変更時
         public void OnPositionChanged()
         {
@@ -121,6 +127,18 @@ namespace ArmorstandAnimator
         public void OnRemoveNodeClicked()
         {
             targetNode.RemoveNode();
+        }
+
+        // ノード更新
+        public void OnUpdateNodeClicked()
+        {
+            nodeManager.StartUpdateNodeModel(targetNode);
+        }
+
+        // ノード名更新
+        public void UpdateNodeName()
+        {
+            this.nodeName.text = targetNode.nodeName;
         }
     }
 }

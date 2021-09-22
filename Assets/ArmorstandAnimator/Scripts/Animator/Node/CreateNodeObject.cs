@@ -49,6 +49,7 @@ namespace ArmorstandAnimator
         private const float ScaleOffset = 16.0f;
         private const float HeadScaleOffset = 0.622568f;
         private const float PivotCenter = 8.0f;
+        private const float DefaultLocalPositionY = 0.5f;
 
         // モデルJsonファイル読み込み
         public Node GenerateJsonModel(string path, string nodeName, int id)
@@ -94,7 +95,7 @@ namespace ArmorstandAnimator
                 // head.rotation
                 if (inputJson.display.head.rotation != null)
                 {
-                    elementHolder.localRotation = Quaternion.Euler(new Vector3(-inputJson.display.head.rotation[0], -inputJson.display.head.rotation[1], inputJson.display.head.rotation[2]));
+                    elementHolder.localEulerAngles = new Vector3(-inputJson.display.head.rotation[0], -inputJson.display.head.rotation[1], inputJson.display.head.rotation[2]);
                 }
 
                 // head.translation
@@ -222,6 +223,83 @@ namespace ArmorstandAnimator
 
             // rotation
             cube.transform.localEulerAngles = new Vector3(element.rotation[0], element.rotation[1], element.rotation[2]);
+        }
+
+        // ノード更新
+        public void UpdateJsonModel(string path, Node targetNode)
+        {
+            // component, transform取得
+            var elementHolder = targetNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
+            // モデル削除
+            var tList = new List<Transform>();
+            foreach (Transform t in elementHolder)
+            {
+                tList.Add(t);
+            }
+            foreach (Transform t in tList)
+            {
+                t.parent = transform.root;
+                Destroy(t.gameObject);
+            }
+
+            // ファイル読み込み
+            string line;
+            string inputString = "";
+            // ファイルの改行削除，1行に纏める
+            System.IO.StreamReader file =
+                new System.IO.StreamReader(path);
+            while ((line = file.ReadLine()) != null)
+            {
+                inputString += line.Replace("\r", "").Replace("\n", "");
+            }
+            file.Close();
+
+            // デシリアライズ
+            JsonModel inputJson = new JsonModel();
+            inputJson = JsonUtility.FromJson<JsonModel>(inputString);
+
+            // Transform初期化
+            targetNode.transform.position = Vector3.zero;
+            targetNode.transform.rotation = Quaternion.identity;
+            targetNode.pose2.localRotation = Quaternion.identity;
+            targetNode.pose01.localRotation = Quaternion.identity;
+            elementHolder.localRotation = Quaternion.identity;
+            elementHolder.localPosition = new Vector3(0.0f, DefaultLocalPositionY, 0.0f);
+            elementHolder.localScale = Vector3.one;
+
+            // キューブ生成
+            foreach (JsonElement element in inputJson.elements)
+            {
+                GenerateCube(element, elementHolder);
+            }
+
+            // Scale Offset
+            elementHolder.localScale /= ScaleOffset;
+            elementHolder.localScale *= HeadScaleOffset;
+
+            // head
+            if (!ReferenceEquals(inputJson.display.head, null))
+            {
+                // head.rotation
+                if (inputJson.display.head.rotation != null)
+                {
+                    elementHolder.localEulerAngles = new Vector3(-inputJson.display.head.rotation[0], -inputJson.display.head.rotation[1], inputJson.display.head.rotation[2]);
+                }
+
+                // head.translation
+                if (inputJson.display.head.translation != null)
+                {
+                    var headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffset, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffset, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffset);
+                    elementHolder.localPosition += headTranslation;
+                }
+
+                // head.scale
+                if (inputJson.display.head.scale != null)
+                {
+                    var headScale = new Vector3(elementHolder.localScale.x * inputJson.display.head.scale[0], elementHolder.localScale.y * inputJson.display.head.scale[1], elementHolder.localScale.z * inputJson.display.head.scale[2]);
+                    elementHolder.localScale = headScale;
+                }
+            }
         }
     }
 }
