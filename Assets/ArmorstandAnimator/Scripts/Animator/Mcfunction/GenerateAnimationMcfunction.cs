@@ -59,14 +59,31 @@ namespace ArmorstandAnimator
             // model.mcfunction   
             modelMcfunc.GenerateModelFunction(path, generalSetting, nodeList);
 
+            // アニメーション名分割
+            string[] anmName = animationSetting.AnimationName.Split('/');
             // アニメーション名フォルダ作成
-            path = Path.Combine(path, animationSetting.AnimationName.ToLower());
+            if (anmName.Length < 2)
+                path = Path.Combine(path, anmName[0]);
+            else
+                foreach (string s in anmName)
+                {
+                    path = Path.Combine(path, s);
+                }
             Directory.CreateDirectory(path);
 
+            // 再生速度変換済みキーフレーム
+            int index = 0;
+            var spdKeyframeList = new List<Keyframe>();
+            foreach (Keyframe k in keyframeList)
+            {
+                var newKey = new Keyframe(index, Mathf.FloorToInt(k.tick / animationSetting.AnimationSpeed), k.rootPos, k.rotations);
+                spdKeyframeList.Add(newKey);
+            }
+
             // start.mcfunction
-            GenerateStartFunction(path, keyframeList[0], nodeList);
+            GenerateStartFunction(path, spdKeyframeList[0], nodeList);
             // main.mcfunction
-            GenerateMainFunction(path, keyframeList);
+            GenerateMainFunction(path, spdKeyframeList);
             // end.mcfunction
             GenerateEndFunction(path);
 
@@ -75,7 +92,7 @@ namespace ArmorstandAnimator
             Directory.CreateDirectory(path);
 
             // index.mcfunction
-            GenerateKeyframeFunction(path, keyframeList, nodeList);
+            GenerateKeyframeFunction(path, spdKeyframeList, nodeList);
 
             Debug.Log("Animation Datapack Exported");
         }
@@ -101,10 +118,19 @@ namespace ArmorstandAnimator
             path = Path.Combine(path, animationSetting.AnimationName.ToLower());
             Directory.CreateDirectory(path);
 
+            // 再生速度変換済みキーフレーム
+            int index = 0;
+            var spdKeyframeList = new List<Keyframe>();
+            foreach (Keyframe k in keyframeList)
+            {
+                var newKey = new Keyframe(index, Mathf.FloorToInt(k.tick / animationSetting.AnimationSpeed), k.rootPos, k.rotations);
+                spdKeyframeList.Add(newKey);
+            }
+
             // start.mcfunction
-            GenerateStartFunction(path, keyframeList[0], nodeList);
+            GenerateStartFunction(path, spdKeyframeList[0], nodeList);
             // main.mcfunction
-            GenerateMainFunction(path, keyframeList);
+            GenerateMainFunction(path, spdKeyframeList);
             // end.mcfunction
             GenerateEndFunction(path);
 
@@ -113,7 +139,7 @@ namespace ArmorstandAnimator
             Directory.CreateDirectory(path);
 
             // index.mcfunction
-            GenerateKeyframeFunction(path, keyframeList, nodeList);
+            GenerateKeyframeFunction(path, spdKeyframeList, nodeList);
 
             Debug.Log("Animation Datapack Exported");
         }
@@ -337,12 +363,15 @@ namespace ArmorstandAnimator
                     var rotateX = Mathf.FloorToInt((rotateNext.x - rotateCurrent.x) * 1000 / time);
                     var rotateY = Mathf.FloorToInt((rotateNext.y - rotateCurrent.y) * 1000 / time);
                     var rotateZ = Mathf.FloorToInt((rotateNext.z - rotateCurrent.z) * 1000 / time);
-                    string func = $"scoreboard players set #asa_animate_x AsaMatrix {rotateX}";
+                    // string func = $"data modify storage asa_matrix: Rotate set value {{RotateX:{rotateX}f,RotateY:{rotateY}f,RotateZ:{rotateZ}f}}";
+                    string func = $"data modify storage asa_matrix: Rotate set value {{Rotate:[{rotateX}f,{rotateY}f,{rotateZ}f]}}";
                     writer.WriteLine(func);
-                    func = $"scoreboard players set #asa_animate_y AsaMatrix {rotateY}";
-                    writer.WriteLine(func);
-                    func = $"scoreboard players set #asa_animate_z AsaMatrix {rotateZ}";
-                    writer.WriteLine(func);
+                    // string func = $"scoreboard players set #asa_animate_x AsaMatrix {rotateX}";
+                    // writer.WriteLine(func);
+                    // func = $"scoreboard players set #asa_animate_y AsaMatrix {rotateY}";
+                    // writer.WriteLine(func);
+                    // func = $"scoreboard players set #asa_animate_z AsaMatrix {rotateZ}";
+                    // writer.WriteLine(func);
                     // animate_setparam実行
                     string selector = $"@e[type=armor_stand,tag={modelName}Parts,tag={n.nodeName}]";
                     func = $"execute as {selector} run function #asa_matrix:animate_setparam";

@@ -101,11 +101,6 @@ namespace ArmorstandAnimator
             SetUIContent(newKeyframe);
         }
 
-        // public void OnButtonClicked()
-        // {
-        //     animationManager.SelectKeyframe(this.keyframe);
-        // }
-
         private void SetInputFieldIntaractive(bool value)
         {
             tick.interactable = value;
