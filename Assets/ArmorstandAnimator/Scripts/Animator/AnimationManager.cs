@@ -29,6 +29,8 @@ namespace ArmorstandAnimator
     {
         [SerializeField]
         private SceneManager sceneManager;
+        [SerializeField]
+        private AnimationSettingUI animationSetting;
 
         // キーフレーム管理用
         public KeyframeUI keyframeUI;
@@ -78,6 +80,7 @@ namespace ArmorstandAnimator
         {
             keyframeList = new List<Keyframe>();
             keyframeButtonList = new List<KeyframeButton>();
+            animationSetting.SetSpeed(1.0f);
         }
 
         // アニメーションUI表示
@@ -380,31 +383,39 @@ namespace ArmorstandAnimator
         {
             Debug.Log("Start Animation");
 
-            whileAnimationMask.SetActive(true);
             isPreviewPlaying = true;
 
+            // 再生速度変換済みキーフレーム
             int index = 0;
-            while (index < keyframeList.Count - 1 && !stopPreview)
+            var spdKeyframeList = new List<Keyframe>();
+            foreach (Keyframe k in keyframeList)
+            {
+                var newKey = new Keyframe(index, Mathf.FloorToInt(k.tick / animationSetting.AnimationSpeed), k.rootPos, k.rotations);
+                spdKeyframeList.Add(newKey);
+            }
+
+            index = 0;
+            while (index < spdKeyframeList.Count - 1 && !stopPreview)
             {
                 // tick
                 float t = 0.0f;
                 // アニメーション時間
-                float animationTime = (keyframeList[index + 1].tick - keyframeList[index].tick) * TickToSec;
+                float animationTime = (spdKeyframeList[index + 1].tick - spdKeyframeList[index].tick) * TickToSec;
 
                 // indexからindex+1までアニメーション再生
                 while (t < animationTime && !stopPreview)
                 {
                     var lerpTime = t / animationTime;
-                    var rootX = Mathf.Lerp(keyframeList[index].rootPos.x, keyframeList[index + 1].rootPos.x, lerpTime);
-                    var rootY = Mathf.Lerp(keyframeList[index].rootPos.y, keyframeList[index + 1].rootPos.y, lerpTime);
-                    var rootZ = Mathf.Lerp(keyframeList[index].rootPos.z, keyframeList[index + 1].rootPos.z, lerpTime);
+                    var rootX = Mathf.Lerp(spdKeyframeList[index].rootPos.x, spdKeyframeList[index + 1].rootPos.x, lerpTime);
+                    var rootY = Mathf.Lerp(spdKeyframeList[index].rootPos.y, spdKeyframeList[index + 1].rootPos.y, lerpTime);
+                    var rootZ = Mathf.Lerp(spdKeyframeList[index].rootPos.z, spdKeyframeList[index + 1].rootPos.z, lerpTime);
                     var rootPos = new Vector3(rootX, rootY, rootZ);
                     var rotations = new List<Vector3>();
-                    for (int i = 0; i < keyframeList[index].rotations.Count; i++)
+                    for (int i = 0; i < spdKeyframeList[index].rotations.Count; i++)
                     {
-                        var rotateX = Mathf.Lerp(keyframeList[index].rotations[i].x, keyframeList[index + 1].rotations[i].x, lerpTime);
-                        var rotateY = Mathf.Lerp(keyframeList[index].rotations[i].y, keyframeList[index + 1].rotations[i].y, lerpTime);
-                        var rotateZ = Mathf.Lerp(keyframeList[index].rotations[i].z, keyframeList[index + 1].rotations[i].z, lerpTime);
+                        var rotateX = Mathf.Lerp(spdKeyframeList[index].rotations[i].x, spdKeyframeList[index + 1].rotations[i].x, lerpTime);
+                        var rotateY = Mathf.Lerp(spdKeyframeList[index].rotations[i].y, spdKeyframeList[index + 1].rotations[i].y, lerpTime);
+                        var rotateZ = Mathf.Lerp(spdKeyframeList[index].rotations[i].z, spdKeyframeList[index + 1].rotations[i].z, lerpTime);
                         rotations.Add(new Vector3(rotateX, rotateY, rotateZ));
                     }
 
@@ -422,7 +433,6 @@ namespace ArmorstandAnimator
             // アニメーション終了
             SelectKeyframe(0);
 
-            whileAnimationMask.SetActive(false);
             isPreviewPlaying = false;
             stopPreview = false;
 
