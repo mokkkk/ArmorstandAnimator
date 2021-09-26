@@ -38,7 +38,23 @@ namespace ArmorstandAnimator
 
             // .mcfunction書き込み用
             writer = new System.IO.StreamWriter(path, false);
-            string line = "";
+
+            // 値初期化
+            var anmSpeedDp = $"#asa_{generalSetting.ModelName.ToLower()}_anmspeed";
+            string func = $"scoreboard players set {anmSpeedDp} AsaMatrix 1000";
+            writer.WriteLine(func);
+
+            var keyframeIndexDp = $"#asa_{generalSetting.ModelName.ToLower()}_kindex";
+            func = $"scoreboard players set {keyframeIndexDp} AsaMatrix 0";
+            writer.WriteLine(func);
+
+            var currentTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_current";
+            func = $"scoreboard players set {currentTickDp} AsaMatrix 0";
+            writer.WriteLine(func);
+
+            var endTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_end";
+            func = $"scoreboard players set {endTickDp} AsaMatrix 0";
+            writer.WriteLine(func);
 
             // Root
             writer.WriteLine(ArmorstandNbtRoot());
@@ -63,7 +79,7 @@ namespace ArmorstandAnimator
 
         private string ArmorstandNbt(Node node)
         {
-            var line = $"summon armor_stand ~ ~ ~ {{Marker:1b,Invisible:1b,Tags:[\"{generalSetting.ModelName}Parts\",\"{node.nodeName}\"],ArmorItems:[{{}},{{}},{{}},{{id:\"minecraft:{generalSetting.CmdItemID}\",Count:1b,tag:{{CustomModelData:{node.customModelData},RotateX:0,RotateY:0,RotateZ:0}}}}],Pose:{{Head:[{node.rotate.x}f,{node.rotate.y}f,{node.rotate.z}f]}}}}";
+            var line = $"summon armor_stand ~ ~ ~ {{Marker:1b,Invisible:1b,Tags:[\"{generalSetting.ModelName}Parts\",\"{node.nodeName}\"],ArmorItems:[{{}},{{}},{{}},{{id:\"minecraft:{generalSetting.CmdItemID}\",Count:1b,tag:{{CustomModelData:{node.customModelData},Rotate:[0f,0f,0f]}}}}],Pose:{{Head:[{node.rotate.x}f,{node.rotate.y}f,{node.rotate.z}f]}}}}";
 
             return line;
         }
@@ -93,7 +109,6 @@ namespace ArmorstandAnimator
 
             // .mcfunction書き込み用
             writer = new System.IO.StreamWriter(Application.dataPath + "\\ArmorstandAnimator\\Test\\test_model.mcfunction", false);
-            string line = "";
 
             // Root matrix
             writer.WriteLine(GetRootMatrix());
@@ -203,6 +218,23 @@ namespace ArmorstandAnimator
 
             // .mcfunction書き込み用
             writer = new System.IO.StreamWriter(path, false);
+
+            // 値初期化
+            var anmSpeedDp = $"#asa_{generalSetting.ModelName.ToLower()}_anmspeed";
+            string func = $"scoreboard players set {anmSpeedDp} AsaMatrix 1000";
+            writer.WriteLine(func);
+
+            var keyframeIndexDp = $"#asa_{generalSetting.ModelName.ToLower()}_kindex";
+            func = $"scoreboard players set {keyframeIndexDp} AsaMatrix 0";
+            writer.WriteLine(func);
+
+            var currentTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_current";
+            func = $"scoreboard players set {currentTickDp} AsaMatrix 0";
+            writer.WriteLine(func);
+
+            var endTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_end";
+            func = $"scoreboard players set {endTickDp} AsaMatrix 0";
+            writer.WriteLine(func);
 
             // Root
             writer.WriteLine(ArmorstandNbtRoot());
