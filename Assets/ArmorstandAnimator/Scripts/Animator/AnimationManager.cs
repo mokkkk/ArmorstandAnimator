@@ -81,6 +81,7 @@ namespace ArmorstandAnimator
             keyframeList = new List<Keyframe>();
             keyframeButtonList = new List<KeyframeButton>();
             animationSetting.SetSpeed(1.0f);
+            keyframeUI.ClearEventUIList();
         }
 
         // アニメーションUI表示
@@ -165,7 +166,6 @@ namespace ArmorstandAnimator
             }
             // リスト更新
             keyframeUI.ClearAnimationUIList();
-            keyframeUI.ClearEventUIList();
             keyframeButtonList = new List<KeyframeButton>();
         }
 

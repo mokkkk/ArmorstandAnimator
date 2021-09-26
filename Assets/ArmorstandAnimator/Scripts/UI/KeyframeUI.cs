@@ -147,6 +147,13 @@ namespace ArmorstandAnimator
             eventUI.GetComponent<EventUI>().Initialize(this);
             UpdateEventUIList();
         }
+        public void CreateEvent(ASAAnimationEvent asaEvent)
+        {
+            var eventUI = Instantiate(eventUIObj, Vector3.zero, Quaternion.identity, eventUIHolder);
+            eventUI.GetComponent<EventUI>().Initialize(this);
+            eventUI.GetComponent<EventUI>().SetValue(asaEvent.tick, asaEvent.name);
+            UpdateEventUIList();
+        }
 
         // EventUIリスト更新
         public void UpdateEventUIList()
@@ -170,6 +177,17 @@ namespace ArmorstandAnimator
                 k.transform.SetSiblingIndex(i);
                 i++;
             }
+        }
+
+        // EventUI作成
+        public void CreateEventUIList(ASAAnimationEvent[] events)
+        {
+            ClearEventUIList();
+            if (!ReferenceEquals(events, null))
+                for (int i = 0; i < events.Length; i++)
+                {
+                    CreateEvent(events[i]);
+                }
         }
 
         private void SetInputFieldIntaractive(bool value)

@@ -156,7 +156,7 @@ namespace ArmorstandAnimator
         // asaanimproject保存
         public void SaveProjectFileAnim()
         {
-            animationFileManager.SaveProjectFileAnim(animationSetting, animationManager.KeyframeList);
+            animationFileManager.SaveProjectFileAnim(animationSetting, animationManager.KeyframeList, animationManager.keyframeUI.eventUIList);
         }
 
         // asamodelproject読込
@@ -204,6 +204,8 @@ namespace ArmorstandAnimator
             animationSetting.SetText(project.animationName);
             // キーフレーム作成
             animationManager.CreateAnimationUIProject(project);
+            // イベントリスト作成
+            animationManager.keyframeUI.CreateEventUIList(project.events);
         }
 
         // Export summon function

@@ -32,6 +32,12 @@ namespace ArmorstandAnimator
             this.tickInputField.text = "0";
         }
 
+        public void SetValue(int tick, string name)
+        {
+            this.nameInputField.text = name.ToString();
+            this.tickInputField.text = tick.ToString();
+        }
+
         public void OnValueChanged()
         {
             keyframeUI.UpdateEventUIList();
