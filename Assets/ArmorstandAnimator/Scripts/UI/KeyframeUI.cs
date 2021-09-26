@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,13 @@ namespace ArmorstandAnimator
 
         // UIList
         public List<AnimationUI> animationUIList;
+        public List<EventUI> eventUIList;
+
+        // UIPanel
+        [SerializeField]
+        private GameObject KeyframeUIPanel;
+        [SerializeField]
+        private GameObject eventUIPanel;
 
         // Component
         [SerializeField]
@@ -28,10 +36,41 @@ namespace ArmorstandAnimator
         [SerializeField]
         private Button deleteButton;
 
+        [SerializeField]
+        private Text tabText;
+        [SerializeField]
+        private GameObject eventUIObj;
+        [SerializeField]
+        private Transform eventUIHolder;
+
         // animationUIList消去
         public void ClearAnimationUIList()
         {
             this.animationUIList = new List<AnimationUI>();
+        }
+
+        // eventUIList消去
+        public void ClearEventUIList()
+        {
+            this.eventUIList = new List<EventUI>();
+        }
+
+        // UI表示切替
+        public void ChangeUI(Slider slider)
+        {
+            var value = slider.value;
+            if (value == 0)
+            {
+                tabText.text = "キーフレーム設定";
+                KeyframeUIPanel.SetActive(true);
+                eventUIPanel.SetActive(false);
+            }
+            else
+            {
+                tabText.text = "イベント設定";
+                KeyframeUIPanel.SetActive(false);
+                eventUIPanel.SetActive(true);
+            }
         }
 
         // UI更新
@@ -99,6 +138,56 @@ namespace ArmorstandAnimator
 
             // UIの内容更新
             SetUIContent(newKeyframe);
+        }
+
+        // EventUI追加
+        public void CreateEvent()
+        {
+            var eventUI = Instantiate(eventUIObj, Vector3.zero, Quaternion.identity, eventUIHolder);
+            eventUI.GetComponent<EventUI>().Initialize(this);
+            UpdateEventUIList();
+        }
+        public void CreateEvent(ASAAnimationEvent asaEvent)
+        {
+            var eventUI = Instantiate(eventUIObj, Vector3.zero, Quaternion.identity, eventUIHolder);
+            eventUI.GetComponent<EventUI>().Initialize(this);
+            eventUI.GetComponent<EventUI>().SetValue(asaEvent.tick, asaEvent.name);
+            UpdateEventUIList();
+        }
+
+        // EventUIリスト更新
+        public void UpdateEventUIList()
+        {
+            this.eventUIList = new List<EventUI>();
+            foreach (Transform t in eventUIHolder)
+            {
+                eventUIList.Add(t.GetComponent<EventUI>());
+                // t.transform.parent = transform.root;
+            }
+
+            // tick昇順でソート
+            var orderList = eventUIList.OrderBy(d => d.Tick);
+            eventUIList = new List<EventUI>();
+
+            int i = 0;
+            foreach (EventUI k in orderList)
+            {
+                eventUIList.Add(k);
+                // k.transform.parent = eventUIHolder;
+                k.transform.SetSiblingIndex(i);
+                i++;
+            }
+        }
+
+        // EventUI作成
+        public void CreateEventUIList(ASAAnimationEvent[] events)
+        {
+            ClearEventUIList();
+            if (!ReferenceEquals(events, null))
+                for (int i = 0; i < events.Length; i++)
+                {
+                    CreateEvent(events[i]);
+                }
         }
 
         private void SetInputFieldIntaractive(bool value)

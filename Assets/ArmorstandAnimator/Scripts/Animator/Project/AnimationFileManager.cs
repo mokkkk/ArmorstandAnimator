@@ -12,6 +12,7 @@ namespace ArmorstandAnimator
     {
         public string animationName;
         public ASAAnimationKeyframe[] keyframes;
+        public ASAAnimationEvent[] events;
     }
     [Serializable]
     public class ASAAnimationKeyframe
@@ -25,6 +26,12 @@ namespace ArmorstandAnimator
     {
         public float[] rotate;
     }
+    [Serializable]
+    public class ASAAnimationEvent
+    {
+        public string name;
+        public int tick;
+    }
 
     public class AnimationFileManager : MonoBehaviour
     {
@@ -32,7 +39,7 @@ namespace ArmorstandAnimator
         private string[] paths;
 
         // Animationプロジェクトファイル保存
-        public void SaveProjectFileAnim(AnimationSettingUI animationSetting, List<Keyframe> keyframeList)
+        public void SaveProjectFileAnim(AnimationSettingUI animationSetting, List<Keyframe> keyframeList, List<EventUI> eventList)
         {
             // ファイルパス決定
             var extensionList = new[]
@@ -63,6 +70,15 @@ namespace ArmorstandAnimator
                 }
             }
             project.keyframes = keyframeArray;
+
+            var eventArray = new ASAAnimationEvent[eventList.Count];
+            for (int i = 0; i < eventArray.Length; i++)
+            {
+                eventArray[i] = new ASAAnimationEvent();
+                eventArray[i].name = eventList[i].Name;
+                eventArray[i].tick = eventList[i].Tick;
+            }
+            project.events = eventArray;
 
             // プロジェクトファイル保存
             var projectFileJson = JsonUtility.ToJson(project);

@@ -156,7 +156,7 @@ namespace ArmorstandAnimator
         // asaanimproject保存
         public void SaveProjectFileAnim()
         {
-            animationFileManager.SaveProjectFileAnim(animationSetting, animationManager.KeyframeList);
+            animationFileManager.SaveProjectFileAnim(animationSetting, animationManager.KeyframeList, animationManager.keyframeUI.eventUIList);
         }
 
         // asamodelproject読込
@@ -204,6 +204,8 @@ namespace ArmorstandAnimator
             animationSetting.SetText(project.animationName);
             // キーフレーム作成
             animationManager.CreateAnimationUIProject(project);
+            // イベントリスト作成
+            animationManager.keyframeUI.CreateEventUIList(project.events);
         }
 
         // Export summon function
@@ -221,13 +223,13 @@ namespace ArmorstandAnimator
         // Export animation datapack
         public void ExportFuncAnimation()
         {
-            animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
+            animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList, animationManager.keyframeUI.eventUIList);
         }
 
         // Export animation datapack (animation only)
         public void ExportFuncOnlyAnimation()
         {
-            animationMcfunc.GenerateDatapackOnlyAnimation(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
+            // animationMcfunc.GenerateDatapackOnlyAnimation(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
         }
 
         // Node追加
