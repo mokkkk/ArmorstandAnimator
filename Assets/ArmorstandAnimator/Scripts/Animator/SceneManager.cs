@@ -221,7 +221,7 @@ namespace ArmorstandAnimator
         // Export animation datapack
         public void ExportFuncAnimation()
         {
-            animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
+            animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList, animationManager.keyframeUI.eventUIList);
         }
 
         // Export animation datapack (animation only)

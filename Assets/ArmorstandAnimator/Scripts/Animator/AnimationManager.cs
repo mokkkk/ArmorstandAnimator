@@ -165,6 +165,7 @@ namespace ArmorstandAnimator
             }
             // リスト更新
             keyframeUI.ClearAnimationUIList();
+            keyframeUI.ClearEventUIList();
             keyframeButtonList = new List<KeyframeButton>();
         }
 

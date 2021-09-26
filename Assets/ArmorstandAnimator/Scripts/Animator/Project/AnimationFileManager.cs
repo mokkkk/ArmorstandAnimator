@@ -12,6 +12,7 @@ namespace ArmorstandAnimator
     {
         public string animationName;
         public ASAAnimationKeyframe[] keyframes;
+        public ASAAnimationEvent[] events;
     }
     [Serializable]
     public class ASAAnimationKeyframe
@@ -24,6 +25,12 @@ namespace ArmorstandAnimator
     public class ASAAnimationRotate
     {
         public float[] rotate;
+    }
+    [Serializable]
+    public class ASAAnimationEvent
+    {
+        public string name;
+        public int tick;
     }
 
     public class AnimationFileManager : MonoBehaviour

@@ -27,8 +27,9 @@ namespace ArmorstandAnimator
         private const string DatapackFolderName = "asa_animator";
         // キーフレームフォルダ名
         private const string KeyframesFolderName = "keyframes";
+        private const string EventsFolderName = "events";
 
-        public void GenerateDatapack(GeneralSettingUI generalSetting, AnimationSettingUI animationSetting, List<Node> nodeList, List<Keyframe> keyframeList)
+        public void GenerateDatapack(GeneralSettingUI generalSetting, AnimationSettingUI animationSetting, List<Node> nodeList, List<Keyframe> keyframeList, List<EventUI> eventList)
         {
             // ファイルパス決定
             var extensionList = new[]
@@ -88,13 +89,18 @@ namespace ArmorstandAnimator
             GenerateEndFunction(path);
 
             // Keyframesフォルダ作成
-            path = Path.Combine(path, KeyframesFolderName);
-            Directory.CreateDirectory(path);
+            var keyframePath = Path.Combine(path, KeyframesFolderName);
+            Directory.CreateDirectory(keyframePath);
 
             // manager.mcfunction
-            GenerateKeyframeManagerFunction(path, keyframeList);
+            GenerateKeyframeManagerFunction(keyframePath, keyframeList);
             // index.mcfunction
-            GenerateKeyframeFunction(path, keyframeList, nodeList);
+            GenerateKeyframeFunction(keyframePath, keyframeList, nodeList);
+
+            // Eventsフォルダ作成
+            var eventPath = Path.Combine(path, EventsFolderName);
+            Directory.CreateDirectory(eventPath);
+            GenerateEventManagerFunction(eventPath, keyframeList, eventList);
 
             Debug.Log("Animation Datapack Exported");
         }
@@ -109,6 +115,10 @@ namespace ArmorstandAnimator
 
             // currentTick初期化
             string func = $"scoreboard players set {currentTickDp} AsaMatrix 0";
+            writer.WriteLine(func);
+
+            // eventTick初期化
+            func = $"function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/{EventsFolderName}/set_tick";
             writer.WriteLine(func);
 
             // 各ノードのPose.Headのrotationsを設定
@@ -173,6 +183,10 @@ namespace ArmorstandAnimator
 
             // Rootタイマー >= EndTick時， keyframe/manager実行
             func = $"execute if score {currentTickDp} AsaMatrix >= {endTickDp} AsaMatrix run function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/{KeyframesFolderName}/manager";
+            writer.WriteLine(func);
+
+            // event実行
+            func = $"function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/{EventsFolderName}/manager";
             writer.WriteLine(func);
 
             // animate実行
@@ -434,6 +448,91 @@ namespace ArmorstandAnimator
             }
 
             Debug.Log("Generated keyframe mcfunction");
+        }
+
+        // events/manager.mcfunction
+        private void GenerateEventManagerFunction(string path, List<Keyframe> keyframeList, List<EventUI> eventList)
+        {
+            // ファイルパス
+            string funcPath = "";
+            // .mcfunction書き込み用
+            StreamWriter writer;
+
+            // パス決定
+            funcPath = Path.Combine(path, $"set_tick.mcfunction");
+            writer = new StreamWriter(funcPath, false);
+            string func;
+
+            int index = 0;
+            foreach (EventUI e in eventList)
+            {
+                int eventTick = e.Tick;
+                int keyframeIndex = 0;
+
+                // キーフレームindex探索
+                for (int i = 0; i < keyframeList.Count - 1; i++)
+                {
+                    if (e.Tick >= keyframeList[i].tick)
+                    {
+                        keyframeIndex = keyframeList[i].index;
+                    }
+                }
+
+                // tick
+                eventTick -= keyframeList[keyframeIndex].tick;
+
+                // 再生速度により変換
+                func = $"scoreboard players set #asa_{modelName.ToLower()}_etick_{index} AsaMatrix {eventTick}";
+                writer.WriteLine(func);
+                func = $"scoreboard players operation #asa_{modelName.ToLower()}_etick_{index} AsaMatrix *= #asam_const_1000 AsaMatrix";
+                writer.WriteLine(func);
+                func = $"scoreboard players operation #asa_{modelName.ToLower()}_etick_{index} AsaMatrix /= {anmSpeedDp} AsaMatrix";
+                writer.WriteLine(func);
+
+                index++;
+            }
+
+            // 終了
+            writer.Flush();
+            writer.Close();
+
+
+            // パス決定
+            funcPath = Path.Combine(path, $"manager.mcfunction");
+            writer = new StreamWriter(funcPath, false);
+
+            index = 0;
+            foreach (EventUI e in eventList)
+            {
+                int eventTick = e.Tick;
+                string eventName = e.Name;
+                int keyframeIndex = 0;
+
+                // キーフレームindex探索
+                for (int i = 0; i < keyframeList.Count - 1; i++)
+                {
+                    if (e.Tick >= keyframeList[i].tick)
+                    {
+                        keyframeIndex = keyframeList[i].index;
+                    }
+                }
+
+                // tick
+                eventTick -= keyframeList[keyframeIndex].tick;
+
+                // 再生速度により変換
+                func = $"# execute if score {keyframeIndexDp} AsaMatrix matches {keyframeIndex + 1} if score {currentTickDp} AsaMatrix = #asa_{modelName.ToLower()}_etick_{index} AsaMatrix run {eventName}";
+                writer.WriteLine(func);
+
+                index++;
+            }
+
+            // 終了
+            writer.Flush();
+            writer.Close();
+
+
+            Debug.Log("Generated keyframe manager mcfunction");
         }
 
         /*public void GenerateDatapackOnlyAnimation(GeneralSettingUI generalSetting, AnimationSettingUI animationSetting, List<Node> nodeList, List<Keyframe> keyframeList)
