@@ -58,6 +58,7 @@ namespace ArmorstandAnimator
         // mcfunction書出用
         private GenerateModelMcfunc modelMcfunc;
         private GenerateAnimationMcfunction animationMcfunc;
+        private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
 
         // Start is called before the first frame update
         void Start()
@@ -73,6 +74,7 @@ namespace ArmorstandAnimator
             animationFileManager = this.gameObject.GetComponent<AnimationFileManager>();
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
             animationMcfunc = this.gameObject.GetComponent<GenerateAnimationMcfunction>();
+            animationMcfuncfs = this.gameObject.GetComponent<GenerateAnimationMcfunctionFixSpeed>();
         }
 
         // Update is called once per frame
@@ -224,6 +226,11 @@ namespace ArmorstandAnimator
         public void ExportFuncAnimation()
         {
             animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList, animationManager.keyframeUI.eventUIList);
+        }
+
+        public void ExportFuncAnimationFs()
+        {
+            animationMcfuncfs.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
         }
 
         // Export animation datapack (animation only)

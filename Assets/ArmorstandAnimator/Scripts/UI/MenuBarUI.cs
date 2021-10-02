@@ -104,5 +104,11 @@ namespace ArmorstandAnimator
             sceneManager.ExportFuncOnlyAnimation();
             fileMenuAnim.SetActive(false);
         }
+
+        public void OnExportDatapackFSClicked()
+        {
+            sceneManager.ExportFuncAnimationFs();
+            fileMenuAnim.SetActive(false);
+        }
     }
 }
