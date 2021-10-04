@@ -121,7 +121,7 @@ namespace ArmorstandAnimator
                 this.nodeList = new List<Node>();
 
                 // プロジェクト設定更新
-                generalSetting.SetText("", "");
+                generalSetting.SetText("", "", false);
             }
 
             // 警告非表示
@@ -183,7 +183,7 @@ namespace ArmorstandAnimator
             this.nodeList = new List<Node>();
 
             // プロジェクト設定更新
-            generalSetting.SetText(project.itemID, project.modelName);
+            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities);
             // ノード作成
             nodeManager.CreateNodeProject(project.nodeList);
         }
@@ -225,6 +225,8 @@ namespace ArmorstandAnimator
         // Export animation datapack
         public void ExportFuncAnimation()
         {
+            if (ReferenceEquals(animationManager.keyframeUI.eventUIList, null))
+                Debug.Log("Null");
             animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList, animationManager.keyframeUI.eventUIList);
         }
 

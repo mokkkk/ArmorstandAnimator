@@ -59,7 +59,7 @@ namespace ArmorstandAnimator
             Directory.CreateDirectory(path);
 
             // summon.mcfunction
-            modelMcfunc.GenerateSummonFunction(path, generalSetting, nodeList);
+            modelMcfunc.GenerateSummonFunction(path, generalSetting, nodeList, false, generalSetting.MultiEntities);
             // model.mcfunction   
             modelMcfunc.GenerateModelFunction(path, generalSetting, nodeList);
 
