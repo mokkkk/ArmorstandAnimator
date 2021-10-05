@@ -570,6 +570,8 @@ namespace ArmorstandAnimator
                 }
             }
 
+            // 内容設定
+            keyframeUI.SetUIContent(newKeyframe);
             UpdateKeyframeList(newKeyframe);
         }
 
