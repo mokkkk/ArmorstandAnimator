@@ -87,6 +87,12 @@ namespace ArmorstandAnimator
             keyframeUI.ClearEventUIList();
         }
 
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.X))
+                MirrorKeyframe();
+        }
+
         // アニメーションUI表示
         public void CreateAnimationUI()
         {
@@ -463,5 +469,111 @@ namespace ArmorstandAnimator
                 UpdateKeyframeList(newKeyframe);
             }
         }
+
+        // キーフレーム反転（feature）
+        public void MirrorKeyframe()
+        {
+            var newKeyframe = new Keyframe(selectedKeyframeIndex, keyframeList[selectedKeyframeIndex].tick, keyframeList[selectedKeyframeIndex].rootPos, keyframeList[selectedKeyframeIndex].rotations);
+            int length = sceneManager.NodeList.Count();
+
+            // rootPos反転
+            newKeyframe.rootPos = new Vector3(-newKeyframe.rootPos.x, newKeyframe.rootPos.y, newKeyframe.rootPos.z);
+
+            for (int i = 0; i < length; i++)
+            {
+                bool isMirror = false;
+                var nameA = sceneManager.NodeList[i].nodeName;
+
+                // L to R
+                int index = nameA.LastIndexOf('L');
+
+                // LでのSplitに成功
+                if (index > 0)
+                {
+                    string[] splitStrL = { nameA.Remove(index), nameA.Substring(index + 1) };
+                    for (int j = 0; j < length; j++)
+                    {
+                        var nameB = sceneManager.NodeList[j].nodeName;
+                        index = nameB.LastIndexOf('R');
+
+                        // RでのSplitに成功
+                        if (index > 0)
+                        {
+                            string[] splitStrR = { nameB.Remove(index), nameB.Substring(index + 1) };
+
+                            // 名前が対応している場合
+                            if (splitStrL.SequenceEqual(splitStrR))
+                            {
+                                isMirror = true;
+                                if (i < j)
+                                {
+                                    var tempRotateA = newKeyframe.rotations[i];
+                                    var tempRotateB = newKeyframe.rotations[j];
+
+                                    newKeyframe.rotations[i] = new Vector3(tempRotateB.x, -tempRotateB.y, -tempRotateB.z);
+                                    newKeyframe.rotations[j] = new Vector3(tempRotateA.x, -tempRotateA.y, -tempRotateA.z);
+                                    Debug.Log($"Mirror: {nameA} & {nameB}");
+                                }
+                                else
+                                {
+                                    Debug.Log($"{nameA} already update");
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                // R to L
+                index = nameA.LastIndexOf('R');
+
+                // LでのSplitに成功
+                if (index > 0)
+                {
+                    string[] splitStrL = { nameA.Remove(index), nameA.Substring(index + 1) };
+                    for (int j = 0; j < length; j++)
+                    {
+                        var nameB = sceneManager.NodeList[j].nodeName;
+                        index = nameB.LastIndexOf('L');
+
+                        // LでのSplitに成功
+                        if (index > 0)
+                        {
+                            string[] splitStrR = { nameB.Remove(index), nameB.Substring(index + 1) };
+
+                            // 名前が対応している場合
+                            if (splitStrL.SequenceEqual(splitStrR))
+                            {
+                                isMirror = true;
+                                if (i < j)
+                                {
+                                    var tempRotateA = newKeyframe.rotations[i];
+                                    var tempRotateB = newKeyframe.rotations[j];
+
+                                    newKeyframe.rotations[i] = new Vector3(tempRotateB.x, -tempRotateB.y, -tempRotateB.z);
+                                    newKeyframe.rotations[j] = new Vector3(tempRotateA.x, -tempRotateA.y, -tempRotateA.z);
+                                    Debug.Log($"Mirror: {nameA} & {nameB}");
+                                }
+                                else
+                                {
+                                    Debug.Log($"{nameA} already update");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!isMirror)
+                {
+                    var tempRotate = newKeyframe.rotations[i];
+                    newKeyframe.rotations[i] = new Vector3(tempRotate.x, -tempRotate.y, -tempRotate.z);
+                }
+            }
+
+            UpdateKeyframeList(newKeyframe);
+        }
+
+        // キーフレーム分割（feature）
+        // public void SeparateKeyframe()
     }
 }
