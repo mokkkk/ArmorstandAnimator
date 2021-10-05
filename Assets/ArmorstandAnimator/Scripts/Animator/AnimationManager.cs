@@ -69,6 +69,9 @@ namespace ArmorstandAnimator
         // アニメーション終了タイム
         private int animationEndTime;
 
+        // コピペ用
+        private Keyframe copiedKeyframe;
+
         // キーフレームビュー用
         private const float KeyframeButtonWidth = 25.0f;
         private const float KeyframeButtonMarginOffset = 5f;
@@ -113,7 +116,7 @@ namespace ArmorstandAnimator
             // キーフレームが存在しない場合，キーフレーム[0]を作成
             if (!keyframeList.Any())
             {
-                CreateKeyframe(-1, rotations);
+                copiedKeyframe = CreateKeyframe(-1, rotations);
             }
 
             // キーフレームリスト数だけキーフレームビュー用ボタン作成
@@ -204,11 +207,12 @@ namespace ArmorstandAnimator
         }
 
         // キーフレーム作成
-        public void CreateKeyframe(int tick, List<Vector3> rotations)
+        public Keyframe CreateKeyframe(int tick, List<Vector3> rotations)
         {
             // キーフレーム作成
             var newKeyframe = new Keyframe(0, tick + 1, Vector3.zero, rotations);
             this.keyframeList.Add(newKeyframe);
+            return newKeyframe;
         }
 
         // キーフレーム削除
@@ -438,6 +442,26 @@ namespace ArmorstandAnimator
             stopPreview = false;
 
             Debug.Log("End Animation");
+        }
+
+        // キーフレームコピー
+        public void CopyKeyframe()
+        {
+            this.copiedKeyframe = this.keyframeList[selectedKeyframeIndex];
+        }
+
+        // キーフレームペースト
+        public void PasteKeyframe()
+        {
+            if (!ReferenceEquals(copiedKeyframe, null))
+            {
+                var tickCurrent = this.keyframeList[selectedKeyframeIndex].tick;
+                var rootPosCurrent = copiedKeyframe.rootPos;
+                if (selectedKeyframeIndex == 0)
+                    rootPosCurrent = Vector3.zero;
+                var newKeyframe = new Keyframe(selectedKeyframeIndex, tickCurrent, rootPosCurrent, copiedKeyframe.rotations);
+                UpdateKeyframeList(newKeyframe);
+            }
         }
     }
 }
