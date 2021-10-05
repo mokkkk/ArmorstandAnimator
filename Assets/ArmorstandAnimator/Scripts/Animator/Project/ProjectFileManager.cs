@@ -13,6 +13,7 @@ namespace ArmorstandAnimator
         public string itemID;
         public string modelName;
         public ASAModelNode[] nodeList;
+        public bool multiEntities;
     }
     [Serializable]
     public class ASAModelNode
@@ -96,6 +97,8 @@ namespace ArmorstandAnimator
                 }
             }
             project.nodeList = nodeArray;
+            project.multiEntities = generalSetting.MultiEntities;
+
             // プロジェクトファイル保存
             var projectFileJson = JsonUtility.ToJson(project);
             System.IO.StreamWriter writer = new System.IO.StreamWriter(path, false);
@@ -149,6 +152,9 @@ namespace ArmorstandAnimator
             file.Close();
 
             project = JsonUtility.FromJson<ASAModelProject>(inputString);
+
+            if (ReferenceEquals(project.multiEntities, null))
+                project.multiEntities = false;
 
             Debug.Log("ProjectFile Loaded");
 

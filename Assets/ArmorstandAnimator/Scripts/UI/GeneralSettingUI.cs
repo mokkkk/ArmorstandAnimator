@@ -53,10 +53,21 @@ namespace ArmorstandAnimator
             }
         }
 
-        public void SetText(string itemId, string modelName)
+        [SerializeField]
+        private Toggle multiEntities;
+        public bool MultiEntities
+        {
+            get
+            {
+                return this.multiEntities.isOn;
+            }
+        }
+
+        public void SetText(string itemId, string modelName, bool multiEntities)
         {
             this.cmdItemID.text = itemId;
             this.modelName.text = modelName;
+            this.multiEntities.isOn = multiEntities;
             Debug.Log(itemId);
         }
 

@@ -59,7 +59,7 @@ namespace ArmorstandAnimator
             Directory.CreateDirectory(path);
 
             // summon.mcfunction
-            modelMcfunc.GenerateSummonFunction(path, generalSetting, nodeList);
+            modelMcfunc.GenerateSummonFunction(path, generalSetting, nodeList, false, generalSetting.MultiEntities);
             // model.mcfunction   
             modelMcfunc.GenerateModelFunction(path, generalSetting, nodeList);
 
@@ -195,7 +195,13 @@ namespace ArmorstandAnimator
             writer.WriteLine(execute + func);
 
             // move実行
-            func = $"# function #asa_matrix:move";
+            func = $"scoreboard players operation #asa_move_pos_x AsaMatrix = #asa_{modelName.ToLower()}_move_pos_x AsaMatrix";
+            writer.WriteLine(func);
+            func = $"scoreboard players operation #asa_move_pos_y AsaMatrix = #asa_{modelName.ToLower()}_move_pos_y AsaMatrix";
+            writer.WriteLine(func);
+            func = $"scoreboard players operation #asa_move_pos_z AsaMatrix = #asa_{modelName.ToLower()}_move_pos_z AsaMatrix";
+            writer.WriteLine(func);
+            func = $"function #asa_matrix:move";
             writer.WriteLine(func);
 
             // model実行
@@ -321,25 +327,25 @@ namespace ArmorstandAnimator
                 var moveY = Mathf.FloorToInt((keyframeList[i + 1].rootPos.y - keyframeList[i].rootPos.y) * 1000 / time);
                 var moveZ = Mathf.FloorToInt((keyframeList[i + 1].rootPos.z - keyframeList[i].rootPos.z) * 1000 / time);
                 // 再生速度により変換
-                func = $"scoreboard players set #asa_move_pos_x AsaMatrix {moveX}";
+                func = $"scoreboard players set #asa_{modelName.ToLower()}_move_pos_x AsaMatrix {moveX}";
                 writer.WriteLine(func);
-                func = $"scoreboard players operation #asa_move_pos_x AsaMatrix *= {anmSpeedDp} AsaMatrix";
+                func = $"scoreboard players operation #asa_{modelName.ToLower()}_move_pos_x AsaMatrix *= {anmSpeedDp} AsaMatrix";
                 writer.WriteLine(func);
-                func = $"scoreboard players operation #asa_move_pos_x AsaMatrix /= #asam_const_1000 AsaMatrix";
-                writer.WriteLine(func);
-
-                func = $"scoreboard players set #asa_move_pos_y AsaMatrix {moveY}";
-                writer.WriteLine(func);
-                func = $"scoreboard players operation #asa_move_pos_y AsaMatrix *= {anmSpeedDp} AsaMatrix";
-                writer.WriteLine(func);
-                func = $"scoreboard players operation #asa_move_pos_y AsaMatrix /= #asam_const_1000 AsaMatrix";
+                func = $"scoreboard players operation #asa_{modelName.ToLower()}_move_pos_x AsaMatrix /= #asam_const_1000 AsaMatrix";
                 writer.WriteLine(func);
 
-                func = $"scoreboard players set #asa_move_pos_z AsaMatrix {moveZ}";
+                func = $"scoreboard players set #asa_{modelName.ToLower()}_move_pos_y AsaMatrix {moveY}";
                 writer.WriteLine(func);
-                func = $"scoreboard players operation #asa_move_pos_z AsaMatrix *= {anmSpeedDp} AsaMatrix";
+                func = $"scoreboard players operation #asa_{modelName.ToLower()}_move_pos_y AsaMatrix *= {anmSpeedDp} AsaMatrix";
                 writer.WriteLine(func);
-                func = $"scoreboard players operation #asa_move_pos_z AsaMatrix /= #asam_const_1000 AsaMatrix";
+                func = $"scoreboard players operation #asa_{modelName.ToLower()}_move_pos_y AsaMatrix /= #asam_const_1000 AsaMatrix";
+                writer.WriteLine(func);
+
+                func = $"scoreboard players set #asa_{modelName.ToLower()}_move_pos_z AsaMatrix {moveZ}";
+                writer.WriteLine(func);
+                func = $"scoreboard players operation #asa_{modelName.ToLower()}_move_pos_z AsaMatrix *= {anmSpeedDp} AsaMatrix";
+                writer.WriteLine(func);
+                func = $"scoreboard players operation #asa_{modelName.ToLower()}_move_pos_z AsaMatrix /= #asam_const_1000 AsaMatrix";
                 writer.WriteLine(func);
 
                 // storage用意

@@ -138,7 +138,12 @@ namespace ArmorstandAnimator
         // rootnode_position
         private string SetRootNodePosition(Node node)
         {
-            var line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName},limit=1] rotated ~ 0 run tp @s ^{-node.pos.x} ^{node.pos.y} ^{node.pos.z} ~ ~";
+            string line = "";
+            if (generalSetting.MultiEntities)
+                line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName}] if score @s AsamID = #asa_id_temp AsamID rotated ~ 0 run tp @s ^{-node.pos.x} ^{node.pos.y} ^{node.pos.z} ~ ~";
+            else
+                line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName},limit=1] rotated ~ 0 run tp @s ^{-node.pos.x} ^{node.pos.y} ^{node.pos.z} ~ ~";
+
             return line;
         }
 
@@ -174,14 +179,24 @@ namespace ArmorstandAnimator
         // get parent_pos
         private string GetParentPos(Node node)
         {
-            var line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName},limit=1] at @s run {FuncGetParentPos}";
+            string line = "";
+            if (generalSetting.MultiEntities)
+                line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName}] if score @s AsamID = #asa_id_temp AsamID at @s run {FuncGetParentPos}";
+            else
+                line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName},limit=1] at @s run {FuncGetParentPos}";
+
             return line;
         }
 
         // node_matrix
         private string GetNodeMatrix(Node node)
         {
-            var line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName},limit=1] run {FuncGetMatrixNode}";
+            string line = "";
+            if (generalSetting.MultiEntities)
+                line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName}] if score @s AsamID = #asa_id_temp AsamID run {FuncGetMatrixNode}";
+            else
+                line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName},limit=1] run {FuncGetMatrixNode}";
+
             return line;
         }
 
@@ -203,46 +218,74 @@ namespace ArmorstandAnimator
         // set child_pos
         private string SetChildPos(Node node)
         {
-            var line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName},limit=1] run {FuncSetChildPos}";
+            string line = "";
+            if (generalSetting.MultiEntities)
+                line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName}] if score @s AsamID = #asa_id_temp AsamID run {FuncSetChildPos}";
+            else
+                line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName},limit=1] run {FuncSetChildPos}";
+
             return line;
         }
 
 
         // Summon.mcfunction(外部呼出用)
-        public void GenerateSummonFunction(string path, GeneralSettingUI generalSetting, List<Node> nodeList)
+        public void GenerateSummonFunction(string path, GeneralSettingUI generalSetting, List<Node> nodeList, bool isFixSpeed, bool isMultiEntities)
         {
             // ファイルパス決定
             path = Path.Combine(path, "summon.mcfunction");
-
+            // 設定読み込み
             this.generalSetting = generalSetting;
 
             // .mcfunction書き込み用
             writer = new System.IO.StreamWriter(path, false);
 
-            // 値初期化
-            var anmSpeedDp = $"#asa_{generalSetting.ModelName.ToLower()}_anmspeed";
-            string func = $"scoreboard players set {anmSpeedDp} AsaMatrix 1000";
-            writer.WriteLine(func);
+            if (!isFixSpeed)
+            {
+                // 値初期化
+                var anmSpeedDp = $"#asa_{generalSetting.ModelName.ToLower()}_anmspeed";
+                var func = $"scoreboard players set {anmSpeedDp} AsaMatrix 1000";
+                writer.WriteLine(func);
 
-            var keyframeIndexDp = $"#asa_{generalSetting.ModelName.ToLower()}_kindex";
-            func = $"scoreboard players set {keyframeIndexDp} AsaMatrix 0";
-            writer.WriteLine(func);
+                var keyframeIndexDp = $"#asa_{generalSetting.ModelName.ToLower()}_kindex";
+                func = $"scoreboard players set {keyframeIndexDp} AsaMatrix 0";
+                writer.WriteLine(func);
 
-            var currentTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_current";
-            func = $"scoreboard players set {currentTickDp} AsaMatrix 0";
-            writer.WriteLine(func);
+                var currentTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_current";
+                func = $"scoreboard players set {currentTickDp} AsaMatrix 0";
+                writer.WriteLine(func);
 
-            var endTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_end";
-            func = $"scoreboard players set {endTickDp} AsaMatrix 0";
-            writer.WriteLine(func);
+                var endTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_end";
+                func = $"scoreboard players set {endTickDp} AsaMatrix 0";
+                writer.WriteLine(func);
+            }
 
             // Root
             writer.WriteLine(ArmorstandNbtRoot());
+
+            if (isMultiEntities)
+            {
+                // ID割り当て
+                var func = $"scoreboard players add #asa_entity_id AsamID 1";
+                writer.WriteLine(func);
+
+                func = $"execute if score #asa_entity_id AsamID matches 2147483647.. run scoreboard players set #asa_entity_id AsamID -2147483648";
+                writer.WriteLine(func);
+
+                func = $"scoreboard players operation @e[type=armor_stand,tag={generalSetting.ModelName}Root,limit=1,sort=nearest] AsamID = #asa_entity_id AsamID";
+                writer.WriteLine(func);
+            }
 
             // Parts
             foreach (Node n in nodeList)
             {
                 writer.WriteLine(ArmorstandNbt(n));
+
+                if (isMultiEntities)
+                {
+                    // ID割り当て
+                    var func = $"scoreboard players operation @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={n.nodeName},limit=1,sort=nearest] AsamID = #asa_entity_id AsamID";
+                    writer.WriteLine(func);
+                }
             }
 
             writer.Flush();
@@ -258,6 +301,17 @@ namespace ArmorstandAnimator
             path = Path.Combine(path, "model.mcfunction");
 
             this.generalSetting = generalSetting;
+            var isMultiEntities = generalSetting.MultiEntities;
+
+            // .mcfunction書き込み用
+            writer = new System.IO.StreamWriter(path);
+
+            // ID取得
+            if (isMultiEntities)
+            {
+                var func = $"scoreboard players operation #asa_id_temp AsamID = @s AsamID";
+                writer.WriteLine(func);
+            }
 
             // RootNodeのみ抽出
             var rootNodeList = new List<Node>();
@@ -266,9 +320,6 @@ namespace ArmorstandAnimator
                 if (n.nodeType == NodeType.Root)
                     rootNodeList.Add(n);
             }
-
-            // .mcfunction書き込み用
-            writer = new System.IO.StreamWriter(path);
 
             // Root matrix
             writer.WriteLine(GetRootMatrix());

@@ -58,6 +58,7 @@ namespace ArmorstandAnimator
         // mcfunction書出用
         private GenerateModelMcfunc modelMcfunc;
         private GenerateAnimationMcfunction animationMcfunc;
+        private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
 
         // Start is called before the first frame update
         void Start()
@@ -73,6 +74,7 @@ namespace ArmorstandAnimator
             animationFileManager = this.gameObject.GetComponent<AnimationFileManager>();
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
             animationMcfunc = this.gameObject.GetComponent<GenerateAnimationMcfunction>();
+            animationMcfuncfs = this.gameObject.GetComponent<GenerateAnimationMcfunctionFixSpeed>();
         }
 
         // Update is called once per frame
@@ -119,7 +121,7 @@ namespace ArmorstandAnimator
                 this.nodeList = new List<Node>();
 
                 // プロジェクト設定更新
-                generalSetting.SetText("", "");
+                generalSetting.SetText("", "", false);
             }
 
             // 警告非表示
@@ -181,7 +183,7 @@ namespace ArmorstandAnimator
             this.nodeList = new List<Node>();
 
             // プロジェクト設定更新
-            generalSetting.SetText(project.itemID, project.modelName);
+            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities);
             // ノード作成
             nodeManager.CreateNodeProject(project.nodeList);
         }
@@ -223,7 +225,14 @@ namespace ArmorstandAnimator
         // Export animation datapack
         public void ExportFuncAnimation()
         {
+            if (ReferenceEquals(animationManager.keyframeUI.eventUIList, null))
+                Debug.Log("Null");
             animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList, animationManager.keyframeUI.eventUIList);
+        }
+
+        public void ExportFuncAnimationFs()
+        {
+            animationMcfuncfs.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
         }
 
         // Export animation datapack (animation only)
