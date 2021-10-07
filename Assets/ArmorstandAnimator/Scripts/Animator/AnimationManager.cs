@@ -190,8 +190,12 @@ namespace ArmorstandAnimator
         // キーフレーム追加
         public void AddKeyframe()
         {
+            // ローテーション用リスト新規作成
+            var newRotations = new List<Vector3>();
+            foreach (Vector3 rotate in keyframeList[selectedKeyframeIndex].rotations)
+                newRotations.Add(rotate);
             // キーフレーム作成
-            var newKeyframe = new Keyframe(keyframeList.Count, keyframeList[keyframeList.Count - 1].tick + 5, keyframeList[selectedKeyframeIndex].rootPos, keyframeList[selectedKeyframeIndex].rotations);
+            var newKeyframe = new Keyframe(keyframeList.Count, keyframeList[keyframeList.Count - 1].tick + 5, keyframeList[selectedKeyframeIndex].rootPos, newRotations);
             this.keyframeList.Add(newKeyframe);
             // キーフレームボタン作成
             AddKeyframeButton(newKeyframe);
@@ -256,8 +260,17 @@ namespace ArmorstandAnimator
         {
             // ノードTransform更新
             SetNodeRotation(keyframe);
+            // ローテーション用リスト新規作成
+            var newRotations = new List<Vector3>();
+            foreach (Vector3 rotate in keyframe.rotations)
+                newRotations.Add(rotate);
             // キーフレームの値更新
-            this.keyframeList[selectedKeyframeIndex] = keyframe;
+            this.keyframeList[selectedKeyframeIndex].index = keyframe.index;
+            this.keyframeList[selectedKeyframeIndex].rootPos = keyframe.rootPos;
+            this.keyframeList[selectedKeyframeIndex].rotations = newRotations;
+            this.keyframeList[selectedKeyframeIndex].tick = keyframe.tick;
+            // this.keyframeList[selectedKeyframeIndex] = keyframe;
+            // Debug.Log(keyframeList[selectedKeyframeIndex]);
             // tick順でキーフレームソート
             SortKeyframeByTick();
             // キーフレームビュー更新
@@ -473,7 +486,12 @@ namespace ArmorstandAnimator
         // キーフレーム反転（feature）
         public void MirrorKeyframe()
         {
-            var newKeyframe = new Keyframe(selectedKeyframeIndex, keyframeList[selectedKeyframeIndex].tick, keyframeList[selectedKeyframeIndex].rootPos, keyframeList[selectedKeyframeIndex].rotations);
+            // ローテーション用リスト新規作成
+            var newRotations = new List<Vector3>();
+            foreach (Vector3 rotate in keyframeList[selectedKeyframeIndex].rotations)
+                newRotations.Add(rotate);
+
+            var newKeyframe = new Keyframe(selectedKeyframeIndex, keyframeList[selectedKeyframeIndex].tick, keyframeList[selectedKeyframeIndex].rootPos, newRotations);
             int length = sceneManager.NodeList.Count();
 
             // rootPos反転
