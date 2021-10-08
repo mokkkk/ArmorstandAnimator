@@ -189,9 +189,18 @@ namespace ArmorstandAnimator
         }
 
         // 防具立て表示設定
-        public void SetArmorstandVisible(bool visible)
+        public void SetArmorstandVisible(bool visible, bool isSmall)
         {
-            this.transform.Find("ArmorStand").gameObject.SetActive(visible);
+            if (!isSmall)
+            {
+                this.transform.Find("ArmorStand").gameObject.SetActive(visible);
+                this.transform.Find("ArmorStandSmall").gameObject.SetActive(false);
+            }
+            else
+            {
+                this.transform.Find("ArmorStand").gameObject.SetActive(false);
+                this.transform.Find("ArmorStandSmall").gameObject.SetActive(visible);
+            }
         }
 
         // 回転軸表示設定

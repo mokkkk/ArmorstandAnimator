@@ -32,6 +32,13 @@ namespace ArmorstandAnimator
         // 一般設定
         [SerializeField]
         private GeneralSettingUI generalSetting;
+        public GeneralSettingUI GeneralSetting
+        {
+            get
+            {
+                return this.generalSetting;
+            }
+        }
         [SerializeField]
         private AnimationSettingUI animationSetting;
 
@@ -121,7 +128,7 @@ namespace ArmorstandAnimator
                 this.nodeList = new List<Node>();
 
                 // プロジェクト設定更新
-                generalSetting.SetText("", "", false);
+                generalSetting.SetText("", "", false, true, false);
             }
 
             // 警告非表示
@@ -183,7 +190,7 @@ namespace ArmorstandAnimator
             this.nodeList = new List<Node>();
 
             // プロジェクト設定更新
-            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities);
+            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities, project.isMarker, project.isSmall);
             // ノード作成
             nodeManager.CreateNodeProject(project.nodeList);
         }
@@ -265,7 +272,7 @@ namespace ArmorstandAnimator
         {
             foreach (Node n in NodeList)
             {
-                n.SetArmorstandVisible(generalSetting.ShowArmorstand);
+                n.SetArmorstandVisible(generalSetting.ShowArmorstand, generalSetting.IsSmall);
             }
         }
 
@@ -318,6 +325,30 @@ namespace ArmorstandAnimator
             animModeUI.SetActive(true);
             // アニメーションUI表示
             animationManager.CreateAnimationUI();
+        }
+
+        // Armorstand Small 0b/1b 切替
+        public void ChangeArmorstand()
+        {
+            var project = projectFileManager.SaveProjectFileModelReturn(generalSetting, nodeList);
+
+            // ノード消去
+            foreach (Node n in nodeList)
+            {
+                Destroy(n.targetNodeUI.gameObject);
+                Destroy(n.gameObject);
+            }
+
+            // リスト初期化
+            this.nodeList = new List<Node>();
+
+            // プロジェクト設定更新
+            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities, project.isMarker, project.isSmall);
+            // ノード作成
+            nodeManager.ChangeArmorstand(project.nodeList);
+
+            // Armorstand表示設定
+            ShowArmorstand();
         }
     }
 }

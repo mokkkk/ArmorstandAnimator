@@ -68,6 +68,7 @@ namespace ArmorstandAnimator
         private const float ScaleOffset = 16.0f;
         private const float HeadScaleOffset = 0.622568f;
         private const float PivotCenter = 8.0f;
+        private const float SmallArmorStandHeightOffset = -0.575f;
 
         public void Initialize()
         {
@@ -108,7 +109,7 @@ namespace ArmorstandAnimator
             var id = sceneManager.NodeList.Count;
 
             // モデル作成
-            var newNode = createNodeObject.GenerateJsonModel(paths[0], nodeName, id);
+            var newNode = createNodeObject.GenerateJsonModel(paths[0], nodeName, id, sceneManager.GeneralSetting.IsSmall);
 
             // ノード初期化
             newNode.transform.parent = nodeHolder;
@@ -119,6 +120,9 @@ namespace ArmorstandAnimator
 
             // Json読込UI非表示
             SetJsonFilePanelVisible();
+
+            // ノード位置更新
+            UpdateNodeTransform();
         }
 
         // プロジェクトファイルからノード作成
@@ -128,7 +132,7 @@ namespace ArmorstandAnimator
             foreach (ASAModelNode nodeData in nodeDataList)
             {
                 // モデル作成
-                var newNode = createNodeObject.GenerateJsonModelProject(nodeData);
+                var newNode = createNodeObject.GenerateJsonModelProject(nodeData, sceneManager.GeneralSetting.IsSmall);
 
                 // ノード初期化
                 newNode.transform.parent = nodeHolder;
@@ -277,6 +281,15 @@ namespace ArmorstandAnimator
                 if (n.nodeType == NodeType.Root)
                     SetNodePosition(n, Vector3.zero);
             }
+
+            // IsSmall == true の場合，全ノードを下にオフセット
+            if (sceneManager.GeneralSetting.IsSmall)
+            {
+                foreach (Node n in sceneManager.NodeList)
+                {
+                    n.transform.localPosition += Vector3.up * SmallArmorStandHeightOffset;
+                }
+            }
         }
 
         // ノード親子関係整理
@@ -359,6 +372,37 @@ namespace ArmorstandAnimator
             SetJsonFilePanelVisibleUpdate();
 
             // モデル位置更新
+            UpdateNodeTransform();
+        }
+
+        // ノードサイズ変更
+        public void ChangeArmorstand(ASAModelNode[] nodeDataList)
+        {
+            // モデル作成
+            foreach (ASAModelNode nodeData in nodeDataList)
+            {
+                // モデル作成
+                var newNode = createNodeObject.ChangeNodeSize(nodeData, sceneManager.GeneralSetting.IsSmall);
+
+                // ノード初期化
+                newNode.transform.parent = nodeHolder;
+                newNode.InitializeProject(nodeData, nodeUIObj, nodeUIScrollview);
+
+                // SceneManagerのNodeListにノード追加
+                sceneManager.NodeList.Add(newNode);
+            }
+
+            // 親ノード取得
+            foreach (Node n in sceneManager.NodeList)
+            {
+                if (n.nodeType != NodeType.Root)
+                    foreach (Node m in sceneManager.NodeList)
+                        if (m.nodeID == n.parentNodeID)
+                            n.SetParentNode(m);
+            }
+            CreateNodeTree();
+
+            // ノード位置更新
             UpdateNodeTransform();
         }
     }

@@ -62,13 +62,32 @@ namespace ArmorstandAnimator
                 return this.multiEntities.isOn;
             }
         }
+        [SerializeField]
+        private Toggle isMarker;
+        public bool IsMarker
+        {
+            get
+            {
+                return this.isMarker.isOn;
+            }
+        }
+        [SerializeField]
+        private Toggle isSmall;
+        public bool IsSmall
+        {
+            get
+            {
+                return this.isSmall.isOn;
+            }
+        }
 
-        public void SetText(string itemId, string modelName, bool multiEntities)
+        public void SetText(string itemId, string modelName, bool multiEntities, bool isMarker, bool isSmall)
         {
             this.cmdItemID.text = itemId;
             this.modelName.text = modelName;
             this.multiEntities.isOn = multiEntities;
-            Debug.Log(itemId);
+            this.isMarker.isOn = isMarker;
+            this.isSmall.isOn = isSmall;
         }
 
         public void OnShowArmorstandChanged()
@@ -84,6 +103,11 @@ namespace ArmorstandAnimator
         public void OnShowGroundChanged()
         {
             sceneManager.ShowGround();
+        }
+
+        public void OnIsSmallChanged()
+        {
+            sceneManager.ChangeArmorstand();
         }
     }
 }
