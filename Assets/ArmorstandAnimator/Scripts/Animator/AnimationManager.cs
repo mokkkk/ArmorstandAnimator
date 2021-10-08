@@ -77,6 +77,7 @@ namespace ArmorstandAnimator
         private const float KeyframeButtonMarginOffset = 5f;
         // tick -> 秒
         private const float TickToSec = 0.05f;
+        private const float SmallArmorStandHeightOffset = -0.7f;
 
         // Start is called before the first frame update
         void Start()
@@ -339,6 +340,15 @@ namespace ArmorstandAnimator
             foreach (Node n in sceneManager.NodeList)
             {
                 n.transform.position += keyframe.rootPos;
+            }
+
+            // IsSmall == true の場合，全ノードを下にオフセット
+            if (sceneManager.GeneralSetting.IsSmall)
+            {
+                foreach (Node n in sceneManager.NodeList)
+                {
+                    n.transform.localPosition += Vector3.up * SmallArmorStandHeightOffset;
+                }
             }
         }
 

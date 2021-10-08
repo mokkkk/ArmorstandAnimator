@@ -49,7 +49,7 @@ namespace ArmorstandAnimator
         private const float ScaleOffset = 16.0f;
         // private const float HeadScaleOffset = 0.6225681f;
         private const float HeadScaleOffset = 0.625f;
-        private const float HeadScaleOffsetSmall = 0.475f;
+        private const float HeadScaleOffsetSmall = 0.4635f;
         private const float TranslationOffset = 14.0f;
         /* Small Armorstand : 
         Transform Offset ： 0 1 0
@@ -72,6 +72,12 @@ namespace ArmorstandAnimator
 
             // ID設定
             node.nodeID = id;
+
+            // 初期値設定
+            if (!isSmall)
+                elementHolder.localPosition = Vector3.up * 16.0f * 0.0390625f / 2.0f;
+            else
+                elementHolder.localPosition = Vector3.up * 16.0f * 0.02896875f / 2.0f;
 
             // ファイル読み込み
             string line;
@@ -119,10 +125,14 @@ namespace ArmorstandAnimator
                 // head.translation
                 if (inputJson.display.head.translation != null)
                 {
-                    var headTranslation = new Vector3(0, inputJson.display.head.translation[1] * 0.03214285f, 0);
-                    Debug.Log($"{inputJson.display.head.translation[1]} -> {headTranslation.y}");
-
-                    // var headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffset, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffset, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffset);
+                    // var headTranslation = new Vector3(0, inputJson.display.head.translation[1] * 0.03214285f, 0);
+                    // Debug.Log($"{inputJson.display.head.translation[1]} -> {headTranslation.y}");
+                    Debug.Log(elementHolder.localPosition);
+                    var headTranslation = Vector3.zero;
+                    if (!isSmall)
+                        headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffset, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffset, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffset);
+                    else
+                        headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffsetSmall, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffsetSmall, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffsetSmall);
                     elementHolder.localPosition += headTranslation;
                 }
 
@@ -209,6 +219,12 @@ namespace ArmorstandAnimator
             node.nodeManager = nodeManager;
             var elementHolder = newNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
 
+            // 初期値設定
+            if (!isSmall)
+                elementHolder.localPosition = Vector3.up * 16.0f * 0.0390625f / 2.0f;
+            else
+                elementHolder.localPosition = Vector3.up * 16.0f * 0.02896875f / 2.0f;
+
             // ID設定
             node.nodeID = nodeData.id;
 
@@ -247,7 +263,7 @@ namespace ArmorstandAnimator
         }
 
         // ノード更新
-        public void UpdateJsonModel(string path, Node targetNode)
+        public void UpdateJsonModel(string path, Node targetNode, bool isSmall)
         {
             // component, transform取得
             var elementHolder = targetNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
@@ -296,7 +312,20 @@ namespace ArmorstandAnimator
 
             // Scale Offset
             elementHolder.localScale /= ScaleOffset;
-            elementHolder.localScale *= HeadScaleOffset;
+            if (!isSmall)
+            {
+                elementHolder.localScale *= HeadScaleOffset;
+            }
+            else
+            {
+                elementHolder.localScale *= HeadScaleOffsetSmall;
+            }
+
+            // 初期値設定
+            if (!isSmall)
+                elementHolder.localPosition = Vector3.up * 16.0f * 0.0390625f / 2.0f;
+            else
+                elementHolder.localPosition = Vector3.up * 16.0f * 0.02896875f / 2.0f;
 
             // head
             if (!ReferenceEquals(inputJson.display.head, null))
@@ -310,7 +339,12 @@ namespace ArmorstandAnimator
                 // head.translation
                 if (inputJson.display.head.translation != null)
                 {
-                    var headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffset, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffset, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffset);
+                    Debug.Log(elementHolder.localPosition);
+                    var headTranslation = Vector3.zero;
+                    if (!isSmall)
+                        headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffset, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffset, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffset);
+                    else
+                        headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffsetSmall, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffsetSmall, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffsetSmall);
                     elementHolder.localPosition += headTranslation;
                 }
 
@@ -323,6 +357,7 @@ namespace ArmorstandAnimator
             }
         }
 
+        // Small切替
         public Node ChangeNodeSize(ASAModelNode nodeData, bool isSmall)
         {
             // component, transform取得
@@ -330,6 +365,12 @@ namespace ArmorstandAnimator
             var node = newNode.GetComponent<Node>();
             node.nodeManager = nodeManager;
             var elementHolder = newNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
+
+            // 初期値設定
+            if (!isSmall)
+                elementHolder.localPosition = Vector3.up * 16.0f * 0.0390625f / 2.0f;
+            else
+                elementHolder.localPosition = Vector3.up * 16.0f * 0.02896875f / 2.0f;
 
             // ID設定
             node.nodeID = nodeData.id;

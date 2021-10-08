@@ -66,9 +66,8 @@ namespace ArmorstandAnimator
         private InputField updateCustomModelDataField;
 
         private const float ScaleOffset = 16.0f;
-        private const float HeadScaleOffset = 0.622568f;
         private const float PivotCenter = 8.0f;
-        private const float SmallArmorStandHeightOffset = -0.575f;
+        private const float SmallArmorStandHeightOffset = -0.7f;
 
         public void Initialize()
         {
@@ -365,7 +364,7 @@ namespace ArmorstandAnimator
             var customModelData = int.Parse(updateCustomModelDataField.text);
 
             // モデル更新
-            createNodeObject.UpdateJsonModel(paths[0], updateTargetNode);
+            createNodeObject.UpdateJsonModel(paths[0], updateTargetNode, sceneManager.GeneralSetting.IsSmall);
             updateTargetNode.UpdateNodeName(nodeName);
 
             // Json読込UI非表示

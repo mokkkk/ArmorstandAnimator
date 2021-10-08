@@ -73,13 +73,31 @@ namespace ArmorstandAnimator
 
         private string ArmorstandNbtRoot()
         {
-            var line = $"summon armor_stand ~ ~ ~ {{Marker:1b,Invisible:1b,Tags:[\"{generalSetting.ModelName}Root\"]}}";
+            string marker, small = "";
+            if (generalSetting.IsMarker)
+                marker = "Marker:1b";
+            else
+                marker = "NoGravity:1b,Invulnerable:1b";
+
+            if (generalSetting.IsSmall)
+                small = ",Small:1b";
+
+            var line = $"summon armor_stand ~ ~ ~ {{{marker}{small},Invisible:1b,Tags:[\"{generalSetting.ModelName}Root\"]}}";
             return line;
         }
 
         private string ArmorstandNbt(Node node)
         {
-            var line = $"summon armor_stand ~ ~ ~ {{Marker:1b,Invisible:1b,Tags:[\"{generalSetting.ModelName}Parts\",\"{node.nodeName}\"],ArmorItems:[{{}},{{}},{{}},{{id:\"minecraft:{generalSetting.CmdItemID}\",Count:1b,tag:{{CustomModelData:{node.customModelData},Rotate:[0f,0f,0f]}}}}],Pose:{{Head:[{node.rotate.x}f,{node.rotate.y}f,{node.rotate.z}f]}}}}";
+            string marker, small = "";
+            if (generalSetting.IsMarker)
+                marker = "Marker:1b";
+            else
+                marker = "NoGravity:1b,Invulnerable:1b";
+
+            if (generalSetting.IsSmall)
+                small = ",Small:1b";
+
+            var line = $"summon armor_stand ~ ~ ~ {{{marker}{small},Invisible:1b,Tags:[\"{generalSetting.ModelName}Parts\",\"{node.nodeName}\"],ArmorItems:[{{}},{{}},{{}},{{id:\"minecraft:{generalSetting.CmdItemID}\",Count:1b,tag:{{CustomModelData:{node.customModelData},Rotate:[0f,0f,0f]}}}}],Pose:{{Head:[{node.rotate.x}f,{node.rotate.y}f,{node.rotate.z}f]}}}}";
 
             return line;
         }
@@ -139,6 +157,7 @@ namespace ArmorstandAnimator
         private string SetRootNodePosition(Node node)
         {
             string line = "";
+
             if (generalSetting.MultiEntities)
                 line = $"execute as @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={node.nodeName}] if score @s AsamID = #asa_id_temp AsamID rotated ~ 0 run tp @s ^{-node.pos.x} ^{node.pos.y} ^{node.pos.z} ~ ~";
             else
