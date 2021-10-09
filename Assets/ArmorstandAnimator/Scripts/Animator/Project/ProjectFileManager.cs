@@ -10,10 +10,13 @@ namespace ArmorstandAnimator
     [Serializable]
     public class ASAModelProject
     {
+        public int fileVersion;
         public string itemID;
         public string modelName;
         public ASAModelNode[] nodeList;
         public bool multiEntities;
+        public bool isMarker;
+        public bool isSmall;
     }
     [Serializable]
     public class ASAModelNode
@@ -27,6 +30,7 @@ namespace ArmorstandAnimator
         public float[] rotate;
         public ASAModelNodeTransform transform;
         public ASAModelNodeElement[] elements;
+        public float[] rawTranslation;
     }
     [Serializable]
     public class ASAModelNodeTransform
@@ -95,9 +99,16 @@ namespace ArmorstandAnimator
                     nodeArray[i].elements[j].rotation = new float[] { nodeList[i].elementCubes[j].localEulerAngles.x, nodeList[i].elementCubes[j].localEulerAngles.y, nodeList[i].elementCubes[j].localEulerAngles.z };
                     nodeArray[i].elements[j].scale = new float[] { nodeList[i].elementCubes[j].localScale.x, nodeList[i].elementCubes[j].localScale.y, nodeList[i].elementCubes[j].localScale.z };
                 }
+
+                nodeArray[i].rawTranslation = new float[] { nodeList[i].rawTranslation.x, nodeList[i].rawTranslation.y, nodeList[i].rawTranslation.z };
             }
             project.nodeList = nodeArray;
             project.multiEntities = generalSetting.MultiEntities;
+            project.isMarker = generalSetting.IsMarker;
+            project.isSmall = generalSetting.IsSmall;
+
+            // v0.9.5~
+            project.fileVersion = 2;
 
             // プロジェクトファイル保存
             var projectFileJson = JsonUtility.ToJson(project);
@@ -155,10 +166,63 @@ namespace ArmorstandAnimator
 
             if (ReferenceEquals(project.multiEntities, null))
                 project.multiEntities = false;
+            if (ReferenceEquals(project.isMarker, null))
+                project.isMarker = true;
+            if (ReferenceEquals(project.isSmall, null))
+                project.isSmall = false;
+            if (ReferenceEquals(project.fileVersion, null))
+                project.fileVersion = 1;
 
             Debug.Log("ProjectFile Loaded");
 
             return 0;
+        }
+
+        public ASAModelProject SaveProjectFileModelReturn(GeneralSettingUI generalSetting, List<Node> nodeList)
+        {
+            // Jsonシリアライズ用インスタンスに値代入
+            ASAModelProject project = new ASAModelProject();
+            project.itemID = generalSetting.CmdItemID;
+            project.modelName = generalSetting.ModelName;
+
+            var nodeArray = new ASAModelNode[nodeList.Count];
+            for (int i = 0; i < nodeArray.Length; i++)
+            {
+                nodeArray[i] = new ASAModelNode();
+                nodeArray[i].id = nodeList[i].nodeID;
+                nodeArray[i].nodeName = nodeList[i].nodeName;
+                nodeArray[i].cmdID = nodeList[i].customModelData;
+                nodeArray[i].nodeType = nodeList[i].nodeType;
+                if (nodeList[i].nodeType != NodeType.Root)
+                    nodeArray[i].parentNodeID = nodeList[i].parentNode.nodeID;
+                else
+                    nodeArray[i].parentNodeID = 0;
+                nodeArray[i].pos = new float[] { nodeList[i].pos.x, nodeList[i].pos.y, nodeList[i].pos.z };
+                nodeArray[i].rotate = new float[] { nodeList[i].rotate.x, nodeList[i].rotate.y, nodeList[i].rotate.z };
+
+                nodeArray[i].transform = new ASAModelNodeTransform();
+                nodeArray[i].transform.position = new float[] { nodeList[i].element.localPosition.x, nodeList[i].element.localPosition.y, nodeList[i].element.localPosition.z };
+                nodeArray[i].transform.rotation = new float[] { nodeList[i].element.localEulerAngles.x, nodeList[i].element.localEulerAngles.y, nodeList[i].element.localEulerAngles.z };
+                nodeArray[i].transform.scale = new float[] { nodeList[i].element.localScale.x, nodeList[i].element.localScale.y, nodeList[i].element.localScale.z };
+
+                nodeArray[i].elements = new ASAModelNodeElement[nodeList[i].elementCubes.Count];
+                for (int j = 0; j < nodeArray[i].elements.Length; j++)
+                {
+                    nodeArray[i].elements[j] = new ASAModelNodeElement();
+
+                    nodeArray[i].elements[j].position = new float[] { nodeList[i].elementCubes[j].localPosition.x, nodeList[i].elementCubes[j].localPosition.y, nodeList[i].elementCubes[j].localPosition.z };
+                    nodeArray[i].elements[j].rotation = new float[] { nodeList[i].elementCubes[j].localEulerAngles.x, nodeList[i].elementCubes[j].localEulerAngles.y, nodeList[i].elementCubes[j].localEulerAngles.z };
+                    nodeArray[i].elements[j].scale = new float[] { nodeList[i].elementCubes[j].localScale.x, nodeList[i].elementCubes[j].localScale.y, nodeList[i].elementCubes[j].localScale.z };
+                }
+
+                nodeArray[i].rawTranslation = new float[] { nodeList[i].rawTranslation.x, nodeList[i].rawTranslation.y, nodeList[i].rawTranslation.z };
+            }
+            project.nodeList = nodeArray;
+            project.multiEntities = generalSetting.MultiEntities;
+            project.isMarker = generalSetting.IsMarker;
+            project.isSmall = generalSetting.IsSmall;
+
+            return project;
         }
     }
 }

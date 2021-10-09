@@ -12,7 +12,6 @@ namespace ArmorstandAnimator
 
     public class Node : MonoBehaviour
     {
-
         // NodeManager
         public NodeManager nodeManager;
         // 対応するUI
@@ -47,6 +46,9 @@ namespace ArmorstandAnimator
 
         // キューブ
         public List<Transform> elementCubes;
+
+        // データ保存用
+        public Vector3 rawTranslation;
 
         // 初期化
         public void Initialize(string nodeName, int customModelData, GameObject nodeUIObj, Transform uiParent)
@@ -189,9 +191,18 @@ namespace ArmorstandAnimator
         }
 
         // 防具立て表示設定
-        public void SetArmorstandVisible(bool visible)
+        public void SetArmorstandVisible(bool visible, bool isSmall)
         {
-            this.transform.Find("ArmorStand").gameObject.SetActive(visible);
+            if (!isSmall)
+            {
+                this.transform.Find("ArmorStand").gameObject.SetActive(visible);
+                this.transform.Find("ArmorStandSmall").gameObject.SetActive(false);
+            }
+            else
+            {
+                this.transform.Find("ArmorStand").gameObject.SetActive(false);
+                this.transform.Find("ArmorStandSmall").gameObject.SetActive(visible);
+            }
         }
 
         // 回転軸表示設定

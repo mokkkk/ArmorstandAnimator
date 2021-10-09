@@ -66,8 +66,10 @@ namespace ArmorstandAnimator
         private InputField updateCustomModelDataField;
 
         private const float ScaleOffset = 16.0f;
-        private const float HeadScaleOffset = 0.622568f;
         private const float PivotCenter = 8.0f;
+        private const float SmallArmorStandHeightOffset = -0.7f;
+        private const float HeadScaleOffset = 0.625f;
+        private const float HeadScaleOffsetSmall = 0.4635f;
 
         public void Initialize()
         {
@@ -108,7 +110,7 @@ namespace ArmorstandAnimator
             var id = sceneManager.NodeList.Count;
 
             // モデル作成
-            var newNode = createNodeObject.GenerateJsonModel(paths[0], nodeName, id);
+            var newNode = createNodeObject.GenerateJsonModel(paths[0], nodeName, id, sceneManager.GeneralSetting.IsSmall);
 
             // ノード初期化
             newNode.transform.parent = nodeHolder;
@@ -119,6 +121,12 @@ namespace ArmorstandAnimator
 
             // Json読込UI非表示
             SetJsonFilePanelVisible();
+
+            // ノード位置更新
+            UpdateNodeTransform();
+
+            // 表示切替
+            sceneManager.ShowArmorstand();
         }
 
         // プロジェクトファイルからノード作成
@@ -128,7 +136,7 @@ namespace ArmorstandAnimator
             foreach (ASAModelNode nodeData in nodeDataList)
             {
                 // モデル作成
-                var newNode = createNodeObject.GenerateJsonModelProject(nodeData);
+                var newNode = createNodeObject.GenerateJsonModelProject(nodeData, sceneManager.GeneralSetting.IsSmall);
 
                 // ノード初期化
                 newNode.transform.parent = nodeHolder;
@@ -150,6 +158,9 @@ namespace ArmorstandAnimator
 
             // ノード位置更新
             UpdateNodeTransform();
+
+            // 表示切替
+            sceneManager.ShowArmorstand();
         }
 
         // ノードUIのみ表示
@@ -277,6 +288,15 @@ namespace ArmorstandAnimator
                 if (n.nodeType == NodeType.Root)
                     SetNodePosition(n, Vector3.zero);
             }
+
+            // IsSmall == true の場合，全ノードを下にオフセット
+            if (sceneManager.GeneralSetting.IsSmall)
+            {
+                foreach (Node n in sceneManager.NodeList)
+                {
+                    n.transform.localPosition += Vector3.up * SmallArmorStandHeightOffset;
+                }
+            }
         }
 
         // ノード親子関係整理
@@ -352,13 +372,51 @@ namespace ArmorstandAnimator
             var customModelData = int.Parse(updateCustomModelDataField.text);
 
             // モデル更新
-            createNodeObject.UpdateJsonModel(paths[0], updateTargetNode);
+            createNodeObject.UpdateJsonModel(paths[0], updateTargetNode, sceneManager.GeneralSetting.IsSmall);
             updateTargetNode.UpdateNodeName(nodeName);
 
             // Json読込UI非表示
             SetJsonFilePanelVisibleUpdate();
 
             // モデル位置更新
+            UpdateNodeTransform();
+        }
+
+        // ノードサイズ変更
+        public void ChangeArmorstand(ASAModelNode[] nodeDataList, bool isSmall)
+        {
+            // モデル作成
+            foreach (ASAModelNode nodeData in nodeDataList)
+            {
+                // モデル作成
+                var newNode = createNodeObject.ChangeNodeSize(nodeData, sceneManager.GeneralSetting.IsSmall);
+
+                // ノード初期化
+                newNode.transform.parent = nodeHolder;
+                newNode.InitializeProject(nodeData, nodeUIObj, nodeUIScrollview);
+
+                // ポジションオフセット
+                if (!isSmall)
+                    newNode.pos = new Vector3(newNode.pos.x * HeadScaleOffset / HeadScaleOffsetSmall, newNode.pos.y * HeadScaleOffset / HeadScaleOffsetSmall, newNode.pos.z * HeadScaleOffset / HeadScaleOffsetSmall);
+                else
+                    newNode.pos = new Vector3(newNode.pos.x / HeadScaleOffset * HeadScaleOffsetSmall, newNode.pos.y / HeadScaleOffset * HeadScaleOffsetSmall, newNode.pos.z / HeadScaleOffset * HeadScaleOffsetSmall);
+                newNode.targetNodeUI.SetPositionText(newNode.pos);
+
+                // SceneManagerのNodeListにノード追加
+                sceneManager.NodeList.Add(newNode);
+            }
+
+            // 親ノード取得
+            foreach (Node n in sceneManager.NodeList)
+            {
+                if (n.nodeType != NodeType.Root)
+                    foreach (Node m in sceneManager.NodeList)
+                        if (m.nodeID == n.parentNodeID)
+                            n.SetParentNode(m);
+            }
+            CreateNodeTree();
+
+            // ノード位置更新
             UpdateNodeTransform();
         }
     }
