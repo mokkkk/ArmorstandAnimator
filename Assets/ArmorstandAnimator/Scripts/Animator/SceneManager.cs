@@ -128,7 +128,7 @@ namespace ArmorstandAnimator
                 this.nodeList = new List<Node>();
 
                 // プロジェクト設定更新
-                generalSetting.SetText("", "", false, true, false);
+                generalSetting.SetText("", "", false, true, false, 99);
             }
 
             // 警告非表示
@@ -190,7 +190,7 @@ namespace ArmorstandAnimator
             this.nodeList = new List<Node>();
 
             // プロジェクト設定更新
-            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities, project.isMarker, project.isSmall);
+            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities, project.isMarker, project.isSmall, project.fileVersion);
             // ノード作成
             nodeManager.CreateNodeProject(project.nodeList);
         }
@@ -343,9 +343,9 @@ namespace ArmorstandAnimator
             this.nodeList = new List<Node>();
 
             // プロジェクト設定更新
-            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities, project.isMarker, project.isSmall);
+            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities, project.isMarker, project.isSmall, 99);
             // ノード作成
-            nodeManager.ChangeArmorstand(project.nodeList);
+            nodeManager.ChangeArmorstand(project.nodeList, project.isSmall);
 
             // Armorstand表示設定
             ShowArmorstand();

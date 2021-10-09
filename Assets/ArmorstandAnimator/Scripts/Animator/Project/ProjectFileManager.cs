@@ -10,6 +10,7 @@ namespace ArmorstandAnimator
     [Serializable]
     public class ASAModelProject
     {
+        public int fileVersion;
         public string itemID;
         public string modelName;
         public ASAModelNode[] nodeList;
@@ -29,6 +30,7 @@ namespace ArmorstandAnimator
         public float[] rotate;
         public ASAModelNodeTransform transform;
         public ASAModelNodeElement[] elements;
+        public float[] rawTranslation;
     }
     [Serializable]
     public class ASAModelNodeTransform
@@ -97,11 +99,16 @@ namespace ArmorstandAnimator
                     nodeArray[i].elements[j].rotation = new float[] { nodeList[i].elementCubes[j].localEulerAngles.x, nodeList[i].elementCubes[j].localEulerAngles.y, nodeList[i].elementCubes[j].localEulerAngles.z };
                     nodeArray[i].elements[j].scale = new float[] { nodeList[i].elementCubes[j].localScale.x, nodeList[i].elementCubes[j].localScale.y, nodeList[i].elementCubes[j].localScale.z };
                 }
+
+                nodeArray[i].rawTranslation = new float[] { nodeList[i].rawTranslation.x, nodeList[i].rawTranslation.y, nodeList[i].rawTranslation.z };
             }
             project.nodeList = nodeArray;
             project.multiEntities = generalSetting.MultiEntities;
             project.isMarker = generalSetting.IsMarker;
             project.isSmall = generalSetting.IsSmall;
+
+            // v0.9.5~
+            project.fileVersion = 2;
 
             // プロジェクトファイル保存
             var projectFileJson = JsonUtility.ToJson(project);
@@ -160,9 +167,11 @@ namespace ArmorstandAnimator
             if (ReferenceEquals(project.multiEntities, null))
                 project.multiEntities = false;
             if (ReferenceEquals(project.isMarker, null))
-                project.isMarker = false;
+                project.isMarker = true;
             if (ReferenceEquals(project.isSmall, null))
                 project.isSmall = false;
+            if (ReferenceEquals(project.fileVersion, null))
+                project.fileVersion = 1;
 
             Debug.Log("ProjectFile Loaded");
 
@@ -205,6 +214,8 @@ namespace ArmorstandAnimator
                     nodeArray[i].elements[j].rotation = new float[] { nodeList[i].elementCubes[j].localEulerAngles.x, nodeList[i].elementCubes[j].localEulerAngles.y, nodeList[i].elementCubes[j].localEulerAngles.z };
                     nodeArray[i].elements[j].scale = new float[] { nodeList[i].elementCubes[j].localScale.x, nodeList[i].elementCubes[j].localScale.y, nodeList[i].elementCubes[j].localScale.z };
                 }
+
+                nodeArray[i].rawTranslation = new float[] { nodeList[i].rawTranslation.x, nodeList[i].rawTranslation.y, nodeList[i].rawTranslation.z };
             }
             project.nodeList = nodeArray;
             project.multiEntities = generalSetting.MultiEntities;

@@ -68,6 +68,8 @@ namespace ArmorstandAnimator
         private const float ScaleOffset = 16.0f;
         private const float PivotCenter = 8.0f;
         private const float SmallArmorStandHeightOffset = -0.7f;
+        private const float HeadScaleOffset = 0.625f;
+        private const float HeadScaleOffsetSmall = 0.4635f;
 
         public void Initialize()
         {
@@ -122,6 +124,9 @@ namespace ArmorstandAnimator
 
             // ノード位置更新
             UpdateNodeTransform();
+
+            // 表示切替
+            sceneManager.ShowArmorstand();
         }
 
         // プロジェクトファイルからノード作成
@@ -153,6 +158,9 @@ namespace ArmorstandAnimator
 
             // ノード位置更新
             UpdateNodeTransform();
+
+            // 表示切替
+            sceneManager.ShowArmorstand();
         }
 
         // ノードUIのみ表示
@@ -375,7 +383,7 @@ namespace ArmorstandAnimator
         }
 
         // ノードサイズ変更
-        public void ChangeArmorstand(ASAModelNode[] nodeDataList)
+        public void ChangeArmorstand(ASAModelNode[] nodeDataList, bool isSmall)
         {
             // モデル作成
             foreach (ASAModelNode nodeData in nodeDataList)
@@ -386,6 +394,13 @@ namespace ArmorstandAnimator
                 // ノード初期化
                 newNode.transform.parent = nodeHolder;
                 newNode.InitializeProject(nodeData, nodeUIObj, nodeUIScrollview);
+
+                // ポジションオフセット
+                if (!isSmall)
+                    newNode.pos = new Vector3(newNode.pos.x * HeadScaleOffset / HeadScaleOffsetSmall, newNode.pos.y * HeadScaleOffset / HeadScaleOffsetSmall, newNode.pos.z * HeadScaleOffset / HeadScaleOffsetSmall);
+                else
+                    newNode.pos = new Vector3(newNode.pos.x / HeadScaleOffset * HeadScaleOffsetSmall, newNode.pos.y / HeadScaleOffset * HeadScaleOffsetSmall, newNode.pos.z / HeadScaleOffset * HeadScaleOffsetSmall);
+                newNode.targetNodeUI.SetPositionText(newNode.pos);
 
                 // SceneManagerのNodeListにノード追加
                 sceneManager.NodeList.Add(newNode);

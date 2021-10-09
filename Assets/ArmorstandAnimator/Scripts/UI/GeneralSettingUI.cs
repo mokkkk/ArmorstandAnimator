@@ -81,13 +81,22 @@ namespace ArmorstandAnimator
             }
         }
 
-        public void SetText(string itemId, string modelName, bool multiEntities, bool isMarker, bool isSmall)
+        public void SetText(string itemId, string modelName, bool multiEntities, bool isMarker, bool isSmall, int fileVersion)
         {
             this.cmdItemID.text = itemId;
             this.modelName.text = modelName;
             this.multiEntities.isOn = multiEntities;
             this.isMarker.isOn = isMarker;
-            this.isSmall.isOn = isSmall;
+            if (fileVersion > 1)
+            {
+                this.isSmall.isOn = isSmall;
+                this.isSmall.interactable = true;
+            }
+            else
+            {
+                this.isSmall.isOn = false;
+                this.isSmall.interactable = false;
+            }
         }
 
         public void OnShowArmorstandChanged()

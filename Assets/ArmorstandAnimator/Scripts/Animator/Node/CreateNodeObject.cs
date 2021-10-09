@@ -78,6 +78,7 @@ namespace ArmorstandAnimator
                 elementHolder.localPosition = Vector3.up * 16.0f * 0.0390625f / 2.0f;
             else
                 elementHolder.localPosition = Vector3.up * 16.0f * 0.02896875f / 2.0f;
+            node.rawTranslation = Vector3.zero;
 
             // ファイル読み込み
             string line;
@@ -125,9 +126,7 @@ namespace ArmorstandAnimator
                 // head.translation
                 if (inputJson.display.head.translation != null)
                 {
-                    // var headTranslation = new Vector3(0, inputJson.display.head.translation[1] * 0.03214285f, 0);
-                    // Debug.Log($"{inputJson.display.head.translation[1]} -> {headTranslation.y}");
-                    Debug.Log(elementHolder.localPosition);
+                    node.rawTranslation = new Vector3(inputJson.display.head.translation[0], inputJson.display.head.translation[1], inputJson.display.head.translation[2]);
                     var headTranslation = Vector3.zero;
                     if (!isSmall)
                         headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffset, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffset, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffset);
@@ -218,12 +217,11 @@ namespace ArmorstandAnimator
             var node = newNode.GetComponent<Node>();
             node.nodeManager = nodeManager;
             var elementHolder = newNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
-
-            // 初期値設定
-            if (!isSmall)
-                elementHolder.localPosition = Vector3.up * 16.0f * 0.0390625f / 2.0f;
+            // RawTranslation取得
+            if (!ReferenceEquals(nodeData.rawTranslation, null))
+                node.rawTranslation = new Vector3(nodeData.rawTranslation[0], nodeData.rawTranslation[1], nodeData.rawTranslation[2]);
             else
-                elementHolder.localPosition = Vector3.up * 16.0f * 0.02896875f / 2.0f;
+                node.rawTranslation = Vector3.zero;
 
             // ID設定
             node.nodeID = nodeData.id;
@@ -238,7 +236,10 @@ namespace ArmorstandAnimator
             elementHolder.localEulerAngles = new Vector3(nodeData.transform.rotation[0], nodeData.transform.rotation[1], nodeData.transform.rotation[2]);
 
             // head.translation
-            elementHolder.localPosition = new Vector3(nodeData.transform.position[0], nodeData.transform.position[1], nodeData.transform.position[2]);
+            if (ReferenceEquals(nodeData.rawTranslation, null))
+                elementHolder.localPosition = new Vector3(nodeData.transform.position[0], nodeData.transform.position[1], nodeData.transform.position[2]);
+            else
+                elementHolder.localPosition = HeadTranslation(node.rawTranslation, isSmall);
 
             // head.scale
             elementHolder.localScale = new Vector3(nodeData.transform.scale[0], nodeData.transform.scale[1], nodeData.transform.scale[2]);
@@ -339,7 +340,7 @@ namespace ArmorstandAnimator
                 // head.translation
                 if (inputJson.display.head.translation != null)
                 {
-                    Debug.Log(elementHolder.localPosition);
+                    targetNode.rawTranslation = new Vector3(inputJson.display.head.translation[0], inputJson.display.head.translation[1], inputJson.display.head.translation[2]);
                     var headTranslation = Vector3.zero;
                     if (!isSmall)
                         headTranslation = new Vector3(inputJson.display.head.translation[0] / ScaleOffset * HeadScaleOffset, inputJson.display.head.translation[1] / ScaleOffset * HeadScaleOffset, -inputJson.display.head.translation[2] / ScaleOffset * HeadScaleOffset);
@@ -366,14 +367,14 @@ namespace ArmorstandAnimator
             node.nodeManager = nodeManager;
             var elementHolder = newNode.transform.Find("Pose2").Find("Pose01").Find("Elements");
 
+            // ID設定
+            node.nodeID = nodeData.id;
+
             // 初期値設定
             if (!isSmall)
                 elementHolder.localPosition = Vector3.up * 16.0f * 0.0390625f / 2.0f;
             else
                 elementHolder.localPosition = Vector3.up * 16.0f * 0.02896875f / 2.0f;
-
-            // ID設定
-            node.nodeID = nodeData.id;
 
             // キューブ生成
             foreach (ASAModelNodeElement element in nodeData.elements)
@@ -385,7 +386,13 @@ namespace ArmorstandAnimator
             elementHolder.localEulerAngles = new Vector3(nodeData.transform.rotation[0], nodeData.transform.rotation[1], nodeData.transform.rotation[2]);
 
             // head.translation
-            elementHolder.localPosition = new Vector3(nodeData.transform.position[0], nodeData.transform.position[1], nodeData.transform.position[2]);
+            var headTranslation = Vector3.zero;
+            node.rawTranslation = new Vector3(nodeData.rawTranslation[0], nodeData.rawTranslation[1], nodeData.rawTranslation[2]);
+            if (!isSmall)
+                headTranslation = new Vector3(nodeData.rawTranslation[0] / ScaleOffset * HeadScaleOffset, nodeData.rawTranslation[1] / ScaleOffset * HeadScaleOffset, -nodeData.rawTranslation[2] / ScaleOffset * HeadScaleOffset);
+            else
+                headTranslation = new Vector3(nodeData.rawTranslation[0] / ScaleOffset * HeadScaleOffsetSmall, nodeData.rawTranslation[1] / ScaleOffset * HeadScaleOffsetSmall, -nodeData.rawTranslation[2] / ScaleOffset * HeadScaleOffsetSmall);
+            elementHolder.localPosition += headTranslation;
 
             // head.scale
             elementHolder.localScale = new Vector3(nodeData.transform.scale[0], nodeData.transform.scale[1], nodeData.transform.scale[2]);
@@ -404,6 +411,27 @@ namespace ArmorstandAnimator
                 elementHolder.localScale *= HeadScaleOffsetSmall;
 
             return node;
+        }
+
+        // head
+        private Vector3 HeadTranslation(Vector3 rawTranslation, bool isSmall)
+        {
+            var defaultTranslation = Vector3.zero;
+            if (!isSmall)
+                defaultTranslation = Vector3.up * 16.0f * 0.0390625f / 2.0f;
+            else
+                defaultTranslation = Vector3.up * 16.0f * 0.02896875f / 2.0f;
+
+            var headTranslation = Vector3.zero;
+
+            if (!isSmall)
+                headTranslation = new Vector3(rawTranslation.x / ScaleOffset * HeadScaleOffset, rawTranslation.y / ScaleOffset * HeadScaleOffset, -rawTranslation.z / ScaleOffset * HeadScaleOffset);
+            else
+                headTranslation = new Vector3(rawTranslation.x / ScaleOffset * HeadScaleOffsetSmall, rawTranslation.y / ScaleOffset * HeadScaleOffsetSmall, -rawTranslation.z / ScaleOffset * HeadScaleOffsetSmall);
+
+            defaultTranslation += headTranslation;
+
+            return defaultTranslation;
         }
     }
 }

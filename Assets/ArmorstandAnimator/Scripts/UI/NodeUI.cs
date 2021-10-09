@@ -140,5 +140,13 @@ namespace ArmorstandAnimator
         {
             this.nodeName.text = targetNode.nodeName;
         }
+
+        // Position変更時(表示のみ)
+        public void SetPositionText(Vector3 pos)
+        {
+            positionX.text = pos.x.ToString();
+            positionY.text = pos.y.ToString();
+            positionZ.text = pos.z.ToString();
+        }
     }
 }

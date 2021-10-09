@@ -12,7 +12,6 @@ namespace ArmorstandAnimator
 
     public class Node : MonoBehaviour
     {
-
         // NodeManager
         public NodeManager nodeManager;
         // 対応するUI
@@ -47,6 +46,9 @@ namespace ArmorstandAnimator
 
         // キューブ
         public List<Transform> elementCubes;
+
+        // データ保存用
+        public Vector3 rawTranslation;
 
         // 初期化
         public void Initialize(string nodeName, int customModelData, GameObject nodeUIObj, Transform uiParent)
