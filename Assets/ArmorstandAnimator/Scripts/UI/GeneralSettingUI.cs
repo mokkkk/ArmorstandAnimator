@@ -98,22 +98,6 @@ namespace ArmorstandAnimator
                 this.isSmall.interactable = false;
             }
         }
-
-        public void OnShowArmorstandChanged()
-        {
-            sceneManager.ShowArmorstand();
-        }
-
-        public void OnShowAxisChanged()
-        {
-            sceneManager.ShowAxis();
-        }
-
-        public void OnShowGroundChanged()
-        {
-            sceneManager.ShowGround();
-        }
-
         public void OnIsSmallChanged()
         {
             sceneManager.ChangeArmorstand();

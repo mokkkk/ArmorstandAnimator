@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -62,10 +63,16 @@ namespace ArmorstandAnimator
         private ProjectFileManager projectFileManager;
         private AnimationFileManager animationFileManager;
 
+        // 最近使用したファイル用
+        [SerializeField]
+        private GameObject currentFileProjectPanel;
+
         // mcfunction書出用
         private GenerateModelMcfunc modelMcfunc;
         private GenerateAnimationMcfunction animationMcfunc;
         private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
+
+        private const string PathHistoryFileNameProject = "pathhist_project.json";
 
         // Start is called before the first frame update
         void Start()
@@ -268,27 +275,27 @@ namespace ArmorstandAnimator
         }
 
         // 防具立て表示/非表示
-        public void ShowArmorstand()
+        public void ShowArmorstand(bool showArmorstand)
         {
             foreach (Node n in NodeList)
             {
-                n.SetArmorstandVisible(generalSetting.ShowArmorstand, generalSetting.IsSmall);
+                n.SetArmorstandVisible(showArmorstand, generalSetting.IsSmall);
             }
         }
 
-        // 防具立て表示/非表示
-        public void ShowAxis()
+        // 回転軸表示/非表示
+        public void ShowAxis(bool showAxis)
         {
             foreach (Node n in NodeList)
             {
-                n.SetAxisVisible(generalSetting.ShowAxis);
+                n.SetAxisVisible(showAxis);
             }
         }
 
         // 地面表示/非表示
-        public void ShowGround()
+        public void ShowGround(bool showGround)
         {
-            groundPlane.SetActive(generalSetting.ShowGround);
+            groundPlane.SetActive(showGround);
         }
 
         // ModelモードUI消去
@@ -348,7 +355,60 @@ namespace ArmorstandAnimator
             nodeManager.ChangeArmorstand(project.nodeList, project.isSmall);
 
             // Armorstand表示設定
-            ShowArmorstand();
+            ShowArmorstand(true);
+        }
+
+
+        // 最近使用したプロジェクトファイル
+        public void ShowCurrentFileProject()
+        {
+            var histPath = Path.Combine(Application.persistentDataPath, PathHistoryFileNameProject);
+
+            var jsonLine = new ASAPathHistory();
+            if (File.Exists(histPath))
+            {
+                // ファイル読み込み
+                string line;
+                System.IO.StreamReader file =
+                    new System.IO.StreamReader(histPath);
+                line = file.ReadLine();
+                jsonLine = JsonUtility.FromJson<ASAPathHistory>(line);
+                file.Close();
+            }
+            else
+            {
+                jsonLine.paths = new string[0];
+            }
+
+            currentFileProjectPanel.SetActive(true);
+            currentFileProjectPanel.GetComponent<CurrentFileProject>().Initialize(jsonLine.paths);
+        }
+
+        // asamodelproject読込
+        public void LoadProjectFileModelCurrent(string path)
+        {
+            ASAModelProject project;
+            // プロジェクトファイル読込
+            var res = projectFileManager.LoadProjectFileModelCurrent(path, out project);
+
+            // ファイルを読み込めなかった場合，中断
+            if (res < 0)
+                return;
+
+            // ノード消去
+            foreach (Node n in nodeList)
+            {
+                Destroy(n.targetNodeUI.gameObject);
+                Destroy(n.gameObject);
+            }
+
+            // リスト初期化
+            this.nodeList = new List<Node>();
+
+            // プロジェクト設定更新
+            generalSetting.SetText(project.itemID, project.modelName, project.multiEntities, project.isMarker, project.isSmall, project.fileVersion);
+            // ノード作成
+            nodeManager.CreateNodeProject(project.nodeList);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.IO;
 using UnityEngine;
 using SFB;
 
@@ -37,6 +38,8 @@ namespace ArmorstandAnimator
     {
         // ProjectFile読込用パス
         private string[] paths;
+
+        private const string PathHistoryFileName = "pathhist_animation.json";
 
         // Animationプロジェクトファイル保存
         public void SaveProjectFileAnim(AnimationSettingUI animationSetting, List<Keyframe> keyframeList, List<EventUI> eventList)
@@ -88,6 +91,9 @@ namespace ArmorstandAnimator
             writer.Close();
 
             Debug.Log("AnimationFile Saved");
+
+            // アクセス履歴保存
+            SavePathHistory(path);
         }
 
         public int LoadProjectFileAnim(out ASAAnimationProject project)
@@ -124,6 +130,46 @@ namespace ArmorstandAnimator
             Debug.Log("AnimationFile Loaded");
 
             return 0;
+        }
+
+        // アクセス履歴の一時保存
+        private void SavePathHistory(string path)
+        {
+            var histPath = Path.Combine(Application.persistentDataPath, PathHistoryFileName);
+
+            var jsonLine = new ASAPathHistory();
+            if (File.Exists(histPath))
+            {
+                // ファイル読み込み
+                string line;
+                System.IO.StreamReader file =
+                    new System.IO.StreamReader(histPath);
+                line = file.ReadLine();
+                jsonLine = JsonUtility.FromJson<ASAPathHistory>(line);
+                file.Close();
+            }
+            else
+            {
+                jsonLine.paths = new string[0];
+            }
+
+            // パス追加
+            var pathHistories = new List<string>();
+            for (int i = 0; i < jsonLine.paths.Length; i++)
+            {
+                pathHistories.Add(jsonLine.paths[i]);
+            }
+            pathHistories.Add(path);
+
+            // ToJson
+            var asaPathHistory = new ASAPathHistory();
+            asaPathHistory.paths = pathHistories.ToArray();
+            var p = JsonUtility.ToJson(asaPathHistory);
+
+            System.IO.StreamWriter writer = new System.IO.StreamWriter(histPath);
+            writer.WriteLine(p);
+            writer.Flush();
+            writer.Close();
         }
     }
 }
