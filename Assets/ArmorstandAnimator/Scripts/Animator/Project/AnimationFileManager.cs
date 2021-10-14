@@ -96,7 +96,7 @@ namespace ArmorstandAnimator
             SavePathHistory(path);
         }
 
-        public int LoadProjectFileAnim(out ASAAnimationProject project)
+        public int SelectPath(out ASAAnimationProject project)
         {
             // // 初期化
             // paths = new string[];
@@ -107,18 +107,39 @@ namespace ArmorstandAnimator
             {
     new ExtensionFilter( "Animation Files", "asaanim"),
 };
-            paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true);
+            paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
 
             // ファイルを選択しなかった場合，中断
             if (paths.Length < 1)
                 return -1;
+
+            LoadProjectFileAnim(paths[0], out project);
+
+            return 0;
+        }
+
+        public int LoadProjectFileAnim(string path, out ASAAnimationProject project)
+        {
+            // 初期化
+            //             project = new ASAAnimationProject();
+
+            //             // ファイルダイアログを開く
+            //             var extensions = new[]
+            //             {
+            //     new ExtensionFilter( "Animation Files", "asaanim"),
+            // };
+            //             paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
+
+            //             // ファイルを選択しなかった場合，中断
+            //             if (paths.Length < 1)
+            //                 return -1;
 
             // ファイル読み込み
             string line;
             string inputString = "";
             // ファイルの改行削除，1行に纏める
             System.IO.StreamReader file =
-                new System.IO.StreamReader(paths[0]);
+                new System.IO.StreamReader(path);
             while ((line = file.ReadLine()) != null)
             {
                 inputString += line.Replace("\r", "").Replace("\n", "");
@@ -153,13 +174,35 @@ namespace ArmorstandAnimator
                 jsonLine.paths = new string[0];
             }
 
-            // パス追加
+            // リストに変換
             var pathHistories = new List<string>();
             for (int i = 0; i < jsonLine.paths.Length; i++)
             {
                 pathHistories.Add(jsonLine.paths[i]);
             }
-            pathHistories.Add(path);
+
+            // 被り探索
+            bool exist = false;
+            for (int i = 0; i < pathHistories.Count; i++)
+            {
+                var s = pathHistories[i];
+                if (s.Equals(path))
+                    exist = true;
+                if (exist && i < pathHistories.Count - 1)
+                    pathHistories[i] = pathHistories[i + 1];
+                if (exist && i == pathHistories.Count - 1)
+                    pathHistories[i] = path;
+            }
+
+            // パス追加
+            if (!exist)
+                pathHistories.Add(path);
+
+            // パス削除
+            if (pathHistories.Count > 10)
+            {
+                pathHistories.RemoveAt(0);
+            }
 
             // ToJson
             var asaPathHistory = new ASAPathHistory();
@@ -170,6 +213,16 @@ namespace ArmorstandAnimator
             writer.WriteLine(p);
             writer.Flush();
             writer.Close();
+        }
+
+        public int LoadProjectFileAnimCurrent(string path, out ASAAnimationProject project)
+        {
+            // 初期化
+            project = new ASAAnimationProject();
+
+            LoadProjectFileAnim(path, out project);
+
+            return 0;
         }
     }
 }

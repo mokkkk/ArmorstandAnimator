@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ArmorstandAnimator
 {
-    public class CurrentFileProject : MonoBehaviour, CurrentFile
+    public class CurrentFileAnim : MonoBehaviour, CurrentFile
     {
         [SerializeField]
         private GameObject currentPathButton;
@@ -42,7 +42,7 @@ namespace ArmorstandAnimator
             {
                 Destroy(t.gameObject);
             }
-            sceneManager.LoadProjectFileModelCurrent(selectedPath);
+            sceneManager.LoadProjectFileAnimCurrent(selectedPath);
             this.gameObject.SetActive(false);
         }
 

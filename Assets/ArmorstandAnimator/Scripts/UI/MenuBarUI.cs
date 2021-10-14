@@ -166,5 +166,11 @@ namespace ArmorstandAnimator
             sceneManager.ShowCurrentFileProject();
             fileMenuModel.SetActive(false);
         }
+
+        public void OnCurrentFileAnimClicked()
+        {
+            sceneManager.ShowCurrentFileAnimation();
+            fileMenuAnim.SetActive(false);
+        }
     }
 }

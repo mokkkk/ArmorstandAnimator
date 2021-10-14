@@ -65,7 +65,7 @@ namespace ArmorstandAnimator
 
         // 最近使用したファイル用
         [SerializeField]
-        private GameObject currentFileProjectPanel;
+        private GameObject currentFileProjectPanel, currentFileAnimPanel;
 
         // mcfunction書出用
         private GenerateModelMcfunc modelMcfunc;
@@ -73,6 +73,7 @@ namespace ArmorstandAnimator
         private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
 
         private const string PathHistoryFileNameProject = "pathhist_project.json";
+        private const string PathHistoryFileNameAnim = "pathhist_animation.json";
 
         // Start is called before the first frame update
         void Start()
@@ -207,7 +208,7 @@ namespace ArmorstandAnimator
         {
             ASAAnimationProject project;
             // プロジェクトファイル読込
-            var res = animationFileManager.LoadProjectFileAnim(out project);
+            var res = animationFileManager.SelectPath(out project);
 
             // ファイルを読み込めなかった場合，中断
             if (res < 0)
@@ -409,6 +410,53 @@ namespace ArmorstandAnimator
             generalSetting.SetText(project.itemID, project.modelName, project.multiEntities, project.isMarker, project.isSmall, project.fileVersion);
             // ノード作成
             nodeManager.CreateNodeProject(project.nodeList);
+        }
+
+        // 最近使用したアニメーションファイル
+        public void ShowCurrentFileAnimation()
+        {
+            var histPath = Path.Combine(Application.persistentDataPath, PathHistoryFileNameAnim);
+
+            var jsonLine = new ASAPathHistory();
+            if (File.Exists(histPath))
+            {
+                // ファイル読み込み
+                string line;
+                System.IO.StreamReader file =
+                    new System.IO.StreamReader(histPath);
+                line = file.ReadLine();
+                jsonLine = JsonUtility.FromJson<ASAPathHistory>(line);
+                file.Close();
+            }
+            else
+            {
+                jsonLine.paths = new string[0];
+            }
+
+            currentFileAnimPanel.SetActive(true);
+            currentFileAnimPanel.GetComponent<CurrentFileAnim>().Initialize(jsonLine.paths);
+        }
+
+        // asaanimationproject読込
+        public void LoadProjectFileAnimCurrent(string path)
+        {
+            ASAAnimationProject project;
+            // プロジェクトファイル読込
+            var res = animationFileManager.LoadProjectFileAnimCurrent(path, out project);
+
+            // ファイルを読み込めなかった場合，中断
+            if (res < 0)
+                return;
+
+            // Keyframe消去
+            animationManager.ClearAnimationUIOnLoad();
+
+            // アニメーション設定更新
+            animationSetting.SetText(project.animationName);
+            // キーフレーム作成
+            animationManager.CreateAnimationUIProject(project);
+            // イベントリスト作成
+            animationManager.keyframeUI.CreateEventUIList(project.events);
         }
     }
 }

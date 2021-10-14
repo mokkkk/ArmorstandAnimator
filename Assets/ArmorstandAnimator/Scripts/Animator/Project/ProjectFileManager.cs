@@ -258,13 +258,35 @@ namespace ArmorstandAnimator
                 jsonLine.paths = new string[0];
             }
 
-            // パス追加
+            // リストに変換
             var pathHistories = new List<string>();
             for (int i = 0; i < jsonLine.paths.Length; i++)
             {
                 pathHistories.Add(jsonLine.paths[i]);
             }
-            pathHistories.Add(path);
+
+            // 被り探索
+            bool exist = false;
+            for (int i = 0; i < pathHistories.Count; i++)
+            {
+                var s = pathHistories[i];
+                if (s.Equals(path))
+                    exist = true;
+                if (exist && i < pathHistories.Count - 1)
+                    pathHistories[i] = pathHistories[i + 1];
+                if (exist && i == pathHistories.Count - 1)
+                    pathHistories[i] = path;
+            }
+
+            // パス追加
+            if (!exist)
+                pathHistories.Add(path);
+
+            // パス削除
+            if (pathHistories.Count > 10)
+            {
+                pathHistories.RemoveAt(0);
+            }
 
             // ToJson
             var asaPathHistory = new ASAPathHistory();
@@ -276,7 +298,6 @@ namespace ArmorstandAnimator
             writer.Flush();
             writer.Close();
         }
-
 
         public int LoadProjectFileModelCurrent(string path, out ASAModelProject project)
         {
