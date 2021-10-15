@@ -62,6 +62,8 @@ namespace ArmorstandAnimator
             modelMcfunc.GenerateSummonFunction(path, generalSetting, nodeList, false, generalSetting.MultiEntities);
             // model.mcfunction   
             modelMcfunc.GenerateModelFunction(path, generalSetting, nodeList);
+            // kill.mcfunction
+            modelMcfunc.GenerateKillFunction(path, generalSetting);
 
             // アニメーション名分割
             string[] anmName = animationSetting.AnimationName.Split('/');

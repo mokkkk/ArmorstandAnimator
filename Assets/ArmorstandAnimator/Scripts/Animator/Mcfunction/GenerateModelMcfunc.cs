@@ -357,5 +357,30 @@ namespace ArmorstandAnimator
 
             Debug.Log("Generated model mcfunction");
         }
+
+        // Kill.mcfunction(外部呼出用)
+        public void GenerateKillFunction(string path, GeneralSettingUI generalSetting)
+        {
+            // ファイルパス決定
+            path = Path.Combine(path, "kill.mcfunction");
+            // 設定読み込み
+            this.generalSetting = generalSetting;
+
+            // .mcfunction書き込み用
+            writer = new System.IO.StreamWriter(path, false);
+
+            // Root
+            var func = $"kill @e[type=armor_stand,tag={generalSetting.ModelName}Root]";
+            writer.WriteLine(func);
+
+            // Parts
+            func = $"kill @e[type=armor_stand,tag={generalSetting.ModelName}Parts]";
+            writer.WriteLine(func);
+
+            writer.Flush();
+            writer.Close();
+
+            Debug.Log("Generated kill mcfunction");
+        }
     }
 }
