@@ -49,6 +49,7 @@ namespace ArmorstandAnimator
             // データパックフォルダ作成
             path = Path.Combine(path, DatapackFolderName);
             Directory.CreateDirectory(path);
+            var datapackPath = path;
 
             // ファンクションフォルダ作成
             path = Path.Combine(path, "functions");
@@ -105,6 +106,9 @@ namespace ArmorstandAnimator
             GenerateEventManagerFunction(eventPath, keyframeList, eventList);
 
             Debug.Log("Animation Datapack Exported");
+
+            // フォルダ表示
+            System.Diagnostics.Process.Start(datapackPath);
         }
 
         // start.mcfunction

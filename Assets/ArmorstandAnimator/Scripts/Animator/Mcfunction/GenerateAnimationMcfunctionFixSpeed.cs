@@ -51,6 +51,7 @@ namespace ArmorstandAnimator
             // データパックフォルダ作成
             path = Path.Combine(path, DatapackFolderName);
             Directory.CreateDirectory(path);
+            var datapackPath = path;
 
             // ファンクションフォルダ作成
             path = Path.Combine(path, "functions");
@@ -103,6 +104,9 @@ namespace ArmorstandAnimator
             GenerateKeyframeFunction(path, spdKeyframeList, nodeList);
 
             Debug.Log("Animation Datapack Exported");
+
+            // フォルダ表示
+            System.Diagnostics.Process.Start(datapackPath);
         }
 
         public void GenerateDatapackOnlyAnimation(GeneralSettingUI generalSetting, AnimationSettingUI animationSetting, List<Node> nodeList, List<Keyframe> keyframeList)
