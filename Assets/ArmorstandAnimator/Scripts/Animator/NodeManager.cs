@@ -106,6 +106,23 @@ namespace ArmorstandAnimator
             var nodeName = nodeNameInputField.text;
             var customModelData = int.Parse(customModelDataField.text);
 
+            // ノード名被り対策
+            foreach (Node n in sceneManager.NodeList)
+            {
+                if (nodeName.Equals(n.nodeName))
+                {
+                    int i = 1;
+                    foreach (Node n_ in sceneManager.NodeList)
+                    {
+                        var newNodeName = nodeName + "_" + i.ToString();
+                        if (newNodeName.Equals(n_.nodeName))
+                            i++;
+                    }
+
+                    nodeName = nodeName + "_" + i.ToString();
+                }
+            }
+
             // ID決定
             var id = sceneManager.NodeList.Count;
 
