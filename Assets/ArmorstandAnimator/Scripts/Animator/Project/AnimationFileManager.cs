@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.IO;
 using UnityEngine;
 using SFB;
 
@@ -37,6 +38,8 @@ namespace ArmorstandAnimator
     {
         // ProjectFile読込用パス
         private string[] paths;
+
+        private const string PathHistoryFileName = "pathhist_animation.json";
 
         // Animationプロジェクトファイル保存
         public void SaveProjectFileAnim(AnimationSettingUI animationSetting, List<Keyframe> keyframeList, List<EventUI> eventList)
@@ -88,9 +91,12 @@ namespace ArmorstandAnimator
             writer.Close();
 
             Debug.Log("AnimationFile Saved");
+
+            // アクセス履歴保存
+            SavePathHistory(path);
         }
 
-        public int LoadProjectFileAnim(out ASAAnimationProject project)
+        public int SelectPath(out ASAAnimationProject project)
         {
             // // 初期化
             // paths = new string[];
@@ -101,18 +107,39 @@ namespace ArmorstandAnimator
             {
     new ExtensionFilter( "Animation Files", "asaanim"),
 };
-            paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, true);
+            paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
 
             // ファイルを選択しなかった場合，中断
             if (paths.Length < 1)
                 return -1;
+
+            LoadProjectFileAnim(paths[0], out project);
+
+            return 0;
+        }
+
+        public int LoadProjectFileAnim(string path, out ASAAnimationProject project)
+        {
+            // 初期化
+            //             project = new ASAAnimationProject();
+
+            //             // ファイルダイアログを開く
+            //             var extensions = new[]
+            //             {
+            //     new ExtensionFilter( "Animation Files", "asaanim"),
+            // };
+            //             paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
+
+            //             // ファイルを選択しなかった場合，中断
+            //             if (paths.Length < 1)
+            //                 return -1;
 
             // ファイル読み込み
             string line;
             string inputString = "";
             // ファイルの改行削除，1行に纏める
             System.IO.StreamReader file =
-                new System.IO.StreamReader(paths[0]);
+                new System.IO.StreamReader(path);
             while ((line = file.ReadLine()) != null)
             {
                 inputString += line.Replace("\r", "").Replace("\n", "");
@@ -122,6 +149,78 @@ namespace ArmorstandAnimator
             project = JsonUtility.FromJson<ASAAnimationProject>(inputString);
 
             Debug.Log("AnimationFile Loaded");
+
+            return 0;
+        }
+
+        // アクセス履歴の一時保存
+        private void SavePathHistory(string path)
+        {
+            var histPath = Path.Combine(Application.persistentDataPath, PathHistoryFileName);
+
+            var jsonLine = new ASAPathHistory();
+            if (File.Exists(histPath))
+            {
+                // ファイル読み込み
+                string line;
+                System.IO.StreamReader file =
+                    new System.IO.StreamReader(histPath);
+                line = file.ReadLine();
+                jsonLine = JsonUtility.FromJson<ASAPathHistory>(line);
+                file.Close();
+            }
+            else
+            {
+                jsonLine.paths = new string[0];
+            }
+
+            // リストに変換
+            var pathHistories = new List<string>();
+            for (int i = 0; i < jsonLine.paths.Length; i++)
+            {
+                pathHistories.Add(jsonLine.paths[i]);
+            }
+
+            // 被り探索
+            bool exist = false;
+            for (int i = 0; i < pathHistories.Count; i++)
+            {
+                var s = pathHistories[i];
+                if (s.Equals(path))
+                    exist = true;
+                if (exist && i < pathHistories.Count - 1)
+                    pathHistories[i] = pathHistories[i + 1];
+                if (exist && i == pathHistories.Count - 1)
+                    pathHistories[i] = path;
+            }
+
+            // パス追加
+            if (!exist)
+                pathHistories.Add(path);
+
+            // パス削除
+            if (pathHistories.Count > 10)
+            {
+                pathHistories.RemoveAt(0);
+            }
+
+            // ToJson
+            var asaPathHistory = new ASAPathHistory();
+            asaPathHistory.paths = pathHistories.ToArray();
+            var p = JsonUtility.ToJson(asaPathHistory);
+
+            System.IO.StreamWriter writer = new System.IO.StreamWriter(histPath);
+            writer.WriteLine(p);
+            writer.Flush();
+            writer.Close();
+        }
+
+        public int LoadProjectFileAnimCurrent(string path, out ASAAnimationProject project)
+        {
+            // 初期化
+            project = new ASAAnimationProject();
+
+            LoadProjectFileAnim(path, out project);
 
             return 0;
         }

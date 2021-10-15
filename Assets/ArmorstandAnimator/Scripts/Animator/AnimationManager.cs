@@ -90,8 +90,7 @@ namespace ArmorstandAnimator
 
         void Update()
         {
-            if (Input.GetKeyDown(KeyCode.X))
-                MirrorKeyframe();
+
         }
 
         // アニメーションUI表示
@@ -488,7 +487,15 @@ namespace ArmorstandAnimator
                 var rootPosCurrent = copiedKeyframe.rootPos;
                 if (selectedKeyframeIndex == 0)
                     rootPosCurrent = Vector3.zero;
-                var newKeyframe = new Keyframe(selectedKeyframeIndex, tickCurrent, rootPosCurrent, copiedKeyframe.rotations);
+
+                var newRotations = new List<Vector3>();
+                foreach (Vector3 rotate in copiedKeyframe.rotations)
+                    newRotations.Add(rotate);
+
+                var newKeyframe = new Keyframe(selectedKeyframeIndex, tickCurrent, rootPosCurrent, newRotations);
+
+                // 内容設定
+                keyframeUI.SetUIContent(newKeyframe);
                 UpdateKeyframeList(newKeyframe);
             }
         }
