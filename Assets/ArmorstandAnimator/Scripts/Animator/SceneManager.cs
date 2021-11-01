@@ -73,7 +73,7 @@ namespace ArmorstandAnimator
         private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
 
         // 表示設定保持
-        public bool showGround, showArmorstand, showAxis;
+        public bool showGround = true, showArmorstand = true, showAxis = false;
 
         private const string PathHistoryFileNameProject = "pathhist_project.json";
         private const string PathHistoryFileNameAnim = "pathhist_animation.json";

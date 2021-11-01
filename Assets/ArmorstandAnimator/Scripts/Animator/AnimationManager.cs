@@ -645,14 +645,16 @@ namespace ArmorstandAnimator
             for (int i = 1; i < count; i++)
             {
                 // tick計算
-                var newTick = keyframeA.tick + (int)((keyframeB.tick - keyframeA.tick) / count * i);
+                var newTick = keyframeA.tick + Mathf.FloorToInt((keyframeB.tick - keyframeA.tick) / count * (count - i));
                 // rootPos計算
-                var newRootPos = new Vector3((keyframeA.rootPos.x + keyframeB.rootPos.x) / count * i, (keyframeA.rootPos.y + keyframeB.rootPos.y) / count * i, (keyframeA.rootPos.z + keyframeB.rootPos.z) / count * i);
+                var rootPosDiff = keyframeB.rootPos - keyframeA.rootPos;
+                var newRootPos = keyframeA.rootPos + (rootPosDiff / count * (count - i));
                 // ローテーション用リスト新規作成
                 var newRotations = new List<Vector3>();
                 for (int j = 0; j < keyframeA.rotations.Count; j++)
                 {
-                    var rotate = new Vector3((keyframeA.rotations[j].x + keyframeB.rotations[j].x) / count * i, (keyframeA.rotations[j].y + keyframeB.rotations[j].y) / count * i, (keyframeA.rotations[j].z + keyframeB.rotations[j].z) / count * i);
+                    var rotateDiff = keyframeB.rotations[j] - keyframeA.rotations[j];
+                    var rotate = keyframeA.rotations[j] + (rotateDiff / count * (count - i));
                     newRotations.Add(rotate);
                 }
                 // キーフレーム作成
