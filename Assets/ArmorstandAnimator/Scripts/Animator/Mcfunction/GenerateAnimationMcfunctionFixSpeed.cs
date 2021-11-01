@@ -27,6 +27,8 @@ namespace ArmorstandAnimator
         private const string DatapackFolderName = "asa_animator";
         // キーフレームフォルダ名
         private const string KeyframesFolderName = "keyframes";
+        // isQuick用キーフレームフォルダ名
+        private const string QuickFolderName = "quick_";
 
         public void GenerateDatapack(GeneralSettingUI generalSetting, AnimationSettingUI animationSetting, List<Node> nodeList, List<Keyframe> keyframeList)
         {
@@ -85,14 +87,14 @@ namespace ArmorstandAnimator
             var spdKeyframeList = new List<Keyframe>();
             foreach (Keyframe k in keyframeList)
             {
-                var newKey = new Keyframe(index, Mathf.FloorToInt(k.tick / animationSetting.AnimationSpeed), k.rootPos, k.rotations);
+                var newKey = new Keyframe(index, Mathf.FloorToInt(k.tick / animationSetting.AnimationSpeed), k.rootPos, k.rotations, k.isQuick);
                 spdKeyframeList.Add(newKey);
             }
 
             // start.mcfunction
             GenerateStartFunction(path, spdKeyframeList[0], nodeList);
             // main.mcfunction
-            GenerateMainFunction(path, spdKeyframeList);
+            GenerateMainFunction(path, spdKeyframeList, nodeList);
             // end.mcfunction
             GenerateEndFunction(path);
 
@@ -135,14 +137,14 @@ namespace ArmorstandAnimator
             var spdKeyframeList = new List<Keyframe>();
             foreach (Keyframe k in keyframeList)
             {
-                var newKey = new Keyframe(index, Mathf.FloorToInt(k.tick / animationSetting.AnimationSpeed), k.rootPos, k.rotations);
+                var newKey = new Keyframe(index, Mathf.FloorToInt(k.tick / animationSetting.AnimationSpeed), k.rootPos, k.rotations, k.isQuick);
                 spdKeyframeList.Add(newKey);
             }
 
             // start.mcfunction
             GenerateStartFunction(path, spdKeyframeList[0], nodeList);
             // main.mcfunction
-            GenerateMainFunction(path, spdKeyframeList);
+            GenerateMainFunction(path, spdKeyframeList, nodeList);
             // end.mcfunction
             GenerateEndFunction(path);
 
@@ -218,9 +220,10 @@ namespace ArmorstandAnimator
         }
 
         // main.mcfunction
-        private void GenerateMainFunction(string path, List<Keyframe> keyframeList)
+        private void GenerateMainFunction(string path, List<Keyframe> keyframeList, List<Node> nodeList)
         {
             // ファイルパス決定
+            var tempPath = path;
             path = Path.Combine(path, "main.mcfunction");
             // .mcfunction書き込み用
             var writer = new StreamWriter(path, false);
@@ -247,22 +250,56 @@ namespace ArmorstandAnimator
 
             for (int i = 0; i < keyframeList.Count - 1; i++)
             {
-                // 各Keyframeのfunction実行
-                execute = $"execute if score @s AsaMatrix matches {keyframeList[i].tick + 1} run ";
-                func = $"function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/{KeyframesFolderName}/{i}";
-                writer.WriteLine(execute + func);
+                if (keyframeList[i].isQuick && keyframeList[i + 1].isQuick)
+                {
+                    // isQuick to isQuick
 
-                // Root移動実行
-                // アニメーション時間(tick)
-                var time = keyframeList[i + 1].tick - keyframeList[i].tick;
-                // 移動距離
-                var moveX = -(keyframeList[i + 1].rootPos.x - keyframeList[i].rootPos.x) / time;
-                var moveY = (keyframeList[i + 1].rootPos.y - keyframeList[i].rootPos.y) / time;
-                var moveZ = (keyframeList[i + 1].rootPos.z - keyframeList[i].rootPos.z) / time;
-                // 書き込み
-                execute = $"execute if score @s AsaMatrix matches {keyframeList[i].tick + 1}..{keyframeList[i + 1].tick} run ";
-                func = $"tp @s ^{moveX} ^{moveY} ^{moveZ}";
-                writer.WriteLine(execute + func);
+                    // アニメーション時間(tick)
+                    var time = keyframeList[i + 1].tick - keyframeList[i].tick;
+
+                    var qPath = Path.Combine(tempPath, QuickFolderName);
+                    Directory.CreateDirectory(qPath);
+
+                    GenerateQuickFunction(qPath, keyframeList[i], keyframeList[i + 1], time, i, nodeList);
+                    for (int j = 0; j < time; j++)
+                    {
+                        var funcTick = keyframeList[i].tick + j + 1;
+                        execute = $"execute if score @s AsaMatrix matches {funcTick} run ";
+                        func = $"function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/{QuickFolderName}/{i}_{j}";
+                        writer.WriteLine(execute + func);
+                    }
+
+                    // Root移動実行
+                    // 移動距離
+                    var moveX = -(keyframeList[i + 1].rootPos.x - keyframeList[i].rootPos.x) / time;
+                    var moveY = (keyframeList[i + 1].rootPos.y - keyframeList[i].rootPos.y) / time;
+                    var moveZ = (keyframeList[i + 1].rootPos.z - keyframeList[i].rootPos.z) / time;
+                    // 書き込み
+                    execute = $"execute if score @s AsaMatrix matches {keyframeList[i].tick + 1}..{keyframeList[i + 1].tick} run ";
+                    func = $"tp @s ^{moveX} ^{moveY} ^{moveZ}";
+                    writer.WriteLine(execute + func);
+                }
+                else
+                {
+                    // Else
+
+                    // 各Keyframeのfunction実行
+                    execute = $"execute if score @s AsaMatrix matches {keyframeList[i].tick + 1} run ";
+                    func = $"function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/{KeyframesFolderName}/{i}";
+                    writer.WriteLine(execute + func);
+
+                    // Root移動実行
+                    // アニメーション時間(tick)
+                    var time = keyframeList[i + 1].tick - keyframeList[i].tick;
+                    // 移動距離
+                    var moveX = -(keyframeList[i + 1].rootPos.x - keyframeList[i].rootPos.x) / time;
+                    var moveY = (keyframeList[i + 1].rootPos.y - keyframeList[i].rootPos.y) / time;
+                    var moveZ = (keyframeList[i + 1].rootPos.z - keyframeList[i].rootPos.z) / time;
+                    // 書き込み
+                    execute = $"execute if score @s AsaMatrix matches {keyframeList[i].tick + 1}..{keyframeList[i + 1].tick} run ";
+                    func = $"tp @s ^{moveX} ^{moveY} ^{moveZ}";
+                    writer.WriteLine(execute + func);
+                }
             }
 
             // end実行
@@ -413,6 +450,106 @@ namespace ArmorstandAnimator
             }
 
             Debug.Log("Generated keyframe mcfunction");
+        }
+
+
+        // start.mcfunction
+        private void GenerateQuickFunction(string path, Keyframe keyframeA, Keyframe keyframeB, int tick, int index, List<Node> nodeList)
+        {
+            // ファイルパス
+            string funcPath = "";
+
+
+            for (int i = 0; i < tick; i++)
+            {
+                // .mcfunction書き込み用
+                StreamWriter writer;
+                string func = "";
+                // パス決定
+                funcPath = Path.Combine(path, $"{index}_{i}.mcfunction");
+                writer = new StreamWriter(funcPath, false);
+
+                int j = 0;
+                foreach (Node n in nodeList)
+                {
+                    // 現キーフレームのrotate
+                    Vector3 rotateCurrent = Vector3.zero;
+                    if (n.nodeType == NodeType.Root)
+                    {
+                        rotateCurrent.x = keyframeA.rotations[j].x;
+                        rotateCurrent.y = keyframeA.rotations[j].y;
+                        rotateCurrent.z = keyframeA.rotations[j].z;
+                    }
+                    else
+                    {
+                        var end = false;
+                        Vector3 parentRotate = Vector3.zero;
+                        Node parent = n;
+                        // 親ノードのRotateを合計
+                        while (!end)
+                        {
+                            parent = parent.parentNode;
+                            parentRotate += keyframeA.rotations[parent.nodeID];
+                            if (parent.nodeType == NodeType.Root)
+                                end = true;
+                        }
+                        // 親ノードRotate + 自分のRotate
+                        rotateCurrent.x = keyframeA.rotations[j].x + parentRotate.x;
+                        rotateCurrent.y = keyframeA.rotations[j].y + parentRotate.y;
+                        rotateCurrent.z = keyframeA.rotations[j].z + parentRotate.z;
+                    }
+
+                    // 次キーフレームのrotate
+                    Vector3 rotateNext = Vector3.zero;
+                    if (n.nodeType == NodeType.Root)
+                    {
+                        rotateNext.x = keyframeB.rotations[j].x;
+                        rotateNext.y = keyframeB.rotations[j].y;
+                        rotateNext.z = keyframeB.rotations[j].z;
+                    }
+                    else
+                    {
+                        var end = false;
+                        Vector3 parentRotate = Vector3.zero;
+                        Node parent = n;
+                        // 親ノードのRotateを合計
+                        while (!end)
+                        {
+                            parent = parent.parentNode;
+                            parentRotate += keyframeB.rotations[parent.nodeID];
+                            if (parent.nodeType == NodeType.Root)
+                                end = true;
+                        }
+                        // 親ノードRotate + 自分のRotate
+                        rotateNext.x = keyframeB.rotations[j].x + parentRotate.x;
+                        rotateNext.y = keyframeB.rotations[j].y + parentRotate.y;
+                        rotateNext.z = keyframeB.rotations[j].z + parentRotate.z;
+                    }
+
+                    // rotations取得
+                    var fi = (float)i + 1.0f;
+                    var rotateX = Mathf.Lerp(rotateCurrent.x, rotateNext.x, fi / tick);
+                    var rotateY = Mathf.Lerp(rotateCurrent.y, rotateNext.y, fi / tick);
+                    var rotateZ = Mathf.Lerp(rotateCurrent.z, rotateNext.z, fi / tick);
+
+                    Debug.Log(i / tick);
+
+                    string selector = $"@e[type=armor_stand,tag={modelName}Parts,tag={n.nodeName}]";
+
+                    if (generalSetting.MultiEntities)
+                        func = $"execute as {selector} if score @s AsamID = #asa_id_temp AsamID run data merge entity @s {{Pose:{{Head:[{rotateX}f,{rotateY}f,{rotateZ}f]}}}}";
+                    else
+                        func = $"execute as {selector} run data merge entity @s {{Pose:{{Head:[{rotateX}f,{rotateY}f,{rotateZ}f]}}}}";
+
+                    writer.WriteLine(func);
+
+                    j++;
+                }
+
+                // 終了
+                writer.Flush();
+                writer.Close();
+            }
         }
     }
 }

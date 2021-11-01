@@ -15,13 +15,16 @@ namespace ArmorstandAnimator
         public Vector3 rootPos;
         // Rotation
         public List<Vector3> rotations;
+        // isQuick
+        public bool isQuick;
 
-        public Keyframe(int index, int tick, Vector3 rootPos, List<Vector3> rotations)
+        public Keyframe(int index, int tick, Vector3 rootPos, List<Vector3> rotations, bool isQuick)
         {
             this.index = index;
             this.tick = tick;
             this.rootPos = rootPos;
             this.rotations = rotations;
+            this.isQuick = isQuick;
         }
     }
 
@@ -72,6 +75,10 @@ namespace ArmorstandAnimator
         // コピペ用
         private Keyframe copiedKeyframe;
 
+        // キーフレーム補完用
+        [SerializeField]
+        private UnityEngine.UI.InputField separateCount;
+
         // キーフレームビュー用
         private const float KeyframeButtonWidth = 25.0f;
         private const float KeyframeButtonMarginOffset = 5f;
@@ -86,6 +93,7 @@ namespace ArmorstandAnimator
             keyframeButtonList = new List<KeyframeButton>();
             animationSetting.SetSpeed(1.0f);
             keyframeUI.ClearEventUIList();
+            separateCount.text = "2";
         }
 
         void Update()
@@ -152,7 +160,7 @@ namespace ArmorstandAnimator
                 foreach (ASAAnimationRotate r in k.rotates)
                     rotations.Add(new Vector3(r.rotate[0], r.rotate[1], r.rotate[2]));
 
-                var newKeyframe = new Keyframe(i, k.tick, rootPos, rotations);
+                var newKeyframe = new Keyframe(i, k.tick, rootPos, rotations, k.isQuick);
                 keyframeList.Add(newKeyframe);
 
                 i++;
@@ -195,7 +203,7 @@ namespace ArmorstandAnimator
             foreach (Vector3 rotate in keyframeList[selectedKeyframeIndex].rotations)
                 newRotations.Add(rotate);
             // キーフレーム作成
-            var newKeyframe = new Keyframe(keyframeList.Count, keyframeList[keyframeList.Count - 1].tick + 5, keyframeList[selectedKeyframeIndex].rootPos, newRotations);
+            var newKeyframe = new Keyframe(keyframeList.Count, keyframeList[keyframeList.Count - 1].tick + 5, keyframeList[selectedKeyframeIndex].rootPos, newRotations, false);
             this.keyframeList.Add(newKeyframe);
             // キーフレームボタン作成
             AddKeyframeButton(newKeyframe);
@@ -220,7 +228,7 @@ namespace ArmorstandAnimator
         public Keyframe CreateKeyframe(int tick, List<Vector3> rotations)
         {
             // キーフレーム作成
-            var newKeyframe = new Keyframe(0, tick + 1, Vector3.zero, rotations);
+            var newKeyframe = new Keyframe(0, tick + 1, Vector3.zero, rotations, false);
             this.keyframeList.Add(newKeyframe);
             return newKeyframe;
         }
@@ -269,6 +277,7 @@ namespace ArmorstandAnimator
             this.keyframeList[selectedKeyframeIndex].rootPos = keyframe.rootPos;
             this.keyframeList[selectedKeyframeIndex].rotations = newRotations;
             this.keyframeList[selectedKeyframeIndex].tick = keyframe.tick;
+            this.keyframeList[selectedKeyframeIndex].isQuick = keyframe.isQuick;
             // this.keyframeList[selectedKeyframeIndex] = keyframe;
             // Debug.Log(keyframeList[selectedKeyframeIndex]);
             // tick順でキーフレームソート
@@ -388,6 +397,12 @@ namespace ArmorstandAnimator
 
                 rightButtonPos = KeyframeButtonWidth + button.tick * KeyframeButtonMarginOffset;
                 button.GetComponent<RectTransform>().anchoredPosition = new Vector2(rightButtonPos, 0.0f);
+
+                // ボタン色設定
+                if (keyframeList[i].isQuick)
+                    button.transform.Find("Button").GetComponent<UnityEngine.UI.Image>().color = new Color(0.0f, 0.8806345f, 1.0f, 1.0f);
+                else
+                    button.transform.Find("Button").GetComponent<UnityEngine.UI.Image>().color = new Color(1.0f, 0.7526976f, 0.0f, 1.0f);
                 i++;
             }
 
@@ -423,7 +438,7 @@ namespace ArmorstandAnimator
             var spdKeyframeList = new List<Keyframe>();
             foreach (Keyframe k in keyframeList)
             {
-                var newKey = new Keyframe(index, Mathf.FloorToInt(k.tick / animationSetting.AnimationSpeed), k.rootPos, k.rotations);
+                var newKey = new Keyframe(index, Mathf.FloorToInt(k.tick / animationSetting.AnimationSpeed), k.rootPos, k.rotations, false);
                 spdKeyframeList.Add(newKey);
             }
 
@@ -452,7 +467,7 @@ namespace ArmorstandAnimator
                         rotations.Add(new Vector3(rotateX, rotateY, rotateZ));
                     }
 
-                    var dummyKey = new Keyframe(0, 0, rootPos, rotations);
+                    var dummyKey = new Keyframe(0, 0, rootPos, rotations, false);
 
                     SetNodeRotation(dummyKey);
 
@@ -492,7 +507,7 @@ namespace ArmorstandAnimator
                 foreach (Vector3 rotate in copiedKeyframe.rotations)
                     newRotations.Add(rotate);
 
-                var newKeyframe = new Keyframe(selectedKeyframeIndex, tickCurrent, rootPosCurrent, newRotations);
+                var newKeyframe = new Keyframe(selectedKeyframeIndex, tickCurrent, rootPosCurrent, newRotations, false);
 
                 // 内容設定
                 keyframeUI.SetUIContent(newKeyframe);
@@ -508,7 +523,7 @@ namespace ArmorstandAnimator
             foreach (Vector3 rotate in keyframeList[selectedKeyframeIndex].rotations)
                 newRotations.Add(rotate);
 
-            var newKeyframe = new Keyframe(selectedKeyframeIndex, keyframeList[selectedKeyframeIndex].tick, keyframeList[selectedKeyframeIndex].rootPos, newRotations);
+            var newKeyframe = new Keyframe(selectedKeyframeIndex, keyframeList[selectedKeyframeIndex].tick, keyframeList[selectedKeyframeIndex].rootPos, newRotations, keyframeList[selectedKeyframeIndex].isQuick);
             int length = sceneManager.NodeList.Count();
 
             // rootPos反転
@@ -611,6 +626,51 @@ namespace ArmorstandAnimator
         }
 
         // キーフレーム分割（feature）
-        // public void SeparateKeyframe()
+        public void SeparateKeyframe()
+        {
+            if (selectedKeyframeIndex >= keyframeList.Count)
+                return;
+
+            var count = int.Parse(separateCount.text);
+            if (count < 2)
+                return;
+
+            var keyframeA = keyframeList[selectedKeyframeIndex];
+            var keyframeB = keyframeList[selectedKeyframeIndex + 1];
+
+            // indexをずらす
+            for (int i = keyframeA.index + 1; i < keyframeList.Count; i++)
+                keyframeList[i].index += count - 1;
+
+            for (int i = 1; i < count; i++)
+            {
+                // tick計算
+                var newTick = keyframeA.tick + Mathf.FloorToInt((keyframeB.tick - keyframeA.tick) / count * (count - i));
+                // rootPos計算
+                var rootPosDiff = keyframeB.rootPos - keyframeA.rootPos;
+                var newRootPos = keyframeA.rootPos + (rootPosDiff / count * (count - i));
+                // ローテーション用リスト新規作成
+                var newRotations = new List<Vector3>();
+                for (int j = 0; j < keyframeA.rotations.Count; j++)
+                {
+                    var rotateDiff = keyframeB.rotations[j] - keyframeA.rotations[j];
+                    var rotate = keyframeA.rotations[j] + (rotateDiff / count * (count - i));
+                    newRotations.Add(rotate);
+                }
+                // キーフレーム作成
+                var newKeyframe = new Keyframe(keyframeA.index + i, newTick, newRootPos, newRotations, false);
+                this.keyframeList.Add(newKeyframe);
+                // キーフレームボタン作成
+                AddKeyframeButton(newKeyframe);
+            }
+            // 追加したキーフレームを選択
+            SelectKeyframe(keyframeList.Count - 1);
+            // tick順でキーフレームソート
+            SortKeyframeByTick();
+            // キーフレームビュー更新
+            UpdateKeyframeView();
+            // アニメーション終了時間更新
+            this.animationEndTime = keyframeList[keyframeList.Count - 1].tick;
+        }
     }
 }
