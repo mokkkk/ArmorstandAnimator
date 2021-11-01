@@ -632,13 +632,17 @@ namespace ArmorstandAnimator
                 return;
 
             var count = int.Parse(separateCount.text);
-            if (count < 1)
+            if (count < 2)
                 return;
 
             var keyframeA = keyframeList[selectedKeyframeIndex];
             var keyframeB = keyframeList[selectedKeyframeIndex + 1];
 
-            for (int i = 0; i < count; i++)
+            // indexをずらす
+            for (int i = keyframeA.index + 1; i < keyframeList.Count; i++)
+                keyframeList[i].index += count;
+
+            for (int i = 1; i < count; i++)
             {
                 // tick計算
                 var newTick = (int)((keyframeA.tick + keyframeB.tick) / count * i);
@@ -652,12 +656,11 @@ namespace ArmorstandAnimator
                     newRotations.Add(rotate);
                 }
                 // キーフレーム作成
-                var newKeyframe = new Keyframe(keyframeList.Count, newTick, newRootPos, newRotations, false);
+                var newKeyframe = new Keyframe(keyframeA.index + i + 1, newTick, newRootPos, newRotations, false);
                 this.keyframeList.Add(newKeyframe);
                 // キーフレームボタン作成
                 AddKeyframeButton(newKeyframe);
             }
-
             // キーフレームビュー更新
             UpdateKeyframeView();
             // アニメーション終了時間更新
