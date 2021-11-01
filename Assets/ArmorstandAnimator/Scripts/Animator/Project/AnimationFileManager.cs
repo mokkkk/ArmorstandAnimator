@@ -21,6 +21,7 @@ namespace ArmorstandAnimator
         public int tick;
         public float[] rootPos;
         public ASAAnimationRotate[] rotates;
+        public bool isQuick;
     }
     [Serializable]
     public class ASAAnimationRotate
@@ -71,6 +72,7 @@ namespace ArmorstandAnimator
                     keyframeArray[i].rotates[j] = new ASAAnimationRotate();
                     keyframeArray[i].rotates[j].rotate = new float[] { keyframeList[i].rotations[j].x, keyframeList[i].rotations[j].y, keyframeList[i].rotations[j].z };
                 }
+                keyframeArray[i].isQuick = keyframeList[i].isQuick;
             }
             project.keyframes = keyframeArray;
 
@@ -99,7 +101,6 @@ namespace ArmorstandAnimator
         public int SelectPath(out ASAAnimationProject project)
         {
             // // 初期化
-            // paths = new string[];
             project = new ASAAnimationProject();
 
             // ファイルダイアログを開く
@@ -120,20 +121,6 @@ namespace ArmorstandAnimator
 
         public int LoadProjectFileAnim(string path, out ASAAnimationProject project)
         {
-            // 初期化
-            //             project = new ASAAnimationProject();
-
-            //             // ファイルダイアログを開く
-            //             var extensions = new[]
-            //             {
-            //     new ExtensionFilter( "Animation Files", "asaanim"),
-            // };
-            //             paths = StandaloneFileBrowser.OpenFilePanel("Open File", "", extensions, false);
-
-            //             // ファイルを選択しなかった場合，中断
-            //             if (paths.Length < 1)
-            //                 return -1;
-
             // ファイル読み込み
             string line;
             string inputString = "";

@@ -43,6 +43,9 @@ namespace ArmorstandAnimator
         [SerializeField]
         private Transform eventUIHolder;
 
+        [SerializeField]
+        private Toggle isQuick;
+
         // animationUIList消去
         public void ClearAnimationUIList()
         {
@@ -83,6 +86,7 @@ namespace ArmorstandAnimator
             rootPosX.text = keyframe.rootPos.x.ToString();
             rootPosY.text = keyframe.rootPos.y.ToString();
             rootPosZ.text = keyframe.rootPos.z.ToString();
+            isQuick.SetIsOnWithoutNotify(keyframe.isQuick);
             for (int i = 0; i < animationUIList.Count; i++)
             {
                 animationUIList[i].SetRotate(keyframe.rotations[i]);
@@ -106,7 +110,7 @@ namespace ArmorstandAnimator
             {
                 rotations.Add(ui.GetRotate());
             }
-            var newKeyframe = new Keyframe(id, tick, rootPos, rotations);
+            var newKeyframe = new Keyframe(id, tick, rootPos, rotations, isQuick.isOn);
 
             // AnimationManagerのキーフレームリストを更新
             var newIndex = animationManager.UpdateKeyframeList(newKeyframe);
@@ -129,7 +133,7 @@ namespace ArmorstandAnimator
             {
                 rotations.Add(ui.GetRotate());
             }
-            var newKeyframe = new Keyframe(id, tick, rootPos, rotations);
+            var newKeyframe = new Keyframe(id, tick, rootPos, rotations, isQuick.isOn);
 
             // AnimationManagerのキーフレームリストを更新
             var newIndex = animationManager.UpdateKeyframeListTick(newKeyframe);
@@ -197,6 +201,11 @@ namespace ArmorstandAnimator
             rootPosY.interactable = value;
             rootPosZ.interactable = value;
             deleteButton.interactable = value;
+        }
+
+        public void OnIsQuickChanged()
+        {
+            UpdateKeyframe();
         }
     }
 }

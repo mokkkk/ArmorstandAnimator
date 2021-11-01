@@ -72,6 +72,9 @@ namespace ArmorstandAnimator
         private GenerateAnimationMcfunction animationMcfunc;
         private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
 
+        // 表示設定保持
+        public bool showGround, showArmorstand, showAxis;
+
         private const string PathHistoryFileNameProject = "pathhist_project.json";
         private const string PathHistoryFileNameAnim = "pathhist_animation.json";
 
@@ -278,6 +281,7 @@ namespace ArmorstandAnimator
         // 防具立て表示/非表示
         public void ShowArmorstand(bool showArmorstand)
         {
+            this.showArmorstand = showArmorstand;
             foreach (Node n in NodeList)
             {
                 n.SetArmorstandVisible(showArmorstand, generalSetting.IsSmall);
@@ -287,6 +291,7 @@ namespace ArmorstandAnimator
         // 回転軸表示/非表示
         public void ShowAxis(bool showAxis)
         {
+            this.showAxis = showAxis;
             foreach (Node n in NodeList)
             {
                 n.SetAxisVisible(showAxis);
@@ -296,6 +301,7 @@ namespace ArmorstandAnimator
         // 地面表示/非表示
         public void ShowGround(bool showGround)
         {
+            this.showGround = showGround;
             groundPlane.SetActive(showGround);
         }
 
@@ -356,7 +362,7 @@ namespace ArmorstandAnimator
             nodeManager.ChangeArmorstand(project.nodeList, project.isSmall);
 
             // Armorstand表示設定
-            ShowArmorstand(true);
+            ShowArmorstand(showArmorstand);
         }
 
 

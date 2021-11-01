@@ -143,7 +143,7 @@ namespace ArmorstandAnimator
             UpdateNodeTransform();
 
             // 表示切替
-            sceneManager.ShowArmorstand(true);
+            sceneManager.ShowArmorstand(sceneManager.showArmorstand);
         }
 
         // プロジェクトファイルからノード作成
@@ -177,7 +177,7 @@ namespace ArmorstandAnimator
             UpdateNodeTransform();
 
             // 表示切替
-            sceneManager.ShowArmorstand(true);
+            sceneManager.ShowArmorstand(sceneManager.showArmorstand);
         }
 
         // ノードUIのみ表示
