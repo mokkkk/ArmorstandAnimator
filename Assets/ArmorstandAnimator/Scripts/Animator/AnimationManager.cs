@@ -640,12 +640,12 @@ namespace ArmorstandAnimator
 
             // indexをずらす
             for (int i = keyframeA.index + 1; i < keyframeList.Count; i++)
-                keyframeList[i].index += count;
+                keyframeList[i].index += count - 1;
 
             for (int i = 1; i < count; i++)
             {
                 // tick計算
-                var newTick = (int)((keyframeA.tick + keyframeB.tick) / count * i);
+                var newTick = keyframeA.tick + (int)((keyframeB.tick - keyframeA.tick) / count * i);
                 // rootPos計算
                 var newRootPos = new Vector3((keyframeA.rootPos.x + keyframeB.rootPos.x) / count * i, (keyframeA.rootPos.y + keyframeB.rootPos.y) / count * i, (keyframeA.rootPos.z + keyframeB.rootPos.z) / count * i);
                 // ローテーション用リスト新規作成
@@ -656,17 +656,19 @@ namespace ArmorstandAnimator
                     newRotations.Add(rotate);
                 }
                 // キーフレーム作成
-                var newKeyframe = new Keyframe(keyframeA.index + i + 1, newTick, newRootPos, newRotations, false);
+                var newKeyframe = new Keyframe(keyframeA.index + i, newTick, newRootPos, newRotations, false);
                 this.keyframeList.Add(newKeyframe);
                 // キーフレームボタン作成
                 AddKeyframeButton(newKeyframe);
             }
+            // 追加したキーフレームを選択
+            SelectKeyframe(keyframeList.Count - 1);
+            // tick順でキーフレームソート
+            SortKeyframeByTick();
             // キーフレームビュー更新
             UpdateKeyframeView();
             // アニメーション終了時間更新
             this.animationEndTime = keyframeList[keyframeList.Count - 1].tick;
-            // 追加したキーフレームを選択
-            SelectKeyframe(keyframeList.Count - 1);
         }
     }
 }
