@@ -212,6 +212,25 @@ namespace ArmorstandAnimator
             pose01.Find("Axis").gameObject.SetActive(visible);
         }
 
+        // PivotCubeMaterial変更
+        public void SetCubeMaterial(bool visible)
+        {
+            if (visible)
+            {
+                foreach (Transform t in elementCubes)
+                {
+                    t.GetChild(0).GetComponent<Renderer>().material = (Material)Resources.Load("Materials/PivotCubeAlpha", typeof(Material));
+                }
+            }
+            else
+            {
+                foreach (Transform t in elementCubes)
+                {
+                    t.GetChild(0).GetComponent<Renderer>().material = (Material)Resources.Load("Materials/PivotCube", typeof(Material));
+                }
+            }
+        }
+
         // NodeName変更
         public void UpdateNodeName(string name)
         {

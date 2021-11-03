@@ -72,7 +72,8 @@ namespace ArmorstandAnimator
         private GenerateAnimationMcfunction animationMcfunc;
         private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
 
-        // 表示設定保持
+        // 表示設定用
+        public Node currentNode;
         public bool showGround = true, showArmorstand = true, showAxis = false;
 
         private const string PathHistoryFileNameProject = "pathhist_project.json";
@@ -93,6 +94,11 @@ namespace ArmorstandAnimator
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
             animationMcfunc = this.gameObject.GetComponent<GenerateAnimationMcfunction>();
             animationMcfuncfs = this.gameObject.GetComponent<GenerateAnimationMcfunctionFixSpeed>();
+
+            showGround = true;
+            showArmorstand = true;
+            showAxis = false;
+            currentNode = null;
         }
 
         // Update is called once per frame
@@ -294,7 +300,26 @@ namespace ArmorstandAnimator
             this.showAxis = showAxis;
             foreach (Node n in NodeList)
             {
+                n.SetCubeMaterial(showAxis);
                 n.SetAxisVisible(showAxis);
+
+                // if (ReferenceEquals(n, currentNode))
+                //     n.SetAxisVisible(showAxis);
+            }
+        }
+
+        public void SetCurrentNode(Node node)
+        {
+            this.currentNode = node;
+            if (showAxis)
+            {
+                foreach (Node n in NodeList)
+                {
+                    n.SetAxisVisible(false);
+
+                    if (ReferenceEquals(n, currentNode))
+                        n.SetAxisVisible(showAxis);
+                }
             }
         }
 

@@ -436,5 +436,11 @@ namespace ArmorstandAnimator
             // ノード位置更新
             UpdateNodeTransform();
         }
+
+        // ノード選択
+        public void OnNodeSelected(Node node)
+        {
+            sceneManager.SetCurrentNode(node);
+        }
     }
 }

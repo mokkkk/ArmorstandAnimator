@@ -117,13 +117,38 @@ namespace ArmorstandAnimator
                 rotations.Add(n.rotate);
             }
 
-            // キーフレームのrotationsとノード数を比較し，一致しない場合キーフレームリストを初期化
+            // キーフレームのrotationsとノード数を比較
             if (keyframeList.Any())
             {
-                if (rotations.Count != keyframeList[0].rotations.Count)
+                if (keyframeList[0].rotations.Count > 0 && rotations.Count != keyframeList[0].rotations.Count)
                 {
-                    this.keyframeList = new List<Keyframe>();
-                    Debug.Log("Reset Keyframe List");
+                    // Rotations < ノード数
+                    if (rotations.Count < keyframeList[0].rotations.Count)
+                    {
+                        var diff = keyframeList[0].rotations.Count - rotations.Count;
+
+                        foreach (Keyframe k in keyframeList)
+                        {
+                            for (int i = 0; i < diff; i++)
+                                k.rotations.RemoveAt(k.rotations.Count - 1);
+                        }
+                    }
+                    // Rotations > ノード数
+                    else if (rotations.Count > keyframeList[0].rotations.Count)
+                    {
+                        var diff = rotations.Count - keyframeList[0].rotations.Count;
+                        foreach (Keyframe k in keyframeList)
+                        {
+                            for (int i = 0; i < diff; i++)
+                            {
+                                k.rotations.Add(Vector3.zero);
+                            }
+                        }
+                    }
+                }
+                else if (keyframeList[0].rotations.Count <= 0)
+                {
+                    keyframeList = new List<Keyframe>();
                 }
             }
 
@@ -471,8 +496,16 @@ namespace ArmorstandAnimator
 
                     SetNodeRotation(dummyKey);
 
-                    t += Time.deltaTime;
-                    yield return null;
+                    if (animationSetting.IsTickAnimation)
+                    {
+                        t += TickToSec;
+                        yield return new WaitForSeconds(0.05f);
+                    }
+                    else
+                    {
+                        t += Time.deltaTime;
+                        yield return null;
+                    }
                 }
 
                 index++;

@@ -11,6 +11,8 @@ namespace ArmorstandAnimator
         private InputField animationName;
         [SerializeField]
         private InputField animationSpeed;
+        [SerializeField]
+        private Toggle isTickAnimation;
         public string AnimationName
         {
             get
@@ -23,6 +25,13 @@ namespace ArmorstandAnimator
             get
             {
                 return float.Parse(this.animationSpeed.text);
+            }
+        }
+        public bool IsTickAnimation
+        {
+            get
+            {
+                return this.isTickAnimation.isOn;
             }
         }
         public void SetText(string animationName)
