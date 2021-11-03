@@ -292,6 +292,7 @@ namespace ArmorstandAnimator
             {
                 n.SetArmorstandVisible(showArmorstand, generalSetting.IsSmall);
             }
+            ShowAxis(this.showAxis);
         }
 
         // 回転軸表示/非表示
