@@ -124,10 +124,17 @@ namespace ArmorstandAnimator
         // 対応Keyframe更新
         public void UpdateKeyframeTick()
         {
+            float x, y, z;
+            var rx = float.TryParse(rootPosX.text, out x);
+            var ry = float.TryParse(rootPosY.text, out y);
+            var rz = float.TryParse(rootPosZ.text, out z);
+            if (!rx || !ry || !rx)
+                return;
+
             // UIの値からキーフレームの値を設定
             var id = targetKeyframe.index;
             var tick = int.Parse(this.tick.text);
-            var rootPos = new Vector3(float.Parse(rootPosX.text), float.Parse(rootPosY.text), float.Parse(rootPosZ.text));
+            var rootPos = new Vector3(x, y, z);
             var rotations = new List<Vector3>();
             foreach (AnimationUI ui in animationUIList)
             {

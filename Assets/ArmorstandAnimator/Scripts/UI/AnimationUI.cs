@@ -47,9 +47,9 @@ namespace ArmorstandAnimator
 
             // 値設定
             nodeName.text = targetNode.nodeName;
-            rotationX.text = targetNode.rotate.x.ToString();
-            rotationY.text = targetNode.rotate.y.ToString();
-            rotationZ.text = targetNode.rotate.z.ToString();
+            rotationX.SetTextWithoutNotify(targetNode.rotate.x.ToString());
+            rotationY.SetTextWithoutNotify(targetNode.rotate.y.ToString());
+            rotationZ.SetTextWithoutNotify(targetNode.rotate.z.ToString());
 
             // サイズ調整
             this.GetComponent<RectTransform>().sizeDelta = new Vector2(this.GetComponent<RectTransform>().sizeDelta.x, AnimationUISizeOpen);
@@ -79,15 +79,22 @@ namespace ArmorstandAnimator
         // Rotate設定時
         public void OnRotateChanged()
         {
+            float x, y, z;
+            var rx = float.TryParse(rotationX.text, out x);
+            var ry = float.TryParse(rotationY.text, out y);
+            var rz = float.TryParse(rotationZ.text, out z);
+            if (!rx || !ry || !rx)
+                return;
+
             keyframeUI.UpdateKeyframe();
         }
 
         // SetRotate
         public void SetRotate(Vector3 rotate)
         {
-            this.rotationX.text = rotate.x.ToString();
-            this.rotationY.text = rotate.y.ToString();
-            this.rotationZ.text = rotate.z.ToString();
+            this.rotationX.SetTextWithoutNotify(rotate.x.ToString());
+            this.rotationY.SetTextWithoutNotify(rotate.y.ToString());
+            this.rotationZ.SetTextWithoutNotify(rotate.z.ToString());
         }
 
         // GetRotate
@@ -98,6 +105,12 @@ namespace ArmorstandAnimator
             rotate.y = float.Parse(rotationY.text);
             rotate.z = float.Parse(rotationZ.text);
             return rotate;
+        }
+
+        // 選択時
+        public void OnNodeSelected()
+        {
+            animationManager.OnNodeSelected(this.targetNode);
         }
     }
 }

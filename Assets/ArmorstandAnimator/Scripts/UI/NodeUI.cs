@@ -57,12 +57,12 @@ namespace ArmorstandAnimator
                 parentNodeInputField.text = targetNode.parentNode.nodeName;
             else
                 parentNodeInputField.text = "Root";
-            positionX.text = targetNode.pos.x.ToString();
-            positionY.text = targetNode.pos.y.ToString();
-            positionZ.text = targetNode.pos.z.ToString();
-            rotationX.text = targetNode.rotate.x.ToString();
-            rotationY.text = targetNode.rotate.y.ToString();
-            rotationZ.text = targetNode.rotate.z.ToString();
+            positionX.SetTextWithoutNotify(targetNode.pos.x.ToString());
+            positionY.SetTextWithoutNotify(targetNode.pos.y.ToString());
+            positionZ.SetTextWithoutNotify(targetNode.pos.z.ToString());
+            rotationX.SetTextWithoutNotify(targetNode.rotate.x.ToString());
+            rotationY.SetTextWithoutNotify(targetNode.rotate.y.ToString());
+            rotationZ.SetTextWithoutNotify(targetNode.rotate.z.ToString());
 
             // サイズ調整
             this.GetComponent<RectTransform>().sizeDelta = new Vector2(this.GetComponent<RectTransform>().sizeDelta.x, NodeUISizeOpen);
@@ -98,7 +98,14 @@ namespace ArmorstandAnimator
         // Position変更時
         public void OnPositionChanged()
         {
-            var pos = new Vector3(float.Parse(positionX.text), float.Parse(positionY.text), float.Parse(positionZ.text));
+            float x, y, z;
+            var rx = float.TryParse(positionX.text, out x);
+            var ry = float.TryParse(positionY.text, out y);
+            var rz = float.TryParse(positionZ.text, out z);
+            if (!rx || !ry || !rx)
+                return;
+
+            var pos = new Vector3(x, y, z);
             targetNode.SetPosition(pos);
             nodeManager.UpdateNodeTransform();
         }
@@ -106,7 +113,14 @@ namespace ArmorstandAnimator
         // Rotation変更時
         public void OnRotationChanged()
         {
-            var rotate = new Vector3(float.Parse(rotationX.text), float.Parse(rotationY.text), float.Parse(rotationZ.text));
+            float x, y, z;
+            var rx = float.TryParse(rotationX.text, out x);
+            var ry = float.TryParse(rotationY.text, out y);
+            var rz = float.TryParse(rotationZ.text, out z);
+            if (!rx || !ry || !rx)
+                return;
+
+            var rotate = new Vector3(x, y, z);
             targetNode.SetRotation(rotate);
             nodeManager.UpdateNodeTransform();
         }
@@ -144,9 +158,15 @@ namespace ArmorstandAnimator
         // Position変更時(表示のみ)
         public void SetPositionText(Vector3 pos)
         {
-            positionX.text = pos.x.ToString();
-            positionY.text = pos.y.ToString();
-            positionZ.text = pos.z.ToString();
+            positionX.SetTextWithoutNotify(pos.x.ToString());
+            positionY.SetTextWithoutNotify(pos.y.ToString());
+            positionZ.SetTextWithoutNotify(pos.z.ToString());
+        }
+
+        // 選択時
+        public void OnNodeSelected()
+        {
+            nodeManager.OnNodeSelected(this.targetNode);
         }
     }
 }
