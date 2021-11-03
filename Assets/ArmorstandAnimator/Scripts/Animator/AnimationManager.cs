@@ -705,5 +705,11 @@ namespace ArmorstandAnimator
             // アニメーション終了時間更新
             this.animationEndTime = keyframeList[keyframeList.Count - 1].tick;
         }
+
+        // ノード選択
+        public void OnNodeSelected(Node node)
+        {
+            sceneManager.SetCurrentNode(node);
+        }
     }
 }

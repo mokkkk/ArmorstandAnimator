@@ -301,10 +301,10 @@ namespace ArmorstandAnimator
             foreach (Node n in NodeList)
             {
                 n.SetCubeMaterial(showAxis);
-                n.SetAxisVisible(showAxis);
+                n.SetAxisVisible(false);
 
-                // if (ReferenceEquals(n, currentNode))
-                //     n.SetAxisVisible(showAxis);
+                if (ReferenceEquals(n, currentNode))
+                    n.SetAxisVisible(showAxis);
             }
         }
 

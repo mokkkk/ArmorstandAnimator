@@ -166,7 +166,6 @@ namespace ArmorstandAnimator
         // 選択時
         public void OnNodeSelected()
         {
-            Debug.Log("clicked");
             nodeManager.OnNodeSelected(this.targetNode);
         }
     }

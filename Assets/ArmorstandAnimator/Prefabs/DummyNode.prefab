@@ -39,7 +39,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7552191433728227556}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Axis
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7790522319937130982}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Axis
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -567,6 +567,7 @@ MonoBehaviour:
   pose01: {fileID: 0}
   element: {fileID: 0}
   elementCubes: []
+  rawTranslation: {x: 0, y: 0, z: 0}
 --- !u!1 &5379216178480570120
 GameObject:
   m_ObjectHideFlags: 0
@@ -1441,7 +1442,7 @@ GameObject:
   m_Component:
   - component: {fileID: 175580027093660729}
   - component: {fileID: 4399356809702861294}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Z
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1570,7 +1571,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6202453502693805690}
   - component: {fileID: 693312343307950152}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: X
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1699,7 +1700,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7897745582035275423}
   - component: {fileID: 6001133206779997150}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Y
   m_TagString: Untagged
   m_Icon: {fileID: 0}
