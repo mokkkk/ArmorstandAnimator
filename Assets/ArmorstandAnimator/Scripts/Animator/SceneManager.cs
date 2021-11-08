@@ -47,6 +47,10 @@ namespace ArmorstandAnimator
         [SerializeField]
         private MenuBarUI menuBarUI;
 
+        // マウス用
+        [SerializeField]
+        private MouseManager mouseManager;
+
         // 地面
         [SerializeField]
         private GameObject groundPlane;
@@ -94,6 +98,8 @@ namespace ArmorstandAnimator
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
             animationMcfunc = this.gameObject.GetComponent<GenerateAnimationMcfunction>();
             animationMcfuncfs = this.gameObject.GetComponent<GenerateAnimationMcfunctionFixSpeed>();
+            mouseManager = this.gameObject.GetComponent<MouseManager>();
+            mouseManager.Initialize();
 
             showGround = true;
             showArmorstand = true;
@@ -104,6 +110,7 @@ namespace ArmorstandAnimator
         // Update is called once per frame
         void Update()
         {
+            mouseManager.Main();
         }
 
         // モード変更
