@@ -21,31 +21,35 @@ public class SceneviewCamera : MonoBehaviour
 
     private Vector3 preMousePos, preTargetPos;
 
-    private void Update()
+    public void Main()
     {
-        // UI操作中はカメラ操作しない
-        if (!EventSystem.current.IsPointerOverGameObject())
-        {
-            this.transform.position += target.transform.position - preTargetPos;
-            preTargetPos = target.transform.position;
+        this.transform.position += target.transform.position - preTargetPos;
+        preTargetPos = target.transform.position;
 
-            MouseUpdate();
-            return;
-        }
+        MouseUpdate();
+        return;
+    }
+
+    public void GetMousePos()
+    {
+        preMousePos = Input.mousePosition;
     }
 
     private void MouseUpdate()
     {
+        // if (Input.GetMouseButtonDown(0) ||
+        //    Input.GetMouseButtonDown(1) ||
+        //    Input.GetMouseButtonDown(2))
+        //     preMousePos = Input.mousePosition;
+
+        MouseDrag(Input.mousePosition);
+    }
+
+    public void CheckMouseWheel()
+    {
         float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
         if (scrollWheel != 0.0f)
             MouseWheel(scrollWheel);
-
-        if (Input.GetMouseButtonDown(0) ||
-           Input.GetMouseButtonDown(1) ||
-           Input.GetMouseButtonDown(2))
-            preMousePos = Input.mousePosition;
-
-        MouseDrag(Input.mousePosition);
     }
 
     private void MouseWheel(float delta)

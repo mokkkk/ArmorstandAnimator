@@ -786,6 +786,7 @@ GameObject:
   - component: {fileID: 26231357}
   - component: {fileID: 26231360}
   - component: {fileID: 26231361}
+  - component: {fileID: 26231362}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -825,6 +826,7 @@ MonoBehaviour:
   generalSetting: {fileID: 463852439}
   animationSetting: {fileID: 1743436561}
   menuBarUI: {fileID: 2001760933}
+  mouseManager: {fileID: 26231362}
   groundPlane: {fileID: 925871751}
   warningPanelModel: {fileID: 2064682077}
   warningPanelAnim: {fileID: 12194772}
@@ -949,6 +951,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   modelMcfunc: {fileID: 26231357}
+--- !u!114 &26231362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26231352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cc67ee76f66dc742bfaf49da4f31eeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &28034150
 GameObject:
   m_ObjectHideFlags: 0
@@ -14712,7 +14726,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 183
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
