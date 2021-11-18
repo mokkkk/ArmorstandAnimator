@@ -29,9 +29,9 @@ namespace ArmorstandAnimator
         private const float PosOffsetShift = 0.5f;
         private const float PosOffsetCtrl = 0.1f;
         private const float PosOffsetCtrlShift = 0.05f;
-        private const float DegOffsetNone = 5.0f;
-        private const float DegOffsetShift = 1.0f;
-        private const float DegOffsetCtrl = 0.5f;
+        private const float DegOffsetNone = 10.0f;
+        private const float DegOffsetShift = 5.0f;
+        private const float DegOffsetCtrl = 1.0f;
         private const float DegOffsetCtrlShift = 0.1f;
 
         public void Initialize()
@@ -88,43 +88,40 @@ namespace ArmorstandAnimator
             int axisLayerMask = LayerMask.GetMask(new string[] { LayerMask.LayerToName(6) }); ;
             if (Input.GetMouseButtonDown(0) && Physics.Raycast(mouseRay, out axisHit, Mathf.Infinity, axisLayerMask))
             {
-                if (!ReferenceEquals(sceneManager.currentNode, null))
+                // 移動用ハンドルクリック時
+                if (axisHit.collider.gameObject.tag == "PositionAxis")
                 {
-                    // 移動用ハンドルクリック時
-                    if (axisHit.collider.gameObject.tag == "PositionAxis")
-                    {
-                        this.mouseTarget = MouseTarget.AxisT;
-                        this.targetAxis = axisHit.collider.gameObject.GetComponent<PositionLine>().axis;
-                        Debug.Log(axisHit.collider.gameObject.GetComponent<PositionLine>().axis);
-                        // クリック位置保存
-                        posClick = Input.mousePosition;
+                    this.mouseTarget = MouseTarget.AxisT;
+                    this.targetAxis = axisHit.collider.gameObject.GetComponent<PositionLine>().axis;
+                    Debug.Log(axisHit.collider.gameObject.GetComponent<PositionLine>().axis);
+                    // クリック位置保存
+                    posClick = Input.mousePosition;
 
-                        // 移動用ハンドル表示切替
-                        sceneManager.MouseNodePositionColor(targetAxis, false);
-                    }
+                    // 移動用ハンドル表示切替
+                    sceneManager.MouseNodePositionColor(targetAxis, false);
+                }
 
-                    // 回転用ハンドルクリック時
-                    if (axisHit.collider.gameObject.tag == "RotateAxis")
-                    {
-                        this.mouseTarget = MouseTarget.AxisR;
-                        this.targetAxis = axisHit.collider.gameObject.GetComponent<RotateCircle>().axis;
-                        Debug.Log(axisHit.collider.gameObject.GetComponent<RotateCircle>().axis);
+                // 回転用ハンドルクリック時
+                if (axisHit.collider.gameObject.tag == "RotateAxis")
+                {
+                    this.mouseTarget = MouseTarget.AxisR;
+                    this.targetAxis = axisHit.collider.gameObject.GetComponent<RotateCircle>().axis;
+                    Debug.Log(axisHit.collider.gameObject.GetComponent<RotateCircle>().axis);
 
-                        // 中心位置保存
-                        rotateCenter = RectTransformUtility.WorldToScreenPoint(Camera.main, axisHit.collider.transform.position);
-                        // クリック位置保存
-                        rotateClick = Input.mousePosition;
-                        // 初期角度保存
-                        if (targetAxis == Axis.X)
-                            rotateCurrent = sceneManager.currentNode.rotate.x;
-                        else if (targetAxis == Axis.Y)
-                            rotateCurrent = sceneManager.currentNode.rotate.y;
-                        else if (targetAxis == Axis.Z)
-                            rotateCurrent = sceneManager.currentNode.rotate.z;
+                    // 中心位置保存
+                    rotateCenter = RectTransformUtility.WorldToScreenPoint(Camera.main, axisHit.collider.transform.position);
+                    // クリック位置保存
+                    rotateClick = Input.mousePosition;
+                    // 初期角度保存
+                    if (targetAxis == Axis.X)
+                        rotateCurrent = sceneManager.currentNode.rotate.x;
+                    else if (targetAxis == Axis.Y)
+                        rotateCurrent = sceneManager.currentNode.rotate.y;
+                    else if (targetAxis == Axis.Z)
+                        rotateCurrent = sceneManager.currentNode.rotate.z;
 
-                        // 回転用ハンドル表示切替
-                        sceneManager.MouseNodeRotationColor(targetAxis, false);
-                    }
+                    // 回転用ハンドル表示切替
+                    sceneManager.MouseNodeRotationColor(targetAxis, false);
                 }
             }
 
@@ -159,7 +156,7 @@ namespace ArmorstandAnimator
             {
                 sceneManager.currentNode = targetCube.transform.parent.parent.parent.parent.parent.GetComponent<Node>();
             }
-            else if (this.clickTime <= NodeClickTime)
+            else if (this.mouseTarget != MouseTarget.UI && this.clickTime <= NodeClickTime)
             {
                 sceneManager.currentNode = null;
             }
@@ -172,7 +169,11 @@ namespace ArmorstandAnimator
         private void CalcPos()
         {
             Vector2 mousePos = Input.mousePosition;
-            var currentPos = sceneManager.currentNode.pos;
+            var currentPos = Vector3.zero;
+            if (sceneManager.appMode == AppMode.Model)
+                currentPos = sceneManager.currentNode.pos;
+            else
+                currentPos = sceneManager.GetRootPos();
 
             // 差計算
             var mag = 0.0f;
@@ -286,7 +287,6 @@ namespace ArmorstandAnimator
                 deg -= p;
             }
 
-            // Debug.Log(targetAxis + ":" + deg);
             sceneManager.MouseNodeRotation(targetAxis, deg + rotateCurrent);
         }
     }

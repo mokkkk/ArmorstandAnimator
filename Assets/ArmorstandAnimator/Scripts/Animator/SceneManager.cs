@@ -86,6 +86,8 @@ namespace ArmorstandAnimator
         // ノード操作用
         public TransformMode transformMode;
         [SerializeField]
+        private Button tfmPos, tfmRot;
+        [SerializeField]
         private Transform transformUI, positionUI, rotationUI, rotationUIPose01;
         public Node currentNode, currentNodeBefore;
 
@@ -116,7 +118,7 @@ namespace ArmorstandAnimator
             currentNode = null;
             currentNodeBefore = null;
 
-            transformMode = TransformMode.Rotation;
+            transformMode = TransformMode.Position;
         }
 
         // Update is called once per frame
@@ -145,6 +147,8 @@ namespace ArmorstandAnimator
                 ClearModelUI();
                 CreateAnimUI();
             }
+
+            SetUIHandleVisible(!ReferenceEquals(currentNode, null));
         }
 
         public void NewProjectWarning()
@@ -548,11 +552,21 @@ namespace ArmorstandAnimator
                 {
                     positionUI.gameObject.SetActive(true);
                     rotationUI.gameObject.SetActive(false);
+                    if (appMode == AppMode.Animation)
+                        transformUI.position = GetRootPos();
                 }
             }
             else
             {
                 transformUI.gameObject.SetActive(false);
+            }
+
+            if (appMode == AppMode.Animation && transformMode == TransformMode.Position)
+            {
+                transformUI.gameObject.SetActive(true);
+                positionUI.gameObject.SetActive(true);
+                rotationUI.gameObject.SetActive(false);
+                transformUI.position = GetRootPos();
             }
         }
 
@@ -626,8 +640,16 @@ namespace ArmorstandAnimator
             // Nodeの値設定
             if (appMode == AppMode.Model)
                 currentNode.targetNodeUI.UpdatePosition(pos);
-            // else if (appMode == AppMode.Animation)
-            //     currentNode.targetAnimationUI.UpdateRotate(pos);
+            else if (appMode == AppMode.Animation)
+            {
+                transformUI.position = GetRootPos();
+                animationManager.UpdateRootPos(pos);
+            }
+        }
+
+        public Vector3 GetRootPos()
+        {
+            return animationManager.KeyframeList[animationManager.SelectedKeyframeIndex].rootPos;
         }
 
         // マウスによるノード回転
@@ -650,6 +672,26 @@ namespace ArmorstandAnimator
                 currentNode.targetNodeUI.UpdateRotate(newRotate);
             else if (appMode == AppMode.Animation)
                 currentNode.targetAnimationUI.UpdateRotate(newRotate);
+        }
+
+        // TransformMode設定
+        public void SetTransformMode(int mode)
+        {
+            switch (mode)
+            {
+                case 0:
+                    transformMode = TransformMode.Position;
+                    tfmPos.image.color = new Color(1.0f, 1.0f, 0.0f);
+                    tfmRot.image.color = new Color(1.0f, 1.0f, 1.0f);
+                    break;
+                case 1:
+                    transformMode = TransformMode.Rotation;
+                    tfmPos.image.color = new Color(1.0f, 1.0f, 1.0f);
+                    tfmRot.image.color = new Color(1.0f, 1.0f, 0.0f);
+                    break;
+            }
+
+            SetUIHandleVisible(!ReferenceEquals(currentNode, null));
         }
     }
 }

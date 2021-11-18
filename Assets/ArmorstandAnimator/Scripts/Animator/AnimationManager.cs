@@ -68,6 +68,13 @@ namespace ArmorstandAnimator
 
         // 選択中のキーフレームindex
         private int selectedKeyframeIndex;
+        public int SelectedKeyframeIndex
+        {
+            get
+            {
+                return this.selectedKeyframeIndex;
+            }
+        }
 
         // アニメーション終了タイム
         private int animationEndTime;
@@ -705,6 +712,12 @@ namespace ArmorstandAnimator
         public void OnNodeSelected(Node node)
         {
             sceneManager.SetCurrentNode(node);
+        }
+
+        // rootpos更新
+        public void UpdateRootPos(Vector3 pos)
+        {
+            keyframeUI.UpdateRootPos(pos);
         }
     }
 }
