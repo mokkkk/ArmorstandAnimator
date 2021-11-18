@@ -971,6 +971,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cc67ee76f66dc742bfaf49da4f31eeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneviewCamera: {fileID: 995473150}
   mouseTranslatePosOffset: 10
 --- !u!1 &28034150
 GameObject:
@@ -15497,6 +15498,7 @@ MonoBehaviour:
   moveSpeed: 2.66
   rotateSpeed: 0.2
   target: {fileID: 9589473}
+  sceneManager: {fileID: 26231354}
 --- !u!1 &1009512479
 GameObject:
   m_ObjectHideFlags: 0
