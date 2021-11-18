@@ -116,7 +116,7 @@ namespace ArmorstandAnimator
             currentNode = null;
             currentNodeBefore = null;
 
-            transformMode = TransformMode.Position;
+            transformMode = TransformMode.Rotation;
         }
 
         // Update is called once per frame

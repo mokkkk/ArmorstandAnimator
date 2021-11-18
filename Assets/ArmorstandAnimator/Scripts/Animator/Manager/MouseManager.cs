@@ -253,6 +253,18 @@ namespace ArmorstandAnimator
             if (cross < 0)
                 deg *= -1;
 
+            // カメラ角度に応じたオフセット
+            if (targetAxis == Axis.X)
+                if (Camera.main.transform.eulerAngles.y < 180.0f)
+                    deg *= -1;
+            if (targetAxis == Axis.Y)
+                if (Camera.main.transform.eulerAngles.x > 270.0f)
+                    deg *= -1;
+            if (targetAxis == Axis.Z)
+                if (Camera.main.transform.eulerAngles.y < 90.0f || Camera.main.transform.eulerAngles.y > 270.0f)
+                    deg *= -1;
+            Debug.Log(Camera.main.transform.eulerAngles.x);
+
             if (Input.GetKey(KeyCode.LeftShift) && Input.GetKey(KeyCode.LeftControl))
             {
                 var p = deg % DegOffsetCtrlShift;
