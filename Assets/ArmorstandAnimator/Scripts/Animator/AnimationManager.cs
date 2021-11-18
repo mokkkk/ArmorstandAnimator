@@ -96,11 +96,6 @@ namespace ArmorstandAnimator
             separateCount.text = "2";
         }
 
-        void Update()
-        {
-
-        }
-
         // アニメーションUI表示
         public void CreateAnimationUI()
         {

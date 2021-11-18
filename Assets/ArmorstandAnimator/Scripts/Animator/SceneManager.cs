@@ -10,6 +10,10 @@ namespace ArmorstandAnimator
     {
         Model, Animation
     }
+    public enum TransformMode
+    {
+        Position, Rotation
+    }
 
     public class SceneManager : MonoBehaviour
     {
@@ -77,8 +81,13 @@ namespace ArmorstandAnimator
         private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
 
         // 表示設定用
-        public Node currentNode;
         public bool showGround = true, showArmorstand = true, showAxis = false;
+
+        // ノード操作用
+        public TransformMode transformMode;
+        [SerializeField]
+        private Transform transformUI, positionUI, rotationUI, rotationUIPose01;
+        public Node currentNode, currentNodeBefore;
 
         private const string PathHistoryFileNameProject = "pathhist_project.json";
         private const string PathHistoryFileNameAnim = "pathhist_animation.json";
@@ -105,12 +114,18 @@ namespace ArmorstandAnimator
             showArmorstand = true;
             showAxis = false;
             currentNode = null;
+            currentNodeBefore = null;
+
+            transformMode = TransformMode.Position;
         }
 
         // Update is called once per frame
         void Update()
         {
             mouseManager.Main();
+
+            if (!ReferenceEquals(currentNode, currentNodeBefore))
+                OnCurrentNodeChanged();
         }
 
         // モード変更
@@ -496,6 +511,103 @@ namespace ArmorstandAnimator
             animationManager.CreateAnimationUIProject(project);
             // イベントリスト作成
             animationManager.keyframeUI.CreateEventUIList(project.events);
+        }
+
+        // CurrentNode変更時
+        private void OnCurrentNodeChanged()
+        {
+            Debug.Log("On Change");
+            if (!ReferenceEquals(currentNodeBefore, null))
+                currentNodeBefore.SetCubeMaterialTarget(false);
+            if (!ReferenceEquals(currentNode, null))
+            {
+                SetUIHandleVisible(true);
+                currentNode.SetCubeMaterialTarget(true);
+            }
+            else
+            {
+                SetUIHandleVisible(false);
+            }
+            this.currentNodeBefore = currentNode;
+        }
+
+        // ハンドル表示切替
+        private void SetUIHandleVisible(bool visible)
+        {
+            if (visible && !ReferenceEquals(currentNode, null))
+            {
+                transformUI.gameObject.SetActive(true);
+                transformUI.position = currentNode.transform.position;
+                if (transformMode == TransformMode.Rotation)
+                {
+                    positionUI.gameObject.SetActive(false);
+                    rotationUI.parent.gameObject.SetActive(true);
+                    rotationUIPose01.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
+                }
+                else if (transformMode == TransformMode.Position)
+                {
+                    positionUI.gameObject.SetActive(true);
+                    rotationUI.parent.gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                transformUI.gameObject.SetActive(false);
+            }
+        }
+
+        // 回転用ハンドル表示切替
+        public void MouseNodeRotationColor(Axis axis, bool reset)
+        {
+            if (reset)
+            {
+                rotationUIPose01.Find("X").GetComponent<LineRenderer>().startColor = Color.red;
+                rotationUIPose01.Find("Y").GetComponent<LineRenderer>().startColor = Color.green;
+                rotationUI.Find("Z").GetComponent<LineRenderer>().startColor = Color.blue;
+                rotationUIPose01.Find("X").GetComponent<LineRenderer>().endColor = Color.red;
+                rotationUIPose01.Find("Y").GetComponent<LineRenderer>().endColor = Color.green;
+                rotationUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.blue;
+            }
+            else
+            {
+                if (axis == Axis.X)
+                {
+                    rotationUIPose01.Find("X").GetComponent<LineRenderer>().startColor = Color.white;
+                    rotationUIPose01.Find("X").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+                if (axis == Axis.Y)
+                {
+                    rotationUIPose01.Find("Y").GetComponent<LineRenderer>().startColor = Color.white;
+                    rotationUIPose01.Find("Y").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+                if (axis == Axis.Z)
+                {
+                    rotationUI.Find("Z").GetComponent<LineRenderer>().startColor = Color.white;
+                    rotationUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+            }
+        }
+
+        // マウスによるノード回転
+        public void MouseNodeRotation(Axis axis, float deg)
+        {
+            // 角度取得
+            var newRotate = new Vector3(currentNode.rotate.x, currentNode.rotate.y, currentNode.rotate.z);
+            if (axis == Axis.X)
+                newRotate.x = deg;
+            if (axis == Axis.Y)
+                newRotate.y = deg;
+            if (axis == Axis.Z)
+                newRotate.z = deg;
+            currentNode.rotate = newRotate;
+            // 回転軸更新
+            rotationUIPose01.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
+
+            // Nodeの値設定
+            if (appMode == AppMode.Model)
+                currentNode.targetNodeUI.UpdateRotate(newRotate);
+            else if (appMode == AppMode.Animation)
+                currentNode.targetAnimationUI.UpdateRotate(newRotate);
         }
     }
 }

@@ -97,6 +97,15 @@ namespace ArmorstandAnimator
             this.rotationZ.SetTextWithoutNotify(rotate.z.ToString());
         }
 
+        // SetRotate
+        public void UpdateRotate(Vector3 rotate)
+        {
+            this.rotationX.SetTextWithoutNotify(rotate.x.ToString());
+            this.rotationY.SetTextWithoutNotify(rotate.y.ToString());
+            this.rotationZ.SetTextWithoutNotify(rotate.z.ToString());
+            keyframeUI.UpdateKeyframe();
+        }
+
         // GetRotate
         public Vector3 GetRotate()
         {
