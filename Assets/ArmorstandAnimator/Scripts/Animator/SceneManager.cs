@@ -541,18 +541,50 @@ namespace ArmorstandAnimator
                 if (transformMode == TransformMode.Rotation)
                 {
                     positionUI.gameObject.SetActive(false);
-                    rotationUI.parent.gameObject.SetActive(true);
+                    rotationUI.gameObject.SetActive(true);
                     rotationUIPose01.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
                 }
                 else if (transformMode == TransformMode.Position)
                 {
                     positionUI.gameObject.SetActive(true);
-                    rotationUI.parent.gameObject.SetActive(false);
+                    rotationUI.gameObject.SetActive(false);
                 }
             }
             else
             {
                 transformUI.gameObject.SetActive(false);
+            }
+        }
+
+        // 移動用ハンドル表示切替
+        public void MouseNodePositionColor(Axis axis, bool reset)
+        {
+            if (reset)
+            {
+                positionUI.Find("X").GetComponent<LineRenderer>().startColor = Color.red;
+                positionUI.Find("Y").GetComponent<LineRenderer>().startColor = Color.green;
+                positionUI.Find("Z").GetComponent<LineRenderer>().startColor = Color.blue;
+                positionUI.Find("X").GetComponent<LineRenderer>().endColor = Color.red;
+                positionUI.Find("Y").GetComponent<LineRenderer>().endColor = Color.green;
+                positionUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.blue;
+            }
+            else
+            {
+                if (axis == Axis.X)
+                {
+                    positionUI.Find("X").GetComponent<LineRenderer>().startColor = Color.white;
+                    positionUI.Find("X").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+                if (axis == Axis.Y)
+                {
+                    positionUI.Find("Y").GetComponent<LineRenderer>().startColor = Color.white;
+                    positionUI.Find("Y").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+                if (axis == Axis.Z)
+                {
+                    positionUI.Find("Z").GetComponent<LineRenderer>().startColor = Color.white;
+                    positionUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.white;
+                }
             }
         }
 
@@ -586,6 +618,16 @@ namespace ArmorstandAnimator
                     rotationUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.white;
                 }
             }
+        }
+
+        // マウスによるノード移動
+        public void MouseNodePosition(Vector3 pos)
+        {
+            // Nodeの値設定
+            if (appMode == AppMode.Model)
+                currentNode.targetNodeUI.UpdatePosition(pos);
+            // else if (appMode == AppMode.Animation)
+            //     currentNode.targetAnimationUI.UpdateRotate(pos);
         }
 
         // マウスによるノード回転

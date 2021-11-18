@@ -177,6 +177,17 @@ namespace ArmorstandAnimator
             nodeManager.OnNodeSelected(this.targetNode);
         }
 
+        // Position変更
+        public void UpdatePosition(Vector3 pos)
+        {
+            positionX.SetTextWithoutNotify(pos.x.ToString());
+            positionY.SetTextWithoutNotify(pos.y.ToString());
+            positionZ.SetTextWithoutNotify(pos.z.ToString());
+
+            targetNode.SetPosition(pos);
+            nodeManager.UpdateNodeTransform();
+        }
+
         // Rotation変更
         public void UpdateRotate(Vector3 rotate)
         {

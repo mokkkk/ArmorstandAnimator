@@ -21,6 +21,8 @@ public class SceneviewCamera : MonoBehaviour
 
     private Vector3 preMousePos, preTargetPos;
 
+    private float yAngleSum = 0.0f;
+
     public void Main()
     {
         this.transform.position += target.transform.position - preTargetPos;
@@ -37,11 +39,6 @@ public class SceneviewCamera : MonoBehaviour
 
     private void MouseUpdate()
     {
-        // if (Input.GetMouseButtonDown(0) ||
-        //    Input.GetMouseButtonDown(1) ||
-        //    Input.GetMouseButtonDown(2))
-        //     preMousePos = Input.mousePosition;
-
         MouseDrag(Input.mousePosition);
     }
 
@@ -94,6 +91,15 @@ public class SceneviewCamera : MonoBehaviour
         var newAngle = Vector3.zero;
         newAngle.x = x * -rotateSpeed;
         newAngle.y = y * -rotateSpeed;
+
+        yAngleSum += newAngle.y;
+        var clampAngleSum = Mathf.Clamp(yAngleSum, -115.0f, 65.0f);
+        var angleOffset = yAngleSum - clampAngleSum;
+        yAngleSum = clampAngleSum;
+        newAngle.y -= angleOffset;
+
+        if (angleOffset > 0)
+            Debug.Log("stop");
 
         this.transform.RotateAround(target.position, Vector3.up, newAngle.x);
         this.transform.RotateAround(target.position, transform.right, newAngle.y);
