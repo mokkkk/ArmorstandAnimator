@@ -163,10 +163,40 @@ namespace ArmorstandAnimator
             positionZ.SetTextWithoutNotify(pos.z.ToString());
         }
 
+        // Rotation変更時(表示のみ)
+        public void SetRotateText(Vector3 rotate)
+        {
+            rotationX.SetTextWithoutNotify(rotate.x.ToString());
+            rotationY.SetTextWithoutNotify(rotate.y.ToString());
+            rotationZ.SetTextWithoutNotify(rotate.z.ToString());
+        }
+
         // 選択時
         public void OnNodeSelected()
         {
             nodeManager.OnNodeSelected(this.targetNode);
+        }
+
+        // Position変更
+        public void UpdatePosition(Vector3 pos)
+        {
+            positionX.SetTextWithoutNotify(pos.x.ToString());
+            positionY.SetTextWithoutNotify(pos.y.ToString());
+            positionZ.SetTextWithoutNotify(pos.z.ToString());
+
+            targetNode.SetPosition(pos);
+            nodeManager.UpdateNodeTransform();
+        }
+
+        // Rotation変更
+        public void UpdateRotate(Vector3 rotate)
+        {
+            rotationX.SetTextWithoutNotify(rotate.x.ToString());
+            rotationY.SetTextWithoutNotify(rotate.y.ToString());
+            rotationZ.SetTextWithoutNotify(rotate.z.ToString());
+
+            targetNode.SetRotation(rotate);
+            nodeManager.UpdateNodeTransform();
         }
     }
 }

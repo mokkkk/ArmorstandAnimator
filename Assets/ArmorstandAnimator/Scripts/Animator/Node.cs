@@ -240,5 +240,24 @@ namespace ArmorstandAnimator
             foreach (Transform child in element)
                 elementCubes.Add(child);
         }
+
+        // PivotCubeMaterial変更
+        public void SetCubeMaterialTarget(bool target)
+        {
+            if (target)
+            {
+                foreach (Transform t in elementCubes)
+                {
+                    t.GetChild(0).GetComponent<Renderer>().material = (Material)Resources.Load("Materials/PivotCubeTarget", typeof(Material));
+                }
+            }
+            else
+            {
+                foreach (Transform t in elementCubes)
+                {
+                    t.GetChild(0).GetComponent<Renderer>().material = (Material)Resources.Load("Materials/PivotCube", typeof(Material));
+                }
+            }
+        }
     }
 }

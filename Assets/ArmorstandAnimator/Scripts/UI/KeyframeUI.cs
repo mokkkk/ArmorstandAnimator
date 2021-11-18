@@ -204,15 +204,38 @@ namespace ArmorstandAnimator
         private void SetInputFieldIntaractive(bool value)
         {
             tick.interactable = value;
-            rootPosX.interactable = value;
-            rootPosY.interactable = value;
-            rootPosZ.interactable = value;
+            // rootPosX.interactable = value;
+            // rootPosY.interactable = value;
+            // rootPosZ.interactable = value;
             deleteButton.interactable = value;
         }
 
         public void OnIsQuickChanged()
         {
             UpdateKeyframe();
+        }
+
+        // rootpos更新
+        public void UpdateRootPos(Vector3 pos)
+        {
+            // UIの値からキーフレームの値を設定
+            var id = targetKeyframe.index;
+            var tick = int.Parse(this.tick.text);
+            var rootPos = new Vector3(pos.x, pos.y, pos.z);
+            var rotations = new List<Vector3>();
+            foreach (AnimationUI ui in animationUIList)
+            {
+                rotations.Add(ui.GetRotate());
+            }
+            var newKeyframe = new Keyframe(id, tick, rootPos, rotations, isQuick.isOn);
+
+            // AnimationManagerのキーフレームリストを更新
+            var newIndex = animationManager.UpdateKeyframeList(newKeyframe);
+            newKeyframe.index = newIndex;
+            this.targetKeyframe = newKeyframe;
+
+            // UIの内容更新
+            SetUIContent(newKeyframe);
         }
     }
 }

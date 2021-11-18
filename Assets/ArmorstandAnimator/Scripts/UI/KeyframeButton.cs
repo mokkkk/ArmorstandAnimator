@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace ArmorstandAnimator
 {
@@ -28,9 +29,16 @@ namespace ArmorstandAnimator
             indexText.text = tick.ToString();
         }
 
+        // ボタン押し判定
         public void OnButtonClicked()
         {
             animationManager.SelectKeyframe(this.index);
+        }
+
+        // マウスクリック判定
+        public void OnMouseClicked()
+        {
+            Debug.Log("Start Click");
         }
     }
 }

@@ -10,6 +10,10 @@ namespace ArmorstandAnimator
     {
         Model, Animation
     }
+    public enum TransformMode
+    {
+        Position, Rotation
+    }
 
     public class SceneManager : MonoBehaviour
     {
@@ -47,6 +51,10 @@ namespace ArmorstandAnimator
         [SerializeField]
         private MenuBarUI menuBarUI;
 
+        // マウス用
+        [SerializeField]
+        private MouseManager mouseManager;
+
         // 地面
         [SerializeField]
         private GameObject groundPlane;
@@ -73,8 +81,15 @@ namespace ArmorstandAnimator
         private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
 
         // 表示設定用
-        public Node currentNode;
         public bool showGround = true, showArmorstand = true, showAxis = false;
+
+        // ノード操作用
+        public TransformMode transformMode;
+        [SerializeField]
+        private Button tfmPos, tfmRot;
+        [SerializeField]
+        private Transform transformUI, positionUI, rotationUI, rotationUIPose01;
+        public Node currentNode, currentNodeBefore;
 
         private const string PathHistoryFileNameProject = "pathhist_project.json";
         private const string PathHistoryFileNameAnim = "pathhist_animation.json";
@@ -94,16 +109,25 @@ namespace ArmorstandAnimator
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
             animationMcfunc = this.gameObject.GetComponent<GenerateAnimationMcfunction>();
             animationMcfuncfs = this.gameObject.GetComponent<GenerateAnimationMcfunctionFixSpeed>();
+            mouseManager = this.gameObject.GetComponent<MouseManager>();
+            mouseManager.Initialize();
 
             showGround = true;
             showArmorstand = true;
             showAxis = false;
             currentNode = null;
+            currentNodeBefore = null;
+
+            transformMode = TransformMode.Position;
         }
 
         // Update is called once per frame
         void Update()
         {
+            mouseManager.Main();
+
+            if (!ReferenceEquals(currentNode, currentNodeBefore))
+                OnCurrentNodeChanged();
         }
 
         // モード変更
@@ -123,6 +147,8 @@ namespace ArmorstandAnimator
                 ClearModelUI();
                 CreateAnimUI();
             }
+
+            SetUIHandleVisible(!ReferenceEquals(currentNode, null));
         }
 
         public void NewProjectWarning()
@@ -489,6 +515,183 @@ namespace ArmorstandAnimator
             animationManager.CreateAnimationUIProject(project);
             // イベントリスト作成
             animationManager.keyframeUI.CreateEventUIList(project.events);
+        }
+
+        // CurrentNode変更時
+        private void OnCurrentNodeChanged()
+        {
+            Debug.Log("On Change");
+            if (!ReferenceEquals(currentNodeBefore, null))
+                currentNodeBefore.SetCubeMaterialTarget(false);
+            if (!ReferenceEquals(currentNode, null))
+            {
+                SetUIHandleVisible(true);
+                currentNode.SetCubeMaterialTarget(true);
+            }
+            else
+            {
+                SetUIHandleVisible(false);
+            }
+            this.currentNodeBefore = currentNode;
+        }
+
+        // ハンドル表示切替
+        private void SetUIHandleVisible(bool visible)
+        {
+            if (visible && !ReferenceEquals(currentNode, null))
+            {
+                transformUI.gameObject.SetActive(true);
+                transformUI.position = currentNode.transform.position;
+                if (transformMode == TransformMode.Rotation)
+                {
+                    positionUI.gameObject.SetActive(false);
+                    rotationUI.gameObject.SetActive(true);
+                    rotationUIPose01.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
+                }
+                else if (transformMode == TransformMode.Position)
+                {
+                    positionUI.gameObject.SetActive(true);
+                    rotationUI.gameObject.SetActive(false);
+                    if (appMode == AppMode.Animation)
+                        transformUI.position = GetRootPos();
+                }
+            }
+            else
+            {
+                transformUI.gameObject.SetActive(false);
+            }
+
+            if (appMode == AppMode.Animation && transformMode == TransformMode.Position)
+            {
+                transformUI.gameObject.SetActive(true);
+                positionUI.gameObject.SetActive(true);
+                rotationUI.gameObject.SetActive(false);
+                transformUI.position = GetRootPos();
+            }
+        }
+
+        // 移動用ハンドル表示切替
+        public void MouseNodePositionColor(Axis axis, bool reset)
+        {
+            if (reset)
+            {
+                positionUI.Find("X").GetComponent<LineRenderer>().startColor = Color.red;
+                positionUI.Find("Y").GetComponent<LineRenderer>().startColor = Color.green;
+                positionUI.Find("Z").GetComponent<LineRenderer>().startColor = Color.blue;
+                positionUI.Find("X").GetComponent<LineRenderer>().endColor = Color.red;
+                positionUI.Find("Y").GetComponent<LineRenderer>().endColor = Color.green;
+                positionUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.blue;
+            }
+            else
+            {
+                if (axis == Axis.X)
+                {
+                    positionUI.Find("X").GetComponent<LineRenderer>().startColor = Color.white;
+                    positionUI.Find("X").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+                if (axis == Axis.Y)
+                {
+                    positionUI.Find("Y").GetComponent<LineRenderer>().startColor = Color.white;
+                    positionUI.Find("Y").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+                if (axis == Axis.Z)
+                {
+                    positionUI.Find("Z").GetComponent<LineRenderer>().startColor = Color.white;
+                    positionUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+            }
+        }
+
+        // 回転用ハンドル表示切替
+        public void MouseNodeRotationColor(Axis axis, bool reset)
+        {
+            if (reset)
+            {
+                rotationUIPose01.Find("X").GetComponent<LineRenderer>().startColor = Color.red;
+                rotationUIPose01.Find("Y").GetComponent<LineRenderer>().startColor = Color.green;
+                rotationUI.Find("Z").GetComponent<LineRenderer>().startColor = Color.blue;
+                rotationUIPose01.Find("X").GetComponent<LineRenderer>().endColor = Color.red;
+                rotationUIPose01.Find("Y").GetComponent<LineRenderer>().endColor = Color.green;
+                rotationUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.blue;
+            }
+            else
+            {
+                if (axis == Axis.X)
+                {
+                    rotationUIPose01.Find("X").GetComponent<LineRenderer>().startColor = Color.white;
+                    rotationUIPose01.Find("X").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+                if (axis == Axis.Y)
+                {
+                    rotationUIPose01.Find("Y").GetComponent<LineRenderer>().startColor = Color.white;
+                    rotationUIPose01.Find("Y").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+                if (axis == Axis.Z)
+                {
+                    rotationUI.Find("Z").GetComponent<LineRenderer>().startColor = Color.white;
+                    rotationUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.white;
+                }
+            }
+        }
+
+        // マウスによるノード移動
+        public void MouseNodePosition(Vector3 pos)
+        {
+            // Nodeの値設定
+            if (appMode == AppMode.Model)
+                currentNode.targetNodeUI.UpdatePosition(pos);
+            else if (appMode == AppMode.Animation)
+            {
+                transformUI.position = GetRootPos();
+                animationManager.UpdateRootPos(pos);
+            }
+        }
+
+        public Vector3 GetRootPos()
+        {
+            return animationManager.KeyframeList[animationManager.SelectedKeyframeIndex].rootPos;
+        }
+
+        // マウスによるノード回転
+        public void MouseNodeRotation(Axis axis, float deg)
+        {
+            // 角度取得
+            var newRotate = new Vector3(currentNode.rotate.x, currentNode.rotate.y, currentNode.rotate.z);
+            if (axis == Axis.X)
+                newRotate.x = deg;
+            if (axis == Axis.Y)
+                newRotate.y = deg;
+            if (axis == Axis.Z)
+                newRotate.z = deg;
+            currentNode.rotate = newRotate;
+            // 回転軸更新
+            rotationUIPose01.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
+
+            // Nodeの値設定
+            if (appMode == AppMode.Model)
+                currentNode.targetNodeUI.UpdateRotate(newRotate);
+            else if (appMode == AppMode.Animation)
+                currentNode.targetAnimationUI.UpdateRotate(newRotate);
+        }
+
+        // TransformMode設定
+        public void SetTransformMode(int mode)
+        {
+            switch (mode)
+            {
+                case 0:
+                    transformMode = TransformMode.Position;
+                    tfmPos.image.color = new Color(1.0f, 1.0f, 0.0f);
+                    tfmRot.image.color = new Color(1.0f, 1.0f, 1.0f);
+                    break;
+                case 1:
+                    transformMode = TransformMode.Rotation;
+                    tfmPos.image.color = new Color(1.0f, 1.0f, 1.0f);
+                    tfmRot.image.color = new Color(1.0f, 1.0f, 0.0f);
+                    break;
+            }
+
+            SetUIHandleVisible(!ReferenceEquals(currentNode, null));
         }
     }
 }

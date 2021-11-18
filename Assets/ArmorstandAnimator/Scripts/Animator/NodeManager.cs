@@ -270,6 +270,17 @@ namespace ArmorstandAnimator
             UpdateNodeTransform();
         }
 
+        // ノード角度決定(UI更新)
+        public void SetNodeRotationWithUI(Node targetNode)
+        {
+            // 角度計算
+            targetNode.SetRotation(targetNode.rotate);
+            targetNode.targetNodeUI.SetRotateText(targetNode.rotate);
+
+            // ノード位置更新
+            UpdateNodeTransform();
+        }
+
         // ノード位置決定
         public void SetNodePosition(Node targetNode, Vector3 parentRotate)
         {
