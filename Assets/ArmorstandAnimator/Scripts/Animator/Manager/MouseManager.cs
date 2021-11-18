@@ -14,6 +14,7 @@ namespace ArmorstandAnimator
         private SceneManager sceneManager;
 
         private MouseTarget mouseTarget;
+        [SerializeField]
         private SceneviewCamera sceneviewCamera;
         private float clickTime;
         private GameObject targetCube;
@@ -37,7 +38,6 @@ namespace ArmorstandAnimator
         public void Initialize()
         {
             this.sceneManager = this.gameObject.GetComponent<SceneManager>();
-            this.sceneviewCamera = Camera.main.gameObject.GetComponent<SceneviewCamera>();
             mouseTarget = MouseTarget.None;
             clickTime = 0.0f;
         }

@@ -1,108 +1,114 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-/// <summary>
-/// GameビューにてSceneビューのようなカメラの動きをマウス操作によって実現する
-/// </summary>
-[RequireComponent(typeof(Camera))]
-public class SceneviewCamera : MonoBehaviour
+namespace ArmorstandAnimator
 {
-    [SerializeField, Range(0.1f, 10f)]
-    private float wheelSpeed = 1f;
-
-    [SerializeField, Range(0.1f, 10f)]
-    private float moveSpeed = 0.3f;
-
-    [SerializeField, Range(0.1f, 10f)]
-    private float rotateSpeed = 0.3f;
-
-    [SerializeField]
-    private Transform target;
-
-    private Vector3 preMousePos, preTargetPos;
-
-    private float yAngleSum = 0.0f;
-
-    public void Main()
+    /// <summary>
+    /// GameビューにてSceneビューのようなカメラの動きをマウス操作によって実現する
+    /// </summary>
+    [RequireComponent(typeof(Camera))]
+    public class SceneviewCamera : MonoBehaviour
     {
-        this.transform.position += target.transform.position - preTargetPos;
-        preTargetPos = target.transform.position;
+        [SerializeField, Range(0.1f, 10f)]
+        private float wheelSpeed = 1f;
 
-        MouseUpdate();
-        return;
-    }
+        [SerializeField, Range(0.1f, 10f)]
+        private float moveSpeed = 0.3f;
 
-    public void GetMousePos()
-    {
-        preMousePos = Input.mousePosition;
-    }
+        [SerializeField, Range(0.1f, 10f)]
+        private float rotateSpeed = 0.3f;
 
-    private void MouseUpdate()
-    {
-        MouseDrag(Input.mousePosition);
-    }
+        [SerializeField]
+        private Transform target;
 
-    public void CheckMouseWheel()
-    {
-        float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
-        if (scrollWheel != 0.0f)
-            MouseWheel(scrollWheel);
-    }
+        private Vector3 preMousePos, preTargetPos;
 
-    private void MouseWheel(float delta)
-    {
-        transform.position += transform.forward * delta * wheelSpeed;
-        return;
-    }
+        private float yAngleSum = 0.0f;
 
-    private void MouseDrag(Vector3 mousePos)
-    {
-        Vector3 diff = mousePos - preMousePos;
+        [SerializeField]
+        private SceneManager sceneManager;
 
-        if (diff.magnitude < Vector3.kEpsilon)
+        public void Main()
+        {
+            this.transform.position += target.transform.position - preTargetPos;
+            preTargetPos = target.transform.position;
+
+            MouseUpdate();
             return;
+        }
 
-        if (Input.GetMouseButton(1))
-            CameraTranslate(diff * Time.deltaTime * moveSpeed);
-        else if (Input.GetMouseButton(0))
-            CameraRotate(new Vector2(-diff.y, diff.x) * rotateSpeed);
+        public void GetMousePos()
+        {
+            preMousePos = Input.mousePosition;
+        }
 
-        preMousePos = mousePos;
-    }
+        private void MouseUpdate()
+        {
+            MouseDrag(Input.mousePosition);
+        }
 
-    private void CameraTranslate(Vector3 diff)
-    {
-        Transform trans = this.transform;
+        public void CheckMouseWheel()
+        {
+            float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
+            if (scrollWheel != 0.0f)
+                MouseWheel(scrollWheel);
+        }
 
-        // カメラのローカル座標軸を元に注視点オブジェクトを移動する
-        target.Translate((trans.right * -diff.x) + (trans.up * -diff.y));
-    }
+        private void MouseWheel(float delta)
+        {
+            transform.position += transform.forward * delta * wheelSpeed;
+            return;
+        }
 
-    public void CameraRotate(Vector2 angle)
-    {
-        var x = (preMousePos.x - Input.mousePosition.x);
-        var y = (Input.mousePosition.y - preMousePos.y);
+        private void MouseDrag(Vector3 mousePos)
+        {
+            Vector3 diff = mousePos - preMousePos;
 
-        if (Mathf.Abs(x) < Mathf.Abs(y))
-            x = 0;
-        else
-            y = 0;
+            if (diff.magnitude < Vector3.kEpsilon)
+                return;
 
-        var newAngle = Vector3.zero;
-        newAngle.x = x * -rotateSpeed;
-        newAngle.y = y * -rotateSpeed;
+            if (Input.GetMouseButton(1))
+                CameraTranslate(diff * Time.deltaTime * moveSpeed);
+            else if (Input.GetMouseButton(0))
+                CameraRotate(new Vector2(-diff.y, diff.x) * rotateSpeed);
 
-        yAngleSum += newAngle.y;
-        var clampAngleSum = Mathf.Clamp(yAngleSum, -115.0f, 65.0f);
-        var angleOffset = yAngleSum - clampAngleSum;
-        yAngleSum = clampAngleSum;
-        newAngle.y -= angleOffset;
+            preMousePos = mousePos;
+        }
 
-        if (angleOffset > 0)
-            Debug.Log("stop");
+        private void CameraTranslate(Vector3 diff)
+        {
+            Transform trans = this.transform;
 
-        this.transform.RotateAround(target.position, Vector3.up, newAngle.x);
-        this.transform.RotateAround(target.position, transform.right, newAngle.y);
-        preMousePos = Input.mousePosition;
+            // カメラのローカル座標軸を元に注視点オブジェクトを移動する
+            target.Translate((trans.right * -diff.x) + (trans.up * -diff.y));
+        }
+
+        public void CameraRotate(Vector2 angle)
+        {
+            var x = (preMousePos.x - Input.mousePosition.x);
+            var y = (Input.mousePosition.y - preMousePos.y);
+
+            if (Mathf.Abs(x) < Mathf.Abs(y))
+                x = 0;
+            else
+                y = 0;
+
+            var newAngle = Vector3.zero;
+            newAngle.x = x * -rotateSpeed;
+            newAngle.y = y * -rotateSpeed;
+
+            yAngleSum += newAngle.y;
+            var clampAngleSum = Mathf.Clamp(yAngleSum, -115.0f, 65.0f);
+            var angleOffset = yAngleSum - clampAngleSum;
+            yAngleSum = clampAngleSum;
+            newAngle.y -= angleOffset;
+
+            if (angleOffset > 0)
+                Debug.Log("stop");
+
+            this.transform.RotateAround(target.position, Vector3.up, newAngle.x);
+            this.transform.RotateAround(target.position, transform.right, newAngle.y);
+            preMousePos = Input.mousePosition;
+        }
     }
 }
