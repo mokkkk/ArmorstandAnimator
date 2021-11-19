@@ -577,15 +577,34 @@ namespace ArmorstandAnimator
             }
         }
 
+        public void StartMirrotKeyframe()
+        {
+            if (selectedKeyframeList.Any())
+            {
+                var tempIndex = selectedKeyframeIndex;
+                foreach (int index in selectedKeyframeList)
+                {
+                    selectedKeyframeIndex = index;
+                    MirrorKeyframe(keyframeList[index]);
+                }
+                selectedKeyframeIndex = tempIndex;
+                SelectKeyframe(selectedKeyframeIndex);
+            }
+            else
+            {
+                MirrorKeyframe(keyframeList[selectedKeyframeIndex]);
+            }
+        }
+
         // キーフレーム反転（feature）
-        public void MirrorKeyframe()
+        void MirrorKeyframe(Keyframe k)
         {
             // ローテーション用リスト新規作成
             var newRotations = new List<Vector3>();
-            foreach (Vector3 rotate in keyframeList[selectedKeyframeIndex].rotations)
+            foreach (Vector3 rotate in k.rotations)
                 newRotations.Add(rotate);
 
-            var newKeyframe = new Keyframe(selectedKeyframeIndex, keyframeList[selectedKeyframeIndex].tick, keyframeList[selectedKeyframeIndex].rootPos, newRotations, keyframeList[selectedKeyframeIndex].isQuick);
+            var newKeyframe = new Keyframe(selectedKeyframeIndex, k.tick, k.rootPos, newRotations, k.isQuick);
             int length = sceneManager.NodeList.Count();
 
             // rootPos反転
