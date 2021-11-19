@@ -820,14 +820,18 @@ namespace ArmorstandAnimator
                     var currentTick = keyframeList[index].tick;
                     var tickMax = currentTick + add;
                     var tickMin = currentTick - add;
+                    Keyframe k;
 
-                    i = index + 1;
-                    var k = keyframeList[i];
-                    if (right && k.tick <= tickMax && selectedKeyframeList.IndexOf(i) < 0)
+                    if (index != keyframeList.Count - 1)
                     {
-                        var tempOffset = tickMax - k.tick + 1;
-                        if (offset < tempOffset)
-                            offset = tempOffset;
+                        i = index + 1;
+                        k = keyframeList[i];
+                        if (right && k.tick <= tickMax && selectedKeyframeList.IndexOf(i) < 0)
+                        {
+                            var tempOffset = tickMax - k.tick + 1;
+                            if (offset < tempOffset)
+                                offset = tempOffset;
+                        }
                     }
 
                     i = index - 1;
@@ -872,14 +876,18 @@ namespace ArmorstandAnimator
                 var tickMin = currentTick - add;
 
                 int i = 0, offset = 0;
+                Keyframe k;
                 // Tickが被らないようにする
-                i = selectedKeyframeIndex + 1;
-                var k = keyframeList[i];
-                if (right && k.tick <= tickMax && i != selectedKeyframeIndex)
+                if (selectedKeyframeIndex != keyframeList.Count - 1)
                 {
-                    var tempOffset = tickMax - k.tick + 1;
-                    if (offset < tempOffset)
-                        offset = tempOffset;
+                    i = selectedKeyframeIndex + 1;
+                    k = keyframeList[i];
+                    if (right && k.tick <= tickMax && i != selectedKeyframeIndex)
+                    {
+                        var tempOffset = tickMax - k.tick + 1;
+                        if (offset < tempOffset)
+                            offset = tempOffset;
+                    }
                 }
                 i = selectedKeyframeIndex - 1;
                 k = keyframeList[i];
