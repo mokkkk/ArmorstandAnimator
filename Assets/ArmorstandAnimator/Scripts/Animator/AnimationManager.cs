@@ -789,6 +789,54 @@ namespace ArmorstandAnimator
         {
             if (selectedKeyframeList.Any())
             {
+                int i = 0, offset = 0;
+
+                foreach (int index in selectedKeyframeList)
+                {
+                    // Index = 0の場合移動しない
+                    if (index == 0)
+                        continue;
+
+                    // Tickが被らないようにする
+                    var currentTick = keyframeList[index].tick;
+                    var tickMax = currentTick + add;
+                    var tickMin = currentTick - add;
+
+                    i = index + 1;
+                    var k = keyframeList[i];
+                    if (right && k.tick <= tickMax && selectedKeyframeList.IndexOf(i) < 0)
+                    {
+                        var tempOffset = tickMax - k.tick + 1;
+                        if (offset < tempOffset)
+                            offset = tempOffset;
+                    }
+
+                    i = index - 1;
+                    k = keyframeList[i];
+                    if (!right && k.tick >= tickMin && selectedKeyframeList.IndexOf(i) < 0)
+                    {
+                        var tempOffset = k.tick - tickMin + 1;
+                        if (offset < tempOffset)
+                            offset = tempOffset;
+                    }
+                }
+
+                add -= offset;
+
+                foreach (int index in selectedKeyframeList)
+                {
+                    // Index = 0の場合移動しない
+                    if (index == 0)
+                        continue;
+
+                    var currentTick = keyframeList[index].tick;
+                    if (right)
+                        currentTick += add;
+                    else
+                        currentTick -= add;
+
+                    keyframeList[index].tick = currentTick;
+                }
 
                 // UI更新
                 if (selectedKeyframeList.IndexOf(selectedKeyframeIndex) > -1)
