@@ -16,8 +16,6 @@ namespace ArmorstandAnimator
         public float yradius;
         LineRenderer line;
 
-        private float _colliderThickness = 0.1f;
-
         void Start()
         {
             line = gameObject.GetComponent<LineRenderer>();

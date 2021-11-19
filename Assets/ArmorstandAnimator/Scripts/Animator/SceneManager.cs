@@ -128,6 +128,9 @@ namespace ArmorstandAnimator
 
             if (!ReferenceEquals(currentNode, currentNodeBefore))
                 OnCurrentNodeChanged();
+
+            if (appMode == AppMode.Animation)
+                animationManager.CheckKey();
         }
 
         // モード変更

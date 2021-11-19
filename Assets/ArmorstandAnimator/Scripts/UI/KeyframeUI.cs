@@ -237,5 +237,11 @@ namespace ArmorstandAnimator
             // UIの内容更新
             SetUIContent(newKeyframe);
         }
+
+        // tick更新
+        public void UpdateTick(int tick)
+        {
+            this.tick.text = tick.ToString();
+        }
     }
 }

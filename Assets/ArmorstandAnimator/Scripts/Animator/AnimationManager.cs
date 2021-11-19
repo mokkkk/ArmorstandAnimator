@@ -76,6 +76,9 @@ namespace ArmorstandAnimator
             }
         }
 
+        // 複数選択中キーフレームindex
+        private List<int> selectedKeyframeList;
+
         // アニメーション終了タイム
         private int animationEndTime;
 
@@ -101,6 +104,7 @@ namespace ArmorstandAnimator
             animationSetting.SetSpeed(1.0f);
             keyframeUI.ClearEventUIList();
             separateCount.text = "2";
+            selectedKeyframeList = new List<int>();
         }
 
         // アニメーションUI表示
@@ -174,6 +178,10 @@ namespace ArmorstandAnimator
 
             // アニメーション終了時間更新
             this.animationEndTime = keyframeList[keyframeList.Count - 1].tick;
+
+            // 選択中キーフレームリセット
+            selectedKeyframeList = new List<int>();
+            UpdateKeyframeView();
         }
 
         // アニメーションファイル読込
@@ -240,6 +248,10 @@ namespace ArmorstandAnimator
             this.animationEndTime = keyframeList[keyframeList.Count - 1].tick;
             // 追加したキーフレームを選択
             SelectKeyframe(keyframeList.Count - 1);
+
+            // 選択中キーフレームリセット
+            selectedKeyframeList = new List<int>();
+            UpdateKeyframeView();
         }
 
         // キーフレームボタン作成
@@ -277,6 +289,10 @@ namespace ArmorstandAnimator
             // 内容設定
             selectedKeyframeIndex = currentKeyframe;
             SelectKeyframe(selectedKeyframeIndex);
+
+            // 選択中キーフレームリセット
+            selectedKeyframeList = new List<int>();
+            UpdateKeyframeView();
         }
 
         // キーフレーム選択
@@ -288,6 +304,10 @@ namespace ArmorstandAnimator
             keyframeUI.SetUIContent(this.keyframeList[selectedKeyframeIndex]);
             // ノードTransform更新
             SetNodeRotation(keyframeList[index]);
+
+            // 選択中キーフレームリセット
+            selectedKeyframeList = new List<int>();
+            UpdateKeyframeView();
         }
 
         // キーフレームリスト更新
@@ -320,11 +340,13 @@ namespace ArmorstandAnimator
         {
             // ノードTransform更新
             SetNodeRotation(keyframe);
+            int i = 0;
             foreach (Keyframe k in keyframeList)
             {
                 // Tickが被らないようにする
-                if (k.tick == keyframe.tick)
+                if (k.tick == keyframe.tick && i != selectedKeyframeIndex)
                     keyframe.tick++;
+                i++;
             }
             // キーフレームの値更新
             this.keyframeList[selectedKeyframeIndex] = keyframe;
@@ -425,11 +447,16 @@ namespace ArmorstandAnimator
                 rightButtonPos = KeyframeButtonWidth + button.tick * KeyframeButtonMarginOffset;
                 button.GetComponent<RectTransform>().anchoredPosition = new Vector2(rightButtonPos, 0.0f);
 
-                // ボタン色設定
+                // ボタン色設定（IsQuick）
                 if (keyframeList[i].isQuick)
                     button.transform.Find("Button").GetComponent<UnityEngine.UI.Image>().color = new Color(0.0f, 0.8806345f, 1.0f, 1.0f);
                 else
                     button.transform.Find("Button").GetComponent<UnityEngine.UI.Image>().color = new Color(1.0f, 0.7526976f, 0.0f, 1.0f);
+
+                // ボタン色設定
+                if (selectedKeyframeList.IndexOf(i) > -1)
+                    button.transform.Find("Button").GetComponent<UnityEngine.UI.Image>().color = new Color(0.0f, 0f, 1.0f, 1.0f);
+
                 i++;
             }
 
@@ -718,6 +745,99 @@ namespace ArmorstandAnimator
         public void UpdateRootPos(Vector3 pos)
         {
             keyframeUI.UpdateRootPos(pos);
+        }
+
+        // キーフレーム複数選択
+        public void AddSelectedKeyframe(int index)
+        {
+            // リスト内にすでに要素が存在する場合，選択解除
+            if (selectedKeyframeList.IndexOf(index) > -1)
+            {
+                selectedKeyframeList.Remove(index);
+                return;
+            }
+
+            // SelectedKeyframeListに対象キーフレーム追加
+            selectedKeyframeList.Add(index);
+            // KeyframeView更新
+            UpdateKeyframeView();
+        }
+
+        // キー入力検知
+        public void CheckKey()
+        {
+            // キーフレームTick移動ショートカット
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+                if (Input.GetKey(KeyCode.LeftControl))
+                    ScMoveKeyframe(1, true);
+                else if (Input.GetKey(KeyCode.LeftShift))
+                    ScMoveKeyframe(5, true);
+                else
+                    ScMoveKeyframe(10, true);
+
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+                if (Input.GetKey(KeyCode.LeftControl))
+                    ScMoveKeyframe(1, false);
+                else if (Input.GetKey(KeyCode.LeftShift))
+                    ScMoveKeyframe(5, false);
+                else
+                    ScMoveKeyframe(10, false);
+        }
+
+        // キーフレーム移動
+        void ScMoveKeyframe(int add, bool right)
+        {
+            if (selectedKeyframeList.Any())
+            {
+
+                // UI更新
+                if (selectedKeyframeList.IndexOf(selectedKeyframeIndex) > -1)
+                    keyframeUI.UpdateTick(keyframeList[selectedKeyframeIndex].tick);
+            }
+            else
+            {
+                // Index = 0の場合移動しない
+                if (selectedKeyframeIndex == 0)
+                    return;
+
+                var currentTick = keyframeList[selectedKeyframeIndex].tick;
+                var tickMax = currentTick + add;
+                var tickMin = currentTick - add;
+
+                int i = 0, offset = 0;
+                // Tickが被らないようにする
+                i = selectedKeyframeIndex + 1;
+                var k = keyframeList[i];
+                if (right && k.tick <= tickMax && i != selectedKeyframeIndex)
+                {
+                    var tempOffset = tickMax - k.tick + 1;
+                    if (offset < tempOffset)
+                        offset = tempOffset;
+                }
+                i = selectedKeyframeIndex - 1;
+                k = keyframeList[i];
+                if (!right && k.tick >= tickMin && i != selectedKeyframeIndex)
+                {
+                    var tempOffset = k.tick - tickMin + 1;
+                    if (offset < tempOffset)
+                        offset = tempOffset;
+                }
+
+                add -= offset;
+
+                if (right)
+                    currentTick += add;
+                else
+                    currentTick -= add;
+
+                keyframeList[selectedKeyframeIndex].tick = currentTick;
+
+                // UI更新
+                keyframeUI.UpdateTick(keyframeList[selectedKeyframeIndex].tick);
+            }
+
+            // キーフレームビュー更新
+            UpdateKeyframeView();
         }
     }
 }
