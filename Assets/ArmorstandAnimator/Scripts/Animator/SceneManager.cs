@@ -128,6 +128,9 @@ namespace ArmorstandAnimator
 
             if (!ReferenceEquals(currentNode, currentNodeBefore))
                 OnCurrentNodeChanged();
+
+            if (appMode == AppMode.Animation)
+                animationManager.CheckKey();
         }
 
         // モード変更
@@ -546,7 +549,10 @@ namespace ArmorstandAnimator
                 {
                     positionUI.gameObject.SetActive(false);
                     rotationUI.gameObject.SetActive(true);
-                    rotationUIPose01.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
+                    // 回転軸更新
+                    rotationUI.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
+                    rotationUI.Find("Z").rotation = Quaternion.identity;
+                    rotationUIPose01.Find("X").localEulerAngles = currentNode.pose01.transform.localEulerAngles;
                 }
                 else if (transformMode == TransformMode.Position)
                 {
@@ -665,7 +671,9 @@ namespace ArmorstandAnimator
                 newRotate.z = deg;
             currentNode.rotate = newRotate;
             // 回転軸更新
-            rotationUIPose01.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
+            rotationUI.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
+            rotationUI.Find("Z").rotation = Quaternion.identity;
+            rotationUIPose01.Find("X").localEulerAngles = currentNode.pose01.transform.localEulerAngles;
 
             // Nodeの値設定
             if (appMode == AppMode.Model)

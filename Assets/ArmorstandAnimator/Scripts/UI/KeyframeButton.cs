@@ -32,7 +32,11 @@ namespace ArmorstandAnimator
         // ボタン押し判定
         public void OnButtonClicked()
         {
-            animationManager.SelectKeyframe(this.index);
+            // LCtrl:複数選択
+            if (Input.GetKey(KeyCode.LeftControl))
+                animationManager.AddSelectedKeyframe(this.index);
+            else
+                animationManager.SelectKeyframe(this.index);
         }
 
         // マウスクリック判定

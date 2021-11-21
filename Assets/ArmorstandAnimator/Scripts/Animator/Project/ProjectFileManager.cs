@@ -57,6 +57,7 @@ namespace ArmorstandAnimator
     public class ProjectFileManager : MonoBehaviour
     {
         // ProjectFile読込用パス
+        private string path;
         private string[] paths;
 
         private const string PathHistoryFileName = "pathhist_project.json";
@@ -69,7 +70,11 @@ namespace ArmorstandAnimator
             {
     new ExtensionFilter( "Asa Model Project", "asamodel"),
 };
-            var path = StandaloneFileBrowser.SaveFilePanel("Save File", "", "project", extensionList);
+            path = StandaloneFileBrowser.SaveFilePanel("Save File", "", "project", extensionList);
+
+            // paths = StandaloneFileBrowser.OpenFilePanel("Save File", "", extensionList, false);
+            // path = paths[0];
+
             // ファイルを選択しなかった場合，中断
             if (path.Equals(""))
                 return;
