@@ -308,6 +308,8 @@ namespace ArmorstandAnimator
             // 選択中キーフレームリセット
             selectedKeyframeList = new List<int>();
             UpdateKeyframeView();
+
+            sceneManager.UpdateTransformUI();
         }
 
         // キーフレームリスト更新
@@ -791,16 +793,12 @@ namespace ArmorstandAnimator
                     ScMoveKeyframe(1, true);
                 else if (Input.GetKey(KeyCode.LeftShift))
                     ScMoveKeyframe(5, true);
-                else
-                    ScMoveKeyframe(10, true);
 
             if (Input.GetKeyDown(KeyCode.LeftArrow))
                 if (Input.GetKey(KeyCode.LeftControl))
                     ScMoveKeyframe(1, false);
                 else if (Input.GetKey(KeyCode.LeftShift))
                     ScMoveKeyframe(5, false);
-                else
-                    ScMoveKeyframe(10, false);
         }
 
         // キーフレーム移動
