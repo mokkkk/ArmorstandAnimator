@@ -973,6 +973,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneviewCamera: {fileID: 995473150}
   mouseTranslatePosOffset: 10
+  rotationUIPose01: {fileID: 716905779}
 --- !u!1 &28034150
 GameObject:
   m_ObjectHideFlags: 0

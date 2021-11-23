@@ -25,6 +25,10 @@ namespace ArmorstandAnimator
         [SerializeField]
         private float mouseTranslatePosOffset;
 
+        [SerializeField]
+        private Transform rotationUIPose01;
+        private Transform rotationUIX, rotationUIY;
+
         private const float NodeClickTime = 0.15f;
         private const float PosOffsetNone = 1.0f;
         private const float PosOffsetShift = 0.5f;
@@ -40,6 +44,8 @@ namespace ArmorstandAnimator
             this.sceneManager = this.gameObject.GetComponent<SceneManager>();
             mouseTarget = MouseTarget.None;
             clickTime = 0.0f;
+            rotationUIX = rotationUIPose01.Find("X");
+            rotationUIY = rotationUIPose01.Find("Y");
         }
 
         // Update is called once per frame
@@ -256,11 +262,21 @@ namespace ArmorstandAnimator
 
             // カメラ角度に応じたオフセット
             if (targetAxis == Axis.X)
-                if (Camera.main.transform.eulerAngles.y < 180.0f)
+            {
+                var posCamera = Camera.main.transform.position;
+                var posR = rotationUIPose01.transform.position + rotationUIX.transform.right;
+                var posL = rotationUIPose01.transform.position - rotationUIX.transform.right;
+                if (Vector3.Magnitude(posCamera - posL) < Vector3.Magnitude(posCamera - posR))
                     deg *= -1;
+            }
             if (targetAxis == Axis.Y)
-                if (Camera.main.transform.eulerAngles.x > 270.0f)
+            {
+                var posCamera = Camera.main.transform.position;
+                var posU = rotationUIPose01.transform.position + rotationUIY.transform.up;
+                var posD = rotationUIPose01.transform.position - rotationUIY.transform.up;
+                if (Vector3.Magnitude(posCamera - posD) < Vector3.Magnitude(posCamera - posU))
                     deg *= -1;
+            }
             if (targetAxis == Axis.Z)
                 if (Camera.main.transform.eulerAngles.y < 90.0f || Camera.main.transform.eulerAngles.y > 270.0f)
                     deg *= -1;
