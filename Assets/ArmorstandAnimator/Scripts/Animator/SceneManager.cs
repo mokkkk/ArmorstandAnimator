@@ -239,6 +239,8 @@ namespace ArmorstandAnimator
             generalSetting.SetText(project.itemID, project.modelName, project.multiEntities, project.isMarker, project.isSmall, project.fileVersion);
             // ノード作成
             nodeManager.CreateNodeProject(project.nodeList);
+
+            UpdateTransformUI();
         }
 
         // asaanimationproject読込
@@ -261,6 +263,8 @@ namespace ArmorstandAnimator
             animationManager.CreateAnimationUIProject(project);
             // イベントリスト作成
             animationManager.keyframeUI.CreateEventUIList(project.events);
+
+            UpdateTransformUI();
         }
 
         // Export summon function
@@ -646,10 +650,7 @@ namespace ArmorstandAnimator
             if (appMode == AppMode.Model)
                 currentNode.targetNodeUI.UpdatePosition(pos);
             else if (appMode == AppMode.Animation)
-            {
-                transformUI.position = GetRootPos();
                 animationManager.UpdateRootPos(pos);
-            }
             UpdateTransformUI();
         }
 
@@ -703,9 +704,9 @@ namespace ArmorstandAnimator
         // TransformUI位置更新
         public void UpdateTransformUI()
         {
-            if (!ReferenceEquals(currentNode, null) && !(appMode == AppMode.Model && transformMode == TransformMode.Position))
+            if (!ReferenceEquals(currentNode, null) && !(appMode == AppMode.Animation && transformMode == TransformMode.Position))
                 transformUI.position = currentNode.transform.position;
-            if (transformMode == TransformMode.Rotation)
+            if (transformMode == TransformMode.Rotation && !ReferenceEquals(currentNode, null))
             {
                 rotationUI.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
                 rotationUI.Find("Z").rotation = Quaternion.identity;
@@ -713,13 +714,14 @@ namespace ArmorstandAnimator
             }
             else if (transformMode == TransformMode.Position)
             {
-                if (appMode == AppMode.Model)
+                if (appMode == AppMode.Model && !ReferenceEquals(currentNode, null))
                 {
                     var eularangle = currentNode.GetRotation();
                     positionUI.localEulerAngles = eularangle;
                 }
-                else
+                else if (appMode == AppMode.Animation)
                 {
+                    transformUI.position = GetRootPos();
                     positionUI.localRotation = Quaternion.identity;
                 }
             }
