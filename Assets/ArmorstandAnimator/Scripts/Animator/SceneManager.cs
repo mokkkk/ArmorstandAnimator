@@ -549,10 +549,6 @@ namespace ArmorstandAnimator
                 {
                     positionUI.gameObject.SetActive(false);
                     rotationUI.gameObject.SetActive(true);
-                    // 回転軸更新
-                    rotationUI.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
-                    rotationUI.Find("Z").rotation = Quaternion.identity;
-                    rotationUIPose01.Find("X").localEulerAngles = currentNode.pose01.transform.localEulerAngles;
                 }
                 else if (transformMode == TransformMode.Position)
                 {
@@ -561,6 +557,8 @@ namespace ArmorstandAnimator
                     if (appMode == AppMode.Animation)
                         transformUI.position = GetRootPos();
                 }
+                // 軸更新
+                UpdateTransformUI();
             }
             else
             {
@@ -606,6 +604,7 @@ namespace ArmorstandAnimator
                     positionUI.Find("Z").GetComponent<LineRenderer>().endColor = Color.white;
                 }
             }
+            UpdateTransformUI();
         }
 
         // 回転用ハンドル表示切替
@@ -651,6 +650,7 @@ namespace ArmorstandAnimator
                 transformUI.position = GetRootPos();
                 animationManager.UpdateRootPos(pos);
             }
+            UpdateTransformUI();
         }
 
         public Vector3 GetRootPos()
@@ -671,9 +671,7 @@ namespace ArmorstandAnimator
                 newRotate.z = deg;
             currentNode.rotate = newRotate;
             // 回転軸更新
-            rotationUI.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
-            rotationUI.Find("Z").rotation = Quaternion.identity;
-            rotationUIPose01.Find("X").localEulerAngles = currentNode.pose01.transform.localEulerAngles;
+            UpdateTransformUI();
 
             // Nodeの値設定
             if (appMode == AppMode.Model)
@@ -700,6 +698,31 @@ namespace ArmorstandAnimator
             }
 
             SetUIHandleVisible(!ReferenceEquals(currentNode, null));
+        }
+
+        // TransformUI位置更新
+        public void UpdateTransformUI()
+        {
+            if (!ReferenceEquals(currentNode, null) && !(appMode == AppMode.Model && transformMode == TransformMode.Position))
+                transformUI.position = currentNode.transform.position;
+            if (transformMode == TransformMode.Rotation)
+            {
+                rotationUI.localEulerAngles = currentNode.pose2.transform.localEulerAngles;
+                rotationUI.Find("Z").rotation = Quaternion.identity;
+                rotationUIPose01.Find("X").localEulerAngles = currentNode.pose01.transform.localEulerAngles;
+            }
+            else if (transformMode == TransformMode.Position)
+            {
+                if (appMode == AppMode.Model)
+                {
+                    var eularangle = currentNode.GetRotation();
+                    positionUI.localEulerAngles = eularangle;
+                }
+                else
+                {
+                    positionUI.localRotation = Quaternion.identity;
+                }
+            }
         }
     }
 }

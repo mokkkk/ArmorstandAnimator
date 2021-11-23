@@ -259,5 +259,22 @@ namespace ArmorstandAnimator
                 }
             }
         }
+
+        // ParentRotation合計取得
+        public Vector3 GetRotation()
+        {
+            var r = Vector3.zero;
+            if (this.nodeType != NodeType.Root)
+                r = GetParentRotation(r, this.parentNode);
+            return r;
+        }
+
+        Vector3 GetParentRotation(Vector3 r, Node n)
+        {
+            r += n.rotate;
+            if (n.nodeType != NodeType.Root)
+                r = GetParentRotation(r, n.parentNode);
+            return r;
+        }
     }
 }
