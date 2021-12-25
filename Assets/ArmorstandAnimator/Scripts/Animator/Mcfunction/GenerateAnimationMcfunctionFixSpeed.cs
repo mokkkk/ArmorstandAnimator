@@ -244,7 +244,7 @@ namespace ArmorstandAnimator
             writer.WriteLine(func);
 
             // start実行
-            var execute = $"execute if score @s AsaMatrix matches 1 run ";
+            var execute = "execute if entity @s[scores={AsaMatrix=1}] run ";
             func = $"function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/start";
             writer.WriteLine(execute + func);
 
@@ -264,7 +264,7 @@ namespace ArmorstandAnimator
                     for (int j = 0; j < time; j++)
                     {
                         var funcTick = keyframeList[i].tick + j + 1;
-                        execute = $"execute if score @s AsaMatrix matches {funcTick} run ";
+                        execute = $"execute if entity @s[scores={{AsaMatrix={funcTick}}}] run ";
                         func = $"function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/{QuickFolderName}/{i}_{j}";
                         writer.WriteLine(execute + func);
                     }
@@ -275,7 +275,7 @@ namespace ArmorstandAnimator
                     var moveY = (keyframeList[i + 1].rootPos.y - keyframeList[i].rootPos.y) / time;
                     var moveZ = (keyframeList[i + 1].rootPos.z - keyframeList[i].rootPos.z) / time;
                     // 書き込み
-                    execute = $"execute if score @s AsaMatrix matches {keyframeList[i].tick + 1}..{keyframeList[i + 1].tick} run ";
+                    execute = $"execute if entity @s[scores={{AsaMatrix={keyframeList[i].tick + 1}..{keyframeList[i + 1].tick}}}] run ";
                     func = $"tp @s ^{moveX} ^{moveY} ^{moveZ}";
                     writer.WriteLine(execute + func);
                 }
@@ -284,7 +284,7 @@ namespace ArmorstandAnimator
                     // Else
 
                     // 各Keyframeのfunction実行
-                    execute = $"execute if score @s AsaMatrix matches {keyframeList[i].tick + 1} run ";
+                    execute = $"execute if entity @s[scores={{AsaMatrix={keyframeList[i].tick + 1}}}] run ";
                     func = $"function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/{KeyframesFolderName}/{i}";
                     writer.WriteLine(execute + func);
 
@@ -296,14 +296,14 @@ namespace ArmorstandAnimator
                     var moveY = (keyframeList[i + 1].rootPos.y - keyframeList[i].rootPos.y) / time;
                     var moveZ = (keyframeList[i + 1].rootPos.z - keyframeList[i].rootPos.z) / time;
                     // 書き込み
-                    execute = $"execute if score @s AsaMatrix matches {keyframeList[i].tick + 1}..{keyframeList[i + 1].tick} run ";
+                    execute = $"execute if entity @s[scores={{AsaMatrix={keyframeList[i].tick + 1}..{keyframeList[i + 1].tick}}}] run ";
                     func = $"tp @s ^{moveX} ^{moveY} ^{moveZ}";
                     writer.WriteLine(execute + func);
                 }
             }
 
             // end実行
-            execute = $"execute if score @s AsaMatrix matches {keyframeList[keyframeList.Count - 1].tick + 1}.. run ";
+            execute = $"execute if entity @s[scores={{AsaMatrix={keyframeList[keyframeList.Count - 1].tick + 1}..}}] run ";
             func = $"function asa_animator:{modelName.ToLower()}/{animationName.ToLower()}/end";
             writer.WriteLine(execute + func);
 

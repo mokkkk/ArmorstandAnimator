@@ -225,6 +225,8 @@ namespace ArmorstandAnimator
             if (res < 0)
                 return;
 
+            currentNode = null;
+
             // ノード消去
             foreach (Node n in nodeList)
             {
@@ -254,6 +256,8 @@ namespace ArmorstandAnimator
             if (res < 0)
                 return;
 
+            currentNode = null;
+
             // Keyframe消去
             animationManager.ClearAnimationUIOnLoad();
 
@@ -270,13 +274,13 @@ namespace ArmorstandAnimator
         // Export summon function
         public void ExportFuncSummon()
         {
-            modelMcfunc.GenerateSummonFunction(generalSetting, nodeList);
+            // modelMcfunc.GenerateSummonFunction(generalSetting, nodeList);
         }
 
         // Export model function
         public void ExportFuncModel()
         {
-            modelMcfunc.GenerateModelFunction(generalSetting, nodeList);
+            // modelMcfunc.GenerateModelFunction(generalSetting, nodeList);
         }
 
         // Export animation datapack

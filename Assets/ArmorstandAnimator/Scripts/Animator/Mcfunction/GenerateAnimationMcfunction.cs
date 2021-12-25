@@ -62,7 +62,7 @@ namespace ArmorstandAnimator
             // summon.mcfunction
             modelMcfunc.GenerateSummonFunction(path, generalSetting, nodeList, false, generalSetting.MultiEntities);
             // model.mcfunction   
-            modelMcfunc.GenerateModelFunction(path, generalSetting, nodeList);
+            // modelMcfunc.GenerateModelFunction(path, generalSetting, nodeList);
             // kill.mcfunction
             modelMcfunc.GenerateKillFunction(path, generalSetting);
 
