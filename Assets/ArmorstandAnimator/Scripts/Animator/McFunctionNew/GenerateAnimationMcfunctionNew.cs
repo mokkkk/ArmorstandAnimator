@@ -288,7 +288,7 @@ namespace ArmorstandAnimator
             }
 
             // データ取得
-            func = "function asa_animator:reus/get_data";
+            func = $"function asa_animator:{modelName.ToLower()}/get_data";
             writer.WriteLine(func);
 
             // Root移動
