@@ -80,6 +80,10 @@ namespace ArmorstandAnimator
         private GenerateAnimationMcfunction animationMcfunc;
         private GenerateAnimationMcfunctionFixSpeed animationMcfuncfs;
 
+        // mcfunction書出用 軽量版
+        private GenerateModelMcFunctionNew modelMcfuncNew;
+        private GenerateAnimationMcfunctionNew animationMcfuncNew;
+
         // 表示設定用
         public bool showGround = true, showArmorstand = true, showAxis = false;
 
@@ -109,6 +113,8 @@ namespace ArmorstandAnimator
             modelMcfunc = this.gameObject.GetComponent<GenerateModelMcfunc>();
             animationMcfunc = this.gameObject.GetComponent<GenerateAnimationMcfunction>();
             animationMcfuncfs = this.gameObject.GetComponent<GenerateAnimationMcfunctionFixSpeed>();
+            modelMcfuncNew = this.gameObject.GetComponent<GenerateModelMcFunctionNew>();
+            animationMcfuncNew = this.gameObject.GetComponent<GenerateAnimationMcfunctionNew>();
             mouseManager = this.gameObject.GetComponent<MouseManager>();
             mouseManager.Initialize();
 
@@ -291,9 +297,11 @@ namespace ArmorstandAnimator
             animationMcfunc.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList, animationManager.keyframeUI.eventUIList);
         }
 
+        // Export animation datapack (fix speed)
         public void ExportFuncAnimationFs()
         {
-            animationMcfuncfs.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
+            // animationMcfuncfs.GenerateDatapack(generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
+            animationMcfuncNew.GenerateDatapack(animationManager, generalSetting, animationSetting, NodeList, animationManager.KeyframeList);
         }
 
         // Export animation datapack (animation only)

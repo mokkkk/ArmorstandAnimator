@@ -126,11 +126,26 @@ namespace ArmorstandAnimator
             this.customModelData = cmd;
         }
 
+        // pos取得
+        public Vector3 GetPosition()
+        {
+            return this.pos;
+        }
+
         // pos変更
         public void SetPosition(Vector3 pos)
         {
             this.pos = pos;
-            // nodeManager.SetNodePosition(this);
+        }
+
+        // rotate取得
+        public Vector3 GetRotaion()
+        {
+            Vector3 rotate = new Vector3();
+            rotate.x = pose01.localEulerAngles.x;
+            rotate.y = pose01.localEulerAngles.y;
+            rotate.z = pose2.localEulerAngles.z;
+            return rotate;
         }
 
         // rotate変更

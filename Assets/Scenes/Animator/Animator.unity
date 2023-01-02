@@ -787,6 +787,8 @@ GameObject:
   - component: {fileID: 26231360}
   - component: {fileID: 26231361}
   - component: {fileID: 26231362}
+  - component: {fileID: 26231363}
+  - component: {fileID: 26231364}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -974,6 +976,31 @@ MonoBehaviour:
   sceneviewCamera: {fileID: 995473150}
   mouseTranslatePosOffset: 10
   rotationUIPose01: {fileID: 716905779}
+--- !u!114 &26231363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26231352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49c0f7890339a2b4fa8f2a4a47df7c83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modelMcfunc: {fileID: 26231357}
+--- !u!114 &26231364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26231352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9861dd99f47c1446bf13c9fd693cbfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &28034150
 GameObject:
   m_ObjectHideFlags: 0

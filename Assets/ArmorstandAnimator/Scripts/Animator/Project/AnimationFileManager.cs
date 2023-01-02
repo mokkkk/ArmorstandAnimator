@@ -51,7 +51,7 @@ namespace ArmorstandAnimator
     new ExtensionFilter( "Asa Animation Project", "asaanim"),
 };
 
-            var path = StandaloneFileBrowser.SaveFilePanel("Save File", "", "animation", extensionList);
+            var path = StandaloneFileBrowser.SaveFilePanel("Save File", "", animationSetting.AnimationName.ToLower(), extensionList);
 
             // paths = StandaloneFileBrowser.OpenFilePanel("Save File", "", extensionList, false);
             // var path = paths[0];

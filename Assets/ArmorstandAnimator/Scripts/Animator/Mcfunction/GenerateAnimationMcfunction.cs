@@ -34,8 +34,8 @@ namespace ArmorstandAnimator
             // ファイルパス決定
             var extensionList = new[]
             {
-    new ExtensionFilter( "folder", "")
-};
+                new ExtensionFilter( "folder", "")
+            };
             var paths = StandaloneFileBrowser.OpenFolderPanel("Save File", "", false);
             // ファイルを選択しなかった場合，中断
             if (paths.Length < 1)

@@ -6,7 +6,7 @@ using SFB;
 
 namespace ArmorstandAnimator
 {
-    public class GenerateModelMcfunc : MonoBehaviour
+    public class GenerateModelMcFunctionNew : MonoBehaviour
     {
         private GeneralSettingUI generalSetting;
         private System.IO.StreamWriter writer;
