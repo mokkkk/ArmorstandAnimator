@@ -21,53 +21,6 @@ namespace ArmorstandAnimator
         private const string FuncGetChildPos = "function #asa_matrix:rotate";
         private const string FuncSetChildPos = "function #asa_matrix:set_child_pos";
 
-        // Summon.mcfunction
-        public void GenerateSummonFunction(GeneralSettingUI generalSetting, List<Node> nodeList)
-        {
-            // ファイルパス決定
-            var extensionList = new[] { new ExtensionFilter( "summon.mcfunction", "mcfunction") };
-            var path = StandaloneFileBrowser.SaveFilePanel("Save File", "", generalSetting.ModelName.ToLower() + "_summon", extensionList);
-            // ファイルを選択しなかった場合，中断
-            if (path.Equals(""))
-                return;
-
-            this.generalSetting = generalSetting;
-
-            // .mcfunction書き込み用
-            writer = new System.IO.StreamWriter(path, false);
-
-            // 値初期化
-            var anmSpeedDp = $"#asa_{generalSetting.ModelName.ToLower()}_anmspeed";
-            string func = $"scoreboard players set {anmSpeedDp} AsaMatrix 1000";
-            writer.WriteLine(func);
-
-            var keyframeIndexDp = $"#asa_{generalSetting.ModelName.ToLower()}_kindex";
-            func = $"scoreboard players set {keyframeIndexDp} AsaMatrix 0";
-            writer.WriteLine(func);
-
-            var currentTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_current";
-            func = $"scoreboard players set {currentTickDp} AsaMatrix 0";
-            writer.WriteLine(func);
-
-            var endTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_end";
-            func = $"scoreboard players set {endTickDp} AsaMatrix 0";
-            writer.WriteLine(func);
-
-            // Root
-            writer.WriteLine(ArmorstandNbtRoot());
-
-            // Parts
-            foreach (Node n in nodeList)
-            {
-                writer.WriteLine(ArmorstandNbt(n));
-            }
-
-            writer.Flush();
-            writer.Close();
-
-            Debug.Log("Generated summon mcfunction");
-        }
-
         private string ArmorstandNbtRoot()
         {
             string marker, small = "";
@@ -97,50 +50,6 @@ namespace ArmorstandAnimator
             var line = $"summon armor_stand ~ ~ ~ {{{marker}{small},Invisible:1b,Tags:[\"{generalSetting.ModelName}Parts\",\"{node.nodeName}\"],ArmorItems:[{{}},{{}},{{}},{{id:\"minecraft:{generalSetting.CmdItemID}\",Count:1b,tag:{{CustomModelData:{node.customModelData},Rotate:[0f,0f,0f]}}}}],Pose:{{Head:[{node.rotate.x}f,{node.rotate.y}f,{node.rotate.z}f]}}}}";
 
             return line;
-        }
-
-        // Model.mcfunction
-        public void GenerateModelFunction(GeneralSettingUI generalSetting, List<Node> nodeList)
-        {
-            // ファイルパス決定
-            var extensionList = new[]
-            {
-    new ExtensionFilter( "summon.mcfunction", "mcfunction"),
-};
-            var path = StandaloneFileBrowser.SaveFilePanel("Save File", "", generalSetting.ModelName.ToLower() + "_model", extensionList);
-            // ファイルを選択しなかった場合，中断
-            if (path.Equals(""))
-                return;
-
-            this.generalSetting = generalSetting;
-
-            // RootNodeのみ抽出
-            var rootNodeList = new List<Node>();
-            foreach (Node n in nodeList)
-            {
-                if (n.nodeType == NodeType.Root)
-                    rootNodeList.Add(n);
-            }
-
-            // .mcfunction書き込み用
-            writer = new System.IO.StreamWriter(Application.dataPath + "\\ArmorstandAnimator\\Test\\test_model.mcfunction", false);
-
-            // Root matrix
-            writer.WriteLine(GetRootMatrix());
-
-            // 各Rootノードで実行
-            foreach (Node rootNode in rootNodeList)
-            {
-                // Rootノード位置設定
-                writer.WriteLine(SetRootNodePosition(rootNode));
-                // 回転行列計算
-                CalcRotation(rootNode);
-            }
-
-            writer.Flush();
-            writer.Close();
-
-            Debug.Log("Generated model mcfunction");
         }
 
         // root_matrix
@@ -322,31 +231,18 @@ namespace ArmorstandAnimator
             // .mcfunction書き込み用
             writer = new System.IO.StreamWriter(path);
 
-            // ID取得
-            if (isMultiEntities)
-            {
-                var func = $"scoreboard players operation #asa_id_temp AsamID = @s AsamID";
-                writer.WriteLine(func);
-            }
-
-            // RootNodeのみ抽出
-            var rootNodeList = new List<Node>();
+            // 各ノードで実行
+            int i = 0;
             foreach (Node n in nodeList)
             {
-                if (n.nodeType == NodeType.Root)
-                    rootNodeList.Add(n);
-            }
-
-            // Root matrix
-            writer.WriteLine(GetRootMatrix());
-
-            // 各Rootノードで実行
-            foreach (Node rootNode in rootNodeList)
-            {
-                // Rootノード位置設定
-                writer.WriteLine(SetRootNodePosition(rootNode));
-                // 回転行列計算
-                CalcRotation(rootNode);
+                string selector = "";
+                if (generalSetting.MultiEntities)
+                    selector = $"@e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={n.nodeName},tag=AsaTarget,limit=1]";
+                else
+                    selector = $"@e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={n.nodeName},limit=1]";
+                string func = $"data modify entity {selector} {{}} merge from storage asa_temp: Data[{i}]";
+                writer.WriteLine(func);
+                i++;
             }
 
             writer.Flush();

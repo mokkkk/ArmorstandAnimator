@@ -138,8 +138,11 @@ namespace ArmorstandAnimator
                     foreach (Node n in nodeList)
                     {
                         var tickedNodeData = new Vector3[2];
-                        tickedNodeData[0] = n.GetPosition();
-                        tickedNodeData[1] = n.GetRotaion();
+                        // 位置（座標系変換）
+                        tickedNodeData[0] = n.transform.position;
+                        tickedNodeData[0].x *= -1;
+                        // 角度
+                        tickedNodeData[1] = n.rotate + n.GetRotation();
                         tickedKeyframe.Add(tickedNodeData);
                     }
 
@@ -162,7 +165,7 @@ namespace ArmorstandAnimator
             Directory.CreateDirectory(path);
 
             // tickedキーフレーム用ファンクション：index.mcfunction
-            // GenerateKeyframeFunction(path, spdKeyframeList, nodeList);
+            GenerateKeyframeFunction(path, nodeList, tickedKeyframeList);
 
             Debug.Log("Animation Datapack Exported");
 
@@ -189,9 +192,9 @@ namespace ArmorstandAnimator
             {
                 string selector = "";
                 if (generalSetting.MultiEntities)
-                    selector = $"@e[type=armor_stand,tag={modelName}Parts,tag={n.nodeName}]";
-                else
                     selector = $"@e[type=armor_stand,tag={modelName}Parts,tag={n.nodeName},tag=AsaTarget]";
+                else
+                    selector = $"@e[type=armor_stand,tag={modelName}Parts,tag={n.nodeName}]";
                 func = $"execute as {selector} run data modify storage asa_temp: Data append from entity @s";
                 writer.WriteLine(func);
             }
@@ -284,9 +287,13 @@ namespace ArmorstandAnimator
                 writer.WriteLine(func);
             }
 
+            // データ取得
+            func = "function asa_animator:reus/get_data";
+            writer.WriteLine(func);
+
+            // Root移動
             for (int i = 0; i < keyframeList.Count - 1; i++)
             {
-                // Root移動実行
                 // アニメーション時間(tick)
                 var time = keyframeList[i + 1].tick - keyframeList[i].tick;
                 // 移動距離
@@ -295,7 +302,7 @@ namespace ArmorstandAnimator
                 var moveZ = (keyframeList[i + 1].rootPos.z - keyframeList[i].rootPos.z) / time;
                 // 書き込み
                 execute = $"execute if entity @s[scores={{AsaMatrix={keyframeList[i].tick + 1}..{keyframeList[i + 1].tick}}}] run ";
-                func = $"tp @s ^{moveX} ^{moveY} ^{moveZ}";
+                func = $"tp @s ^{moveX:F2} ^{moveY:F2} ^{moveZ:F2}";
 
                 writer.WriteLine(execute + func);
             }
@@ -357,6 +364,74 @@ namespace ArmorstandAnimator
             writer.Close();
 
             Debug.Log("Generated end mcfunction");
+        }
+
+        // keyframe/index.mcfunction
+        private void GenerateKeyframeFunction(string path, List<Node> nodeList, List<List<Vector3[]>> tickedKeyframeList)
+        {
+            // ファイルパス
+            string funcPath = "";
+            // .mcfunction書き込み用
+            StreamWriter writer;
+
+            // 各ノードのArmorItems[3].tag.Rotateをkeyframeのrotationsに設定
+            for (int i = 0; i < tickedKeyframeList.Count; i++)
+            {
+                // キーフレーム
+                var tickedKeyframe = tickedKeyframeList[i];
+                
+                // パス決定
+                funcPath = Path.Combine(path, $"{i + 1}.mcfunction");
+                writer = new StreamWriter(funcPath, false);
+
+                // RootPos取得
+                string func = "function #asa_matrix:get_parent_pos";
+                writer.WriteLine(func);
+                // RootRotation・回転行列取得
+                func = "data modify storage asa_temp: Temp.Rotation set from entity @s Rotation";
+                writer.WriteLine(func);
+                func = "function #asa_matrix:matrix_world";
+                writer.WriteLine(func);
+
+                // 各ノードで実行
+                int j = 0;
+                foreach (Node n in nodeList)
+                {
+                    // ノードRotation更新
+                    func = $"data modify storage asa_temp: Data[{j}].Rotation set from storage asa_temp: Temp.Rotation";
+                    writer.WriteLine(func);
+                    // ノードPose.Head更新
+                    func = $"data modify storage asa_temp: Data[{j}].Pose.Head set value [{tickedKeyframe[j][1].x}f,{tickedKeyframe[j][1].y}f,{tickedKeyframe[j][1].z}f]";
+                    writer.WriteLine(func);
+                    // スコアにノードのPosを代入
+                    func = $"scoreboard players set #asa_child_pos_x AsaMatrix {Mathf.FloorToInt(tickedKeyframe[j][0].x * 1000)}";
+                    writer.WriteLine(func);
+                    func = $"scoreboard players set #asa_child_pos_y AsaMatrix {Mathf.FloorToInt(tickedKeyframe[j][0].y * 1000)}";
+                    writer.WriteLine(func);
+                    func = $"scoreboard players set #asa_child_pos_z AsaMatrix {Mathf.FloorToInt(tickedKeyframe[j][0].z * 1000)}";
+                    writer.WriteLine(func);
+                    // RotationでPosを回転
+                    func = "function #asa_matrix:rotate_world";
+                    writer.WriteLine(func);
+                    func = "function #asa_matrix:get_child_pos";
+                    writer.WriteLine(func);
+                    // ノードPos更新
+                    func = $"execute store result storage asa_temp: Data[{j}].Pos[0] double 0.001 run scoreboard players get #asa_child_pos_x AsaMatrix";
+                    writer.WriteLine(func);
+                    func = $"execute store result storage asa_temp: Data[{j}].Pos[1] double 0.001 run scoreboard players get #asa_child_pos_y AsaMatrix";
+                    writer.WriteLine(func);
+                    func = $"execute store result storage asa_temp: Data[{j}].Pos[2] double 0.001 run scoreboard players get #asa_child_pos_z AsaMatrix";
+                    writer.WriteLine(func);
+                    
+                    j++;
+                }
+
+                // 終了
+                writer.Flush();
+                writer.Close();
+            }
+
+            Debug.Log("Generated keyframe mcfunction");
         }
     }
 }
