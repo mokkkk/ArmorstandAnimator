@@ -36,9 +36,13 @@ namespace ArmorstandAnimator
             return line;
         }
 
-        private string ArmorstandNbt(Node node)
+        private string ArmorstandNbt(Node node, bool isMultiEntities)
         {
-            string marker, small = "";
+            string pos, marker, small = "";
+
+            var posVec = node.GetPosition();
+            pos = $"~{posVec.x} ~{posVec.y} ~{posVec.z}";
+
             if (generalSetting.IsMarker)
                 marker = "Marker:1b";
             else
@@ -47,7 +51,16 @@ namespace ArmorstandAnimator
             if (generalSetting.IsSmall)
                 small = ",Small:1b";
 
-            var line = $"summon armor_stand ~ ~ ~ {{{marker}{small},Invisible:1b,Tags:[\"{generalSetting.ModelName}Parts\",\"{node.nodeName}\"],ArmorItems:[{{}},{{}},{{}},{{id:\"minecraft:{generalSetting.CmdItemID}\",Count:1b,tag:{{CustomModelData:{node.customModelData},Rotate:[0f,0f,0f]}}}}],Pose:{{Head:[{node.rotate.x}f,{node.rotate.y}f,{node.rotate.z}f]}}}}";
+            string line = "";
+            
+            if(isMultiEntities) 
+            {
+                line = $"summon armor_stand {pos} {{{marker}{small},Invisible:1b,Tags:[\"{generalSetting.ModelName}Parts\",\"{node.nodeName}\",\"StartSummon\"],ArmorItems:[{{}},{{}},{{}},{{id:\"minecraft:{generalSetting.CmdItemID}\",Count:1b,tag:{{CustomModelData:{node.customModelData},Rotate:[0f,0f,0f]}}}}],Pose:{{Head:[{node.rotate.x}f,{node.rotate.y}f,{node.rotate.z}f]}}}}";
+            }
+            else
+            {
+                line = $"summon armor_stand {pos} {{{marker}{small},Invisible:1b,Tags:[\"{generalSetting.ModelName}Parts\",\"{node.nodeName}\"],ArmorItems:[{{}},{{}},{{}},{{id:\"minecraft:{generalSetting.CmdItemID}\",Count:1b,tag:{{CustomModelData:{node.customModelData},Rotate:[0f,0f,0f]}}}}],Pose:{{Head:[{node.rotate.x}f,{node.rotate.y}f,{node.rotate.z}f]}}}}";
+            }
 
             return line;
         }
@@ -164,26 +177,6 @@ namespace ArmorstandAnimator
             // .mcfunction書き込み用
             writer = new System.IO.StreamWriter(path, false);
 
-            if (!isFixSpeed)
-            {
-                // 値初期化
-                var anmSpeedDp = $"#asa_{generalSetting.ModelName.ToLower()}_anmspeed";
-                var func = $"scoreboard players set {anmSpeedDp} AsaMatrix 1000";
-                writer.WriteLine(func);
-
-                var keyframeIndexDp = $"#asa_{generalSetting.ModelName.ToLower()}_kindex";
-                func = $"scoreboard players set {keyframeIndexDp} AsaMatrix 0";
-                writer.WriteLine(func);
-
-                var currentTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_current";
-                func = $"scoreboard players set {currentTickDp} AsaMatrix 0";
-                writer.WriteLine(func);
-
-                var endTickDp = $"#asa_{generalSetting.ModelName.ToLower()}_tick_end";
-                func = $"scoreboard players set {endTickDp} AsaMatrix 0";
-                writer.WriteLine(func);
-            }
-
             // Root
             writer.WriteLine(ArmorstandNbtRoot());
 
@@ -203,14 +196,21 @@ namespace ArmorstandAnimator
             // Parts
             foreach (Node n in nodeList)
             {
-                writer.WriteLine(ArmorstandNbt(n));
+                writer.WriteLine(ArmorstandNbt(n, isMultiEntities));
 
                 if (isMultiEntities)
                 {
                     // ID割り当て
-                    var func = $"scoreboard players operation @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={n.nodeName},limit=1,sort=nearest] AsamID = #asa_entity_id AsamID";
+                    var func = $"scoreboard players operation @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag={n.nodeName},tag=StartSummon,limit=1,sort=nearest] AsamID = #asa_entity_id AsamID";
                     writer.WriteLine(func);
                 }
+            }
+
+            // ID割り当て終了
+            if (isMultiEntities)
+            {
+                var func = $"tag @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag=StartSummon] remove StartSummon";
+                writer.WriteLine(func);
             }
 
             writer.Flush();
@@ -274,6 +274,41 @@ namespace ArmorstandAnimator
             writer.Close();
 
             Debug.Log("Generated kill mcfunction");
+        }
+
+        // Kill_target.mcfunction(外部呼出用)
+        public void GenerateKillTargetFunction(string path, GeneralSettingUI generalSetting)
+        {
+            // ファイルパス決定
+            path = Path.Combine(path, "kill_target.mcfunction");
+            // 設定読み込み
+            this.generalSetting = generalSetting;
+
+            // .mcfunction書き込み用
+            writer = new System.IO.StreamWriter(path, false);
+
+            // 警告表示
+            string func = $"execute unless entity @s[type=armor_stand,tag={generalSetting.ModelName}Root] run tellraw @a {{\"text\":\"kill_targetはRootで実行してください\"}}";
+            writer.WriteLine(func);
+            func = $"execute if entity @s[type=armor_stand,tag={generalSetting.ModelName}Root] run tag @s add ExecuteKill";
+            writer.WriteLine(func);
+
+            // 対象を特定
+            func = $"execute if entity @s[tag=ExecuteKill] run function asa_animator:{generalSetting.ModelName.ToLower()}/find_target";
+            writer.WriteLine(func);
+
+            // Root
+            func = $"execute if entity @s[tag=ExecuteKill] run kill @s";
+            writer.WriteLine(func);
+
+            // Parts
+            func = $"execute if entity @s[tag=ExecuteKill] run kill @e[type=armor_stand,tag={generalSetting.ModelName}Parts,tag=AsaTarget]";
+            writer.WriteLine(func);
+
+            writer.Flush();
+            writer.Close();
+
+            Debug.Log("Generated kill_target mcfunction");
         }
     }
 }

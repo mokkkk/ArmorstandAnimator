@@ -72,6 +72,8 @@ namespace ArmorstandAnimator
             // 複数対応用function
             if (generalSetting.MultiEntities)
             {
+                // kill_target.mcfunction
+                modelMcfunc.GenerateKillTargetFunction(path, generalSetting);
                 // find_target.mcfunction
                 GenerateFindTargetFunction(path);
                 // reset_target.mcfunction
@@ -140,6 +142,7 @@ namespace ArmorstandAnimator
                         var tickedNodeData = new Vector3[2];
                         // 位置（座標系変換）
                         tickedNodeData[0] = n.transform.position;
+                        // tickedNodeData[0] = n.GetPosition();
                         tickedNodeData[0].x *= -1;
                         // 角度
                         tickedNodeData[1] = n.rotate + n.GetRotation();
@@ -287,10 +290,6 @@ namespace ArmorstandAnimator
                 writer.WriteLine(func);
             }
 
-            // データ取得
-            func = $"function asa_animator:{modelName.ToLower()}/get_data";
-            writer.WriteLine(func);
-
             // Root移動
             for (int i = 0; i < keyframeList.Count - 1; i++)
             {
@@ -316,12 +315,14 @@ namespace ArmorstandAnimator
             writer.WriteLine("");
             writer.WriteLine("# Keyframe Functions");
 
+            // データ取得
+            func = $"function asa_animator:{modelName.ToLower()}/get_data";
+            writer.WriteLine(func);
+
             // tickedKeyframe実行
             for (int i = 1; i <= tickedKeyframeList.Count; i++)
             {
-                if (i <= 1)
-                    execute = $"execute if entity @s[scores={{AsaMatrix=..{i}}}] run ";
-                else if (i >= tickedKeyframeList.Count)
+                if (i >= tickedKeyframeList.Count)
                     execute = $"execute if entity @s[scores={{AsaMatrix={i}..}}] run ";
                 else
                     execute = $"execute if entity @s[scores={{AsaMatrix={i}}}] run ";
